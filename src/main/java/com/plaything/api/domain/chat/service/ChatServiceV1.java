@@ -23,7 +23,11 @@ public class ChatServiceV1 {
     private final ChatRoomRepository chatRoomRepository;
 
     public ChatListResponse chatList(String from, String to) {
-        List<Chat> chats = chatRepository.findTop10BySenderOrReceiverOrderByIdDesc(from, to);
+
+        //TODO 예외처리
+        ChatRoom chatRoom = chatRoomRepository.findChatRoomByUsers(from, to).orElseThrow();
+
+        List<Chat> chats = chatRepository.findTop10ByChatRoomOrderByIdDesc(chatRoom);
         List<Message> res = chats.stream()
                 .map(chat -> new Message(chat.getReceiver(), chat.getSender(), chat.getMessage()))
                 .toList();
