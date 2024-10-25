@@ -25,7 +25,6 @@ public class WssConfig implements WebSocketMessageBrokerConfigurer {
                 .setAllowedOrigins("http://localhost:3000",
                         "https://fe-chat.vercel.app",
                         "https://fe-chat-jeongs-projects-496987bc.vercel.app");
-
 // 클라이언트가 웹 소켓을 사용할 수 없는 환경에서 방어 로직 -->프록시나 방화벽으로 차단될 때
 // 롱폴링을 대신 사용하게 됨
 
