@@ -17,5 +17,6 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedHeaders("*")
                 .allowCredentials(true) // 자격 증명 허용
                 .maxAge(3600); // preflight 요청 캐시 시간
+
     }
 }
