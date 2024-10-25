@@ -40,7 +40,7 @@ jobs:
 
       - name: SCP file transfer
         run: |
-          scp -i ~/.ssh/key.pem -o StrictHostKeyChecking=no project.jar ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/api/tobe/
+          scp -i ~/.ssh/key.pem -o StrictHostKeyChecking=no project.jar "ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/api/tobe/"
 
       - name: SSH로 EC2에 접속하기
         uses: appleboy/ssh-action@v1.0.3
