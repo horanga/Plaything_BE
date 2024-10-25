@@ -12,6 +12,7 @@ jobs:
       - name: Github 레포지토리에 올린 파일들을 불러오기
         uses: actions/checkout@v4
 
+
       - name: JDK 17버전 설치
         uses: actions/setup-java@v4
         with:
@@ -32,18 +33,19 @@ jobs:
       - name: 빌드된 파일 이름 변경하기
         run: mv ./build/libs/*SNAPSHOT.jar ./project.jar
 
-      - name: Setup SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_PRIVATE_KEY }}" > ~/.ssh/key.pem
-          chmod 600 ~/.ssh/key.pem
-
-      - name: SCP file transfer
-        run: |
-          scp -i ~/.ssh/key.pem -o StrictHostKeyChecking=no project.jar "ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/api/tobe/"
+      - name: SCP 로 EC2에 빌드 파일 전송하기
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          source: project.jar
+          target: /home/ubuntu/api/tobe
+          debug: true
 
       - name: SSH로 EC2에 접속하기
         uses: appleboy/ssh-action@v1.0.3
+
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
