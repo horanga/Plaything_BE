@@ -80,7 +80,7 @@ public class AuthService {
             throw new CustomException(ErrorCode.USER_SAVED_FAILED);
         }
 
-        return new CreateUserResponse(request.name());
+        return new CreateUserResponse(ErrorCode.SUCCESS);
     }
 
     private User newUser(String name){
