@@ -17,6 +17,7 @@ public class Hasher {
             return Base64.getEncoder().encodeToString(hash);
 
         } catch (NoSuchAlgorithmException e){
+
             throw new RuntimeException("Hash Failed", e);
         }
     }
