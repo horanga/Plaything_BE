@@ -42,6 +42,7 @@ jobs:
           source: project.jar
           target: /home/ubuntu/api/tobe
           debug: true
+          passphrase: ""  # 키에 암호가 없다면 이 줄 추가
 
       - name: SSH로 EC2에 접속하기
         uses: appleboy/ssh-action@v1.0.3
