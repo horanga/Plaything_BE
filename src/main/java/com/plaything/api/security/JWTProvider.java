@@ -60,7 +60,6 @@ public class JWTProvider {
                 .withIssuedAt(new Date())
                 .withExpiresAt(new Date(System.currentTimeMillis()+refreshTokenTimeForMinutes* Constants.ON_MINUTE_TO_MILLIS))
                 .sign(Algorithm.HMAC256(refreshSecretKey));
-
     }
 
     public static DecodedJWT checkTokenForRefresh(String token){
