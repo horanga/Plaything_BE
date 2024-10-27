@@ -74,7 +74,6 @@ public class JWTProvider {
             } catch (TokenExpiredException e){
                 return JWT.decode(token);
             }
-
     }
 
     public static DecodedJWT decodeAccessToke(String token){
