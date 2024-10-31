@@ -6,9 +6,10 @@ import com.plaything.api.domain.auth.model.request.CreateUserRequest;
 import com.plaything.api.domain.auth.model.request.LoginRequest;
 import com.plaything.api.domain.auth.model.response.CreateUserResponse;
 import com.plaything.api.domain.auth.model.response.LoginResponse;
-import com.plaything.api.domain.repository.UserRepository;
-import com.plaything.api.domain.repository.entity.User;
-import com.plaything.api.domain.repository.entity.UserCredentials;
+import com.plaything.api.domain.repository.entity.user.profile.Profile;
+import com.plaything.api.domain.repository.user.UserRepository;
+import com.plaything.api.domain.repository.entity.user.User;
+import com.plaything.api.domain.repository.entity.user.UserCredentials;
 import com.plaything.api.security.Hasher;
 import com.plaything.api.security.JWTProvider;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +41,7 @@ public class AuthService {
 
         user.map(u->{
             String hashingValue = hasher.getHashingValue(loginRequest.password());
-            if(!u.getCredentials().getHashedPassowrd().equals(hashingValue)){
+            if(!u.getCredentials().getHashedPassword().equals(hashingValue)){
                 throw new CustomException(ErrorCode.MIS_MATCH_PASSWORD);
             }
             return hashingValue;
@@ -53,10 +54,12 @@ public class AuthService {
 
         String token = JWTProvider.createToken(loginRequest.name());
 
-        return new LoginResponse(ErrorCode.SUCCESS, token);
+        //이용자가 프로필을 설정했는지 안했는지 확인
+        boolean invalidProfile = user.get().getProfile() != null;
+        return new LoginResponse(ErrorCode.SUCCESS, token, invalidProfile);
     }
 
-    @Transactional(transactionManager = "createUserTransactionManger")
+    @Transactional
     public CreateUserResponse creatUser(CreateUserRequest request){
 
         Optional<User> user = userRepository.findByName(request.name());
@@ -86,7 +89,6 @@ public class AuthService {
     private User newUser(String name){
         User user = User.builder()
                 .name(name)
-                .createdAt(new Timestamp(System.currentTimeMillis()))
                 .build();
 
         return user;
@@ -95,11 +97,8 @@ public class AuthService {
     private UserCredentials newUserCredentials(String password, User user){
         String hashingValue = hasher.getHashingValue(password);
 
-        UserCredentials cre = UserCredentials.builder()
-                .user(user)
-                .hashedPassowrd(hashingValue)
+        return UserCredentials.builder()
+                .hashedPassword(hashingValue)
                 .build();
-
-        return cre;
     }
 }

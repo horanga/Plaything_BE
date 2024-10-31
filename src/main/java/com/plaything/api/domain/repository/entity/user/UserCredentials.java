@@ -1,4 +1,4 @@
-package com.plaything.api.domain.repository.entity;
+package com.plaything.api.domain.repository.entity.user;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -11,10 +11,9 @@ import lombok.*;
 public class UserCredentials {
 
     @Id
-    @OneToOne
-    @JoinColumn(name="user_id")
-    private User user;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(nullable = false)
-    private String hashedPassowrd;
+    private String hashedPassword;
 }

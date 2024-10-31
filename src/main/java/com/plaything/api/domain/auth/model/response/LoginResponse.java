@@ -9,5 +9,7 @@ public record LoginResponse(
         @Schema(description = "error code")
         ErrorCode description,
         @Schema(description = "jwt token")
-        String token
+        String token,
+        @Schema(description = "프로필 유무")
+        boolean invalidProfile
 ) {}
