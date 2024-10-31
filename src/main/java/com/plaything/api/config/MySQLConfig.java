@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManagerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -29,10 +30,6 @@ public class MySQLConfig {
     private String driverClassName;
 
 
-    @Bean
-    public DataSourceTransactionManager transactionManager(DataSource dataSource){
-        return new DataSourceTransactionManager(dataSource);
-    }
 
     @Bean
     TransactionTemplate transactionTemplate(PlatformTransactionManager transactionManager){
@@ -46,9 +43,13 @@ public class MySQLConfig {
         return transactionManager;
     }
 
-    @Bean(name = "createUserTransactionManger")
-    public PlatformTransactionManager createTransactionManager(DataSource dataSource){
-        DataSourceTransactionManager manager = new DataSourceTransactionManager(dataSource);
-        return  manager;
+    @Primary
+    @Bean(name="transactionManager")
+    public PlatformTransactionManager createTransactionManager(EntityManagerFactory factory){
+        JpaTransactionManager transactionManager = new JpaTransactionManager();
+        transactionManager.setEntityManagerFactory(factory);
+        return transactionManager;
     }
+
+
 }
