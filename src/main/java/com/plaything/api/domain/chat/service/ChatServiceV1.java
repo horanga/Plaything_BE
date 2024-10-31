@@ -2,10 +2,10 @@ package com.plaything.api.domain.chat.service;
 
 import com.plaything.api.domain.chat.model.Message;
 import com.plaything.api.domain.chat.model.response.ChatListResponse;
-import com.plaything.api.domain.repository.ChatRepository;
-import com.plaything.api.domain.repository.ChatRoomRepository;
-import com.plaything.api.domain.repository.entity.Chat;
-import com.plaything.api.domain.repository.entity.ChatRoom;
+import com.plaything.api.domain.repository.chat.ChatRepository;
+import com.plaything.api.domain.repository.chat.ChatRoomRepository;
+import com.plaything.api.domain.repository.entity.chat.Chat;
+import com.plaything.api.domain.repository.entity.chat.ChatRoom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

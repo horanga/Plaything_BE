@@ -1,4 +1,4 @@
-package com.plaything.api.domain.repository.entity;
+package com.plaything.api.domain.repository.entity.chat;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

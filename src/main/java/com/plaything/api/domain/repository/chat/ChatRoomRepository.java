@@ -1,6 +1,6 @@
-package com.plaything.api.domain.repository;
+package com.plaything.api.domain.repository.chat;
 
-import com.plaything.api.domain.repository.entity.ChatRoom;
+import com.plaything.api.domain.repository.entity.chat.ChatRoom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
