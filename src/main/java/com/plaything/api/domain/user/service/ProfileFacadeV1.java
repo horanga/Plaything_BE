@@ -56,6 +56,10 @@ public class ProfileFacadeV1 {
     public ProfileResponse getProfile(String name){
         User user = userServiceV1.findByName(name);
         Profile profile = user.getProfile();
+
+        if(profile==null){
+            throw new CustomException(ErrorCode.NOT_EXIST_PROFILE);
+        }
         List<ProfileImageResponse> profileImages = profileImageServiceV1.getProfileImages(user);
 
         return ProfileResponse.toResponse(profile, profileImages);
@@ -71,13 +75,14 @@ public class ProfileFacadeV1 {
         return profile;
     }
 
+    @Transactional
     public void setProfilePrivate(String name) {
         User user = userServiceV1.findByName(name);
         Profile profile = user.getProfile();
         profile.setPrivate();
 
     }
-
+    @Transactional
     public void setProfilePublic(String name) {
         User user = userServiceV1.findByName(name);
         Profile profile = user.getProfile();
