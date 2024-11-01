@@ -28,8 +28,8 @@ public record ProfileResponse(
         @Schema(description = "대표 성향")
         PrimaryRole primaryRole,
 
-        @Schema(description = "생년월일")
-        LocalDate birthDate,
+        @Schema(description = "나이")
+        int age,
 
         @Schema(description = "세부 성향")
         List<PersonalityTraitResponse> personalityTrait,
@@ -56,7 +56,7 @@ public record ProfileResponse(
                 profile.getIntroduction(),
                 profile.getGender(),
                 profile.getPrimaryRole(),
-                profile.getBirthDate(),
+                profile.calculateAge(),
                 personalityTraitList,
                 relationshipPreferenceList);
     }
