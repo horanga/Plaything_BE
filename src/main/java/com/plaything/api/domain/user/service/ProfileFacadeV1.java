@@ -4,7 +4,6 @@ import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorCode;
 import com.plaything.api.domain.image.service.S3ImagesServiceV1;
 import com.plaything.api.domain.image.service.model.SavedImage;
-import com.plaything.api.domain.repository.entity.user.ProfileImage;
 import com.plaything.api.domain.repository.entity.user.profile.PersonalityTrait;
 import com.plaything.api.domain.repository.entity.user.profile.Profile;
 import com.plaything.api.domain.repository.entity.user.User;
@@ -65,6 +64,8 @@ public class ProfileFacadeV1 {
         return ProfileResponse.toResponse(profile, profileImages);
     }
 
+
+    //프로필 조회를 위한 api가 아닌 단순 로직에 필요한 메서드
     public Profile getProfileFromDb(String name){
 
         User user = userServiceV1.findByName(name);
@@ -80,13 +81,12 @@ public class ProfileFacadeV1 {
         User user = userServiceV1.findByName(name);
         Profile profile = user.getProfile();
         profile.setPrivate();
-
     }
     @Transactional
     public void setProfilePublic(String name) {
         User user = userServiceV1.findByName(name);
         Profile profile = user.getProfile();
-        profile.setPrivate();
+        profile.setPublic();
     }
 
     //TODO 비동기 처리할지 확인하기
@@ -103,7 +103,7 @@ public class ProfileFacadeV1 {
         }
         User user = userServiceV1.findByName(name);
        getProfileFromDb(user.getName());
-        List<SavedImage> savedImages = s3ImagesServiceV1.uploadFiles(files);
+        List<SavedImage> savedImages = s3ImagesServiceV1.uploadImages(files);
              savedImages.forEach(image ->
                 profileImageServiceV1.saveImage(image, user));
     }

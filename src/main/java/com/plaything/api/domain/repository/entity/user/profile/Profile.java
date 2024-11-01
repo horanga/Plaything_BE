@@ -84,8 +84,11 @@ public class Profile {
         this.isPrivate = true;
     }
 
-
     public void setPublic(){
         this.isPrivate = false;
+    }
+
+    public int calculateAge(){
+       return LocalDate.now().getYear()- this.birthDate.getYear()+ 1;
     }
 }

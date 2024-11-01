@@ -54,6 +54,9 @@ dependencies {
 
 	//s3
 	implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.4.4'
+
+	//Image resize
+	implementation 'net.coobird:thumbnailator:0.4.14'
 }
 
 tasks.named('test') {
