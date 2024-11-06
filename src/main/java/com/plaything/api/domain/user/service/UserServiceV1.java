@@ -3,6 +3,7 @@ package com.plaything.api.domain.user.service;
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorCode;
 import com.plaything.api.domain.repository.entity.user.UserViolationStats;
+import com.plaything.api.domain.repository.entity.user.profile.Profile;
 import com.plaything.api.domain.repository.repo.monitor.UserViolationStatsRepository;
 import com.plaything.api.domain.repository.repo.query.UserQueryRepository;
 import com.plaything.api.domain.repository.repo.user.UserRepository;
@@ -36,7 +37,19 @@ public class UserServiceV1 {
 
     public List<UserMatching> searchPartner(String user, long lastId) {
         User userByName = findByName(user);
-        PersonalityTraitConstant partnerTrait = MatchingRelationship.getPartner(userByName);
+        //TODO 프로필 거절, 사진 거절
+
+        Profile profile = userByName.getProfile();
+
+        if(profile.isProfileImagesEmpty()){
+            throw new CustomException(ErrorCode.MATCHING_FAIL_WITHOUT_IMAGE);
+        }
+
+        if(profile.isBaned()){
+            throw new CustomException(ErrorCode.MATCHING_FAIL_WITH_BAN_PROFILE);
+        }
+
+        PersonalityTraitConstant partnerTrait = MatchingRelationship.getPartner(profile);
         MatchRequest matchRequest = MatchRequest.from(partnerTrait, lastId, user);
         return userQueryRepository.searchUser(matchRequest);
     }

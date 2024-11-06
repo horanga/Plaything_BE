@@ -127,4 +127,8 @@ public class Profile {
     public void setProfileStatusRejected(){
         this.profileStatus = ProfileStatus.REJECTED;
     }
+
+    public boolean isProfileImagesEmpty(){
+        return this.profileImages.isEmpty();
+    }
 }
