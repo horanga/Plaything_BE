@@ -6,8 +6,7 @@ import com.plaything.api.domain.auth.model.request.CreateUserRequest;
 import com.plaything.api.domain.auth.model.request.LoginRequest;
 import com.plaything.api.domain.auth.model.response.CreateUserResponse;
 import com.plaything.api.domain.auth.model.response.LoginResponse;
-import com.plaything.api.domain.repository.entity.user.profile.Profile;
-import com.plaything.api.domain.repository.user.UserRepository;
+import com.plaything.api.domain.repository.repo.user.UserRepository;
 import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.entity.user.UserCredentials;
 import com.plaything.api.security.Hasher;
@@ -17,8 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
 import java.util.Optional;
+
+import static com.plaything.api.domain.user.constants.ProfileStatus.REJECTED;
+import static com.plaything.api.domain.user.constants.Role.ROLE_USER;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -55,7 +56,11 @@ public class AuthService {
         String token = JWTProvider.createToken(loginRequest.name());
 
         //이용자가 프로필을 설정했는지 안했는지 확인
-        boolean invalidProfile = user.get().getProfile() != null;
+        boolean invalidProfile = user.get().isProfileEmpty();
+
+        if(!invalidProfile && user.get().isPreviousProfileRejected()){
+            invalidProfile = true;
+        }
         return new LoginResponse(ErrorCode.SUCCESS, token, invalidProfile);
     }
 
@@ -87,11 +92,10 @@ public class AuthService {
     }
 
     private User newUser(String name){
-        User user = User.builder()
+        return User.builder()
                 .name(name)
+                .role(ROLE_USER)
                 .build();
-
-        return user;
     }
 
     private UserCredentials newUserCredentials(String password, User user){
