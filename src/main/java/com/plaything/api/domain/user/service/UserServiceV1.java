@@ -2,14 +2,23 @@ package com.plaything.api.domain.user.service;
 
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorCode;
-import com.plaything.api.domain.repository.user.UserRepository;
+import com.plaything.api.domain.repository.entity.user.UserViolationStats;
+import com.plaything.api.domain.repository.repo.monitor.UserViolationStatsRepository;
+import com.plaything.api.domain.repository.repo.query.UserQueryRepository;
+import com.plaything.api.domain.repository.repo.user.UserRepository;
 import com.plaything.api.domain.repository.entity.user.User;
+import com.plaything.api.domain.user.constants.MatchingRelationship;
+import com.plaything.api.domain.user.constants.PersonalityTraitConstant;
+import com.plaything.api.domain.user.model.request.MatchRequest;
+import com.plaything.api.domain.user.model.response.UserMatching;
 import com.plaything.api.domain.user.model.response.UserSearchResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -17,14 +26,44 @@ import java.util.List;
 public class UserServiceV1 {
 
     private final UserRepository userRepository;
+    private final UserViolationStatsRepository userViolationStatsRepository;
+    private final UserQueryRepository userQueryRepository;
 
-    public UserSearchResponse searchUser(String name, String user){
+    public UserSearchResponse searchUser(String name, String user) {
         List<String> nameByNameMatch = userRepository.findNameByNameMatch(name, user);
         return new UserSearchResponse(ErrorCode.SUCCESS, nameByNameMatch);
     }
 
-    public User findByName(String name){
-       return userRepository.findByName(name)
-               .orElseThrow(()->new CustomException(ErrorCode.NOT_EXIST_USER));
+    public List<UserMatching> searchPartner(String user, long lastId) {
+        User userByName = findByName(user);
+        PersonalityTraitConstant partnerTrait = MatchingRelationship.getPartner(userByName);
+        MatchRequest matchRequest = MatchRequest.from(partnerTrait, lastId, user);
+        return userQueryRepository.searchUser(matchRequest);
+    }
+
+    public User findByName(String name) {
+        return userRepository.findByName(name)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
+    }
+
+    public User findById(long id){
+        return userRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
+    }
+
+    @Transactional
+    public void increaseBannedProfileCount(User user) {
+        Optional<UserViolationStats> violationStats = userViolationStatsRepository.findByUser(user);
+        if (violationStats.isEmpty()) {
+            UserViolationStats userViolationStats = UserViolationStats.builder().user(user)
+                    .bannedImageCount(0L)
+                    .bannedProfileCount(1L)
+                    .reportViolationCount(0L)
+                    .user(user)
+                    .build();
+            userViolationStatsRepository.save(userViolationStats);
+        } else {
+            violationStats.get().increaseBannedProfileCount();
+        }
     }
 }

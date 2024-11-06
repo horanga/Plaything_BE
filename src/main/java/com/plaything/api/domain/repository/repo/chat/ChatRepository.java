@@ -1,4 +1,4 @@
-package com.plaything.api.domain.repository.chat;
+package com.plaything.api.domain.repository.repo.chat;
 
 import com.plaything.api.domain.repository.entity.chat.Chat;
 import com.plaything.api.domain.repository.entity.chat.ChatRoom;

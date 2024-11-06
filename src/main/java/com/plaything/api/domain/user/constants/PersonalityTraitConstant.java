@@ -21,5 +21,7 @@ public enum PersonalityTraitConstant {
     SADIST,
     MASOCHIST,
     DEGRADER,
-    DEGRADEE;
+    DEGRADEE,
+    DOMINANT,
+    SUBMISSIVE
 }

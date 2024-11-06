@@ -1,6 +1,8 @@
 package com.plaything.api.domain.repository.entity.user;
 
 import com.plaything.api.domain.repository.entity.user.profile.Profile;
+import com.plaything.api.domain.user.constants.PersonalityTraitConstant;
+import com.plaything.api.domain.user.constants.ProfileStatus;
 import com.plaything.api.domain.user.constants.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -16,7 +18,7 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     @Enumerated(EnumType.STRING)
@@ -37,4 +39,13 @@ public class User extends BaseEntity {
     public void setCredentials(UserCredentials credentials) {
         this.credentials = credentials;
     }
+
+    public boolean isProfileEmpty(){
+        return this.profile == null;
+    }
+
+    public boolean isPreviousProfileRejected(){
+        return  this.profile.getProfileStatus().equals(ProfileStatus.REJECTED);
+    }
+
 }

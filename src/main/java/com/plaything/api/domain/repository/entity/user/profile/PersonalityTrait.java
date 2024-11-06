@@ -11,6 +11,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(indexes = {
+                @Index(name = "idx_trait", columnList = "trait")
+        }
+)
 @Entity
 public class PersonalityTrait {
 
@@ -23,6 +27,18 @@ public class PersonalityTrait {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private PersonalityTraitConstant personalityTrait;
+    private PersonalityTraitConstant trait;
+
+    @Column(nullable = false)
+    private boolean isPrimaryTrait;
+
+    public PersonalityTrait checkPrimaryTrait(PersonalityTraitConstant primaryTrait){
+
+        if(this.trait.equals(primaryTrait)){
+            this.isPrimaryTrait = true;
+        }
+
+        return this;
+    }
 
 }

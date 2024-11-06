@@ -1,4 +1,4 @@
-package com.plaything.api.domain.repository.user;
+package com.plaything.api.domain.repository.repo.user;
 
 import com.plaything.api.domain.repository.entity.user.ProfileImage;
 import com.plaything.api.domain.repository.entity.user.User;
@@ -8,6 +8,5 @@ import java.util.List;
 
 public interface ProfileImageRepository extends JpaRepository<ProfileImage, Long> {
 
-    List<ProfileImage> findByUser(User user);
-    long countByUser_name(String name);
+    long countByProfile_Id(Long profileId);
 }

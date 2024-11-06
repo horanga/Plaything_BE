@@ -6,8 +6,8 @@ import com.plaything.api.domain.repository.entity.user.profile.Profile;
 import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.entity.user.UserCredentials;
 import com.plaything.api.domain.repository.entity.user.profile.RelationshipPreference;
-import com.plaything.api.domain.repository.user.ProfileRepository;
-import com.plaything.api.domain.repository.user.UserRepository;
+import com.plaything.api.domain.repository.repo.user.ProfileRepository;
+import com.plaything.api.domain.repository.repo.user.UserRepository;
 import com.plaything.api.domain.user.constants.*;
 import com.plaything.api.domain.user.model.request.ProfileRegistration;
 
@@ -19,8 +19,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
+import static com.plaything.api.domain.repository.entity.user.QUser.user;
 import static com.plaything.api.domain.user.constants.Gender.M;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -61,17 +64,38 @@ class ProfileFacadeV1Test {
 
         LocalDate now = LocalDate.now();
         ProfileRegistration profileRegistration = new ProfileRegistration(
-                "dusgh123","hi", M, PrimaryRole.OTHER, List.of(PersonalityTraitConstant.BOSS), List.of(RelationshipPreferenceConstant.DATE_DS), now);
+                "dusgh123","hi", M, PrimaryRole.OTHER, List.of(PersonalityTraitConstant.BOSS), PersonalityTraitConstant.BOSS, List.of(RelationshipPreferenceConstant.DATE_DS), now);
 
         profileFacadeV1.registerProfile(profileRegistration, "dusgh123");
 
-        Profile profile = profileFacadeV1.getProfileFromDb("dusgh123");
+        Profile profile = profileFacadeV1.getProfileByUser("dusgh123");
 
         assertThat(profile.getNickName()).isEqualTo("dusgh123");
         assertThat(profile.getGender()).isEqualTo(M);
         assertThat(profile.getPrimaryRole()).isEqualTo(PrimaryRole.OTHER);
-        assertThat(profile.getRelationshipPreference()).isEqualTo(RelationshipPreferenceConstant.DATE_DS);
-        assertThat(profile.getPersonalityTrait()).isEqualTo(PersonalityTraitConstant.BOSS);
+        assertThat(profile.getRelationshipPreference()).extracting("relationshipPreference").containsExactly(RelationshipPreferenceConstant.DATE_DS);
+        assertThat(profile.getPersonalityTrait()).extracting("trait").containsExactly(PersonalityTraitConstant.BOSS);
+        assertThat(profile.getBirthDate()).isEqualTo(now);
+    }
+
+    @DisplayName("이용자는 대표 성향을 등록할 수 있다.")
+    @Test
+    void test() {
+
+        LocalDate now = LocalDate.now();
+        ProfileRegistration profileRegistration = new ProfileRegistration(
+                "dusgh123","hi", M, PrimaryRole.OTHER, List.of(PersonalityTraitConstant.BOSS, PersonalityTraitConstant.HUNTER), PersonalityTraitConstant.BOSS, List.of(RelationshipPreferenceConstant.DATE_DS), now);
+
+        profileFacadeV1.registerProfile(profileRegistration, "dusgh123");
+
+        Profile profile = profileFacadeV1.getProfileByUser("dusgh123");
+
+        assertThat(profile.getNickName()).isEqualTo("dusgh123");
+        assertThat(profile.getGender()).isEqualTo(M);
+        assertThat(profile.getPrimaryRole()).isEqualTo(PrimaryRole.OTHER);
+        assertThat(profile.getRelationshipPreference()).extracting("relationshipPreference").containsExactly(RelationshipPreferenceConstant.DATE_DS);
+        assertThat(profile.getPersonalityTrait()).extracting("trait").containsExactly(PersonalityTraitConstant.BOSS, PersonalityTraitConstant.HUNTER);
+        assertThat(profile.getPersonalityTrait()).extracting("isPrimaryTrait").containsExactly(true, false);
         assertThat(profile.getBirthDate()).isEqualTo(now);
     }
 
@@ -79,7 +103,7 @@ class ProfileFacadeV1Test {
     @Test
     void test3() {
         LocalDate now = LocalDate.now();
-        Profile profile = getProfileFromDb(null, M, PrimaryRole.OTHER, List.of(PersonalityTraitConstant.BOSS), List.of(RelationshipPreferenceConstant.DATE_DS), now);
+        Profile profile = getProfileFromDb(null, M, PrimaryRole.OTHER, List.of(PersonalityTraitConstant.BOSS),PersonalityTraitConstant.BOSS, List.of(RelationshipPreferenceConstant.DATE_DS), now);
         assertThatThrownBy(() -> profileRepository.save(profile))
                 .isInstanceOf(Exception.class);
     }
@@ -88,7 +112,7 @@ class ProfileFacadeV1Test {
     @Test
     void test4() {
         LocalDate now = LocalDate.now();
-        Profile profile = getProfileFromDb("aa", null, PrimaryRole.OTHER, List.of(PersonalityTraitConstant.BOSS), List.of(RelationshipPreferenceConstant.DATE_DS), now);
+        Profile profile = getProfileFromDb("aa", null, PrimaryRole.OTHER, List.of(PersonalityTraitConstant.BOSS),PersonalityTraitConstant.BOSS, List.of(RelationshipPreferenceConstant.DATE_DS), now);
         assertThatThrownBy(() -> profileRepository.save(profile))
                 .isInstanceOf(Exception.class);
 
@@ -99,7 +123,7 @@ class ProfileFacadeV1Test {
     void test5() {
 
         LocalDate now = LocalDate.now();
-        Profile profile = getProfileFromDb("aa", M, null, List.of(PersonalityTraitConstant.BOSS), List.of(RelationshipPreferenceConstant.DATE_DS), now);
+        Profile profile = getProfileFromDb("aa", M, null, List.of(PersonalityTraitConstant.BOSS),PersonalityTraitConstant.BOSS, List.of(RelationshipPreferenceConstant.DATE_DS), now);
         assertThatThrownBy(() -> profileRepository.save(profile))
                 .isInstanceOf(Exception.class);
 
@@ -109,7 +133,7 @@ class ProfileFacadeV1Test {
     @Test
     void test6() {
         LocalDate now = LocalDate.now();
-        Profile profile = getProfileFromDb("aa", M, PrimaryRole.OTHER, null, List.of(RelationshipPreferenceConstant.DATE_DS), now);
+        Profile profile = getProfileFromDb("aa", M, PrimaryRole.OTHER, Collections.emptyList(), null, List.of(RelationshipPreferenceConstant.DATE_DS), now);
         assertThatThrownBy(() -> profileRepository.save(profile))
                 .isInstanceOf(Exception.class);
     }
@@ -118,7 +142,7 @@ class ProfileFacadeV1Test {
     @Test
     void test7() {
         LocalDate now = LocalDate.now();
-        Profile profile = getProfileFromDb("aa", M, PrimaryRole.OTHER, List.of(PersonalityTraitConstant.BOSS), null, now);
+        Profile profile = getProfileFromDb("aa", M, PrimaryRole.OTHER, List.of(PersonalityTraitConstant.BOSS), PersonalityTraitConstant.BOSS,Collections.emptyList(), now);
         assertThatThrownBy(() -> profileRepository.save(profile))
                 .isInstanceOf(Exception.class);
     }
@@ -126,7 +150,7 @@ class ProfileFacadeV1Test {
     @DisplayName("생일을 등록하지 않으면 프로필을 등록하는 게 실패한다.")
     @Test
     void test8() {
-        Profile profile = getProfileFromDb("aa", M, PrimaryRole.OTHER, List.of(PersonalityTraitConstant.BOSS), List.of(RelationshipPreferenceConstant.DATE_DS), null);
+        Profile profile = getProfileFromDb("aa", M, PrimaryRole.OTHER, List.of(PersonalityTraitConstant.BOSS), PersonalityTraitConstant.BOSS,List.of(RelationshipPreferenceConstant.DATE_DS), null);
         assertThatThrownBy(() -> profileRepository.save(profile))
                 .isInstanceOf(Exception.class);
     }
@@ -136,39 +160,50 @@ class ProfileFacadeV1Test {
     void test9() {
         LocalDate now = LocalDate.now();
         ProfileRegistration profileRegistration = new ProfileRegistration(
-                "dusgh123","hi", M, PrimaryRole.OTHER, List.of(PersonalityTraitConstant.BOSS), List.of(RelationshipPreferenceConstant.DATE_DS), now);
+                "dusgh123","hi", M, PrimaryRole.OTHER, List.of(PersonalityTraitConstant.BOSS),PersonalityTraitConstant.BOSS, List.of(RelationshipPreferenceConstant.DATE_DS), now);
 
         profileFacadeV1.registerProfile(profileRegistration, "dusgh123");
         assertThatThrownBy(() -> profileFacadeV1.registerProfile(profileRegistration, "dusgh123"))
                 .isInstanceOf(CustomException.class).hasMessage("PROFILE ALREADY EXIST");
     }
 
-    //TODO 보고서 업데이트
+    //이미 프로파일 있는 경우 예외
+
+    //프로파일 공개, 비공개
+
+
+    //대표성향이 선택한 성향중에 없을 때
+
 
     private Profile getProfileFromDb(
             String nickname,
             Gender gender,
             PrimaryRole primaryRole,
             List<PersonalityTraitConstant> personalityTraitConstant,
+            PersonalityTraitConstant primaryTrait,
             List<RelationshipPreferenceConstant> relationshipPreferenceConstant,
             LocalDate localDate) {
 
-        List<PersonalityTrait> list1 = personalityTraitConstant.stream()
-                .map(i -> PersonalityTrait.builder().personalityTrait(i).build())
+        List<PersonalityTrait> list1 =
+                personalityTraitConstant.stream()
+                .map(i -> PersonalityTrait.builder().trait(i).build())
+                .map(i->i.checkPrimaryTrait(primaryTrait))
                 .toList();
         List<RelationshipPreference> list2 = relationshipPreferenceConstant.stream()
                 .map(i -> RelationshipPreference.builder().relationshipPreference(i).build())
                 .toList();
 
-        return Profile.builder()
+        Profile profile = Profile.builder()
                 .nickName(nickname)
                 .introduction("hi")
                 .gender(gender)
                 .primaryRole(primaryRole)
-                .personalityTrait(list1)
-                .relationshipPreference(list2)
                 .birthDate(localDate)
                 .build();
+        profile.addPersonalityTrait(list1);
+        profile.addRelationshipPreference(list2);
+
+        return profile;
     }
 
 }

@@ -1,4 +1,4 @@
-package com.plaything.api.domain.repository.entity.user.profile;
+package com.plaything.api.domain.repository.entity.monitor;
 
 import com.plaything.api.domain.repository.entity.user.ProfileImage;
 import jakarta.persistence.*;
