@@ -1,6 +1,7 @@
 package com.plaything.api.domain.user.constants;
 
 import com.plaything.api.domain.repository.entity.user.User;
+import com.plaything.api.domain.repository.entity.user.profile.Profile;
 
 import java.util.Arrays;
 
@@ -30,8 +31,8 @@ public enum MatchingRelationship {
         this.top = top;
     }
 
-    public static PersonalityTraitConstant getPartner(User user) {
-        PersonalityTraitConstant trait = user.getProfile().getPrimaryTrait();
+    public static PersonalityTraitConstant getPartner(Profile profile) {
+        PersonalityTraitConstant trait = profile.getPrimaryTrait();
         MatchingRelationship[] values = MatchingRelationship.values();
         return Arrays.stream(values).filter(i ->
                         i.bottom.equals(trait) || i.top.equals(trait))

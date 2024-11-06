@@ -454,6 +454,8 @@ class MatchingServiceV1Test {
         profileFacadeV1.registerProfile(profileRegistration, name);
     }
 
+    //이미지가 없거나, 유저다 밴당하면 매칭에 x
+
     private void addImage(User user) {
         ProfileImage image = ProfileImage.builder()
                 .fileName("aa")

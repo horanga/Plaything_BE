@@ -47,5 +47,4 @@ public class User extends BaseEntity {
     public boolean isPreviousProfileRejected(){
         return  this.profile.getProfileStatus().equals(ProfileStatus.REJECTED);
     }
-
 }
