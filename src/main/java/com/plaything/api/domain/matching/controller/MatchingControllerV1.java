@@ -21,8 +21,8 @@ public class MatchingControllerV1 {
     private final MatchingServiceV1 matchingServiceV1;
 
     @Operation(
-            summary = "Register profile",
-            description = "User의 프로필을 등록"
+            summary = "Matching start",
+            description = "다른 유저와 매칭"
     )
     @SecurityRequirement(name = "Authorization")
     @GetMapping

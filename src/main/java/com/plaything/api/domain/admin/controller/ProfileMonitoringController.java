@@ -19,7 +19,7 @@ public class ProfileMonitoringController {
     private final ProfileMonitoringFacadeV1 profileMonitoringFacadeV1;
 
     @Operation(
-            summary = "Get profile records",
+            summary = "Get all profile monitoring records",
             description = "유저 프로필 모니터링 정보 불러오기"
     )
     @GetMapping
