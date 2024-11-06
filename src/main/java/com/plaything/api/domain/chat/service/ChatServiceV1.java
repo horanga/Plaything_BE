@@ -2,8 +2,8 @@ package com.plaything.api.domain.chat.service;
 
 import com.plaything.api.domain.chat.model.Message;
 import com.plaything.api.domain.chat.model.response.ChatListResponse;
-import com.plaything.api.domain.repository.chat.ChatRepository;
-import com.plaything.api.domain.repository.chat.ChatRoomRepository;
+import com.plaything.api.domain.repository.repo.chat.ChatRepository;
+import com.plaything.api.domain.repository.repo.chat.ChatRoomRepository;
 import com.plaything.api.domain.repository.entity.chat.Chat;
 import com.plaything.api.domain.repository.entity.chat.ChatRoom;
 import lombok.RequiredArgsConstructor;
