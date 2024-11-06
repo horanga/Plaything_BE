@@ -8,6 +8,7 @@ import com.plaything.api.domain.user.constants.RelationshipPreferenceConstant;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -16,10 +17,12 @@ import java.util.List;
 public record ProfileRegistration(
 
         @Schema(description = "닉네임")
+        @Size(min = 2, max = 12)
         @NotBlank
         String nickName,
 
         @Schema(description = "소개글")
+        @Size(max = 30)
         @NotBlank
         String introduction,
 
@@ -34,6 +37,10 @@ public record ProfileRegistration(
         @Schema(description = "상세 성향")
         @NotNull
         List<PersonalityTraitConstant> personalityTraitConstant,
+
+        @Schema(description = "상세 성향")
+        @NotNull
+        PersonalityTraitConstant primaryTrait,
 
         @Schema(description = "선호하는 관계")
         @NotNull
