@@ -34,7 +34,7 @@ public class UserControllerV1 {
     @SecurityRequirement(name = "Authorization")
     @PostMapping("/register-profile")
     public void registerProfile(
-            @RequestBody @Valid ProfileRegistration registration,
+            @Valid @RequestBody ProfileRegistration registration,
             @RequestHeader(value = "Authorization", required = false) String authString
     ) {
         String token = JWTProvider.extractToken(authString);
@@ -49,7 +49,7 @@ public class UserControllerV1 {
     @SecurityRequirement(name = "Authorization")
     @PutMapping("/update-profile")
     public void updateProfile(
-            @RequestBody @Valid ProfileUpdate update,
+            @Valid @RequestBody ProfileUpdate update,
             @RequestHeader(value = "Authorization", required = false) String authString
     ) {
         String token = JWTProvider.extractToken(authString);
