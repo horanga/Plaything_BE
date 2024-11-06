@@ -1,17 +1,24 @@
 package com.plaything.api.domain.user.model.response;
 
+import com.plaything.api.domain.repository.entity.user.ProfileImage;
 import com.plaything.api.domain.repository.entity.user.profile.Profile;
 import com.plaything.api.domain.user.constants.Gender;
 import com.plaything.api.domain.user.constants.PrimaryRole;
+import com.plaything.api.domain.user.constants.ProfileStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Schema(description = "User 프로필")
 public record ProfileResponse(
         @Schema(description = "프로필 비공개")
         boolean isPrivate,
+
+        @Schema(description = "프로필 밴 여부")
+        boolean isBaned,
+
+        @Schema(description = "프로필 상태")
+        ProfileStatus profileStatus,
 
         @Schema(description = "유저 사진")
         List<ProfileImageResponse> profileImageResponses,
@@ -36,9 +43,15 @@ public record ProfileResponse(
 
         @Schema(description = "선호 관계")
         List<RelationshipPreferenceResponse> relationshipPreference
+
 ) {
 
-    public static ProfileResponse toResponse(Profile profile, List<ProfileImageResponse> profileImages){
+    public static ProfileResponse toResponse(Profile profile, List<ProfileImage> profileImages){
+
+        List<ProfileImageResponse> profileImageList =
+                profileImages.stream()
+                        .map(ProfileImageResponse::toResponse)
+                        .toList();
 
         List<PersonalityTraitResponse> personalityTraitList
                 = profile.getPersonalityTrait().stream()
@@ -51,7 +64,9 @@ public record ProfileResponse(
 
         return new ProfileResponse(
                 profile.isPrivate(),
-                profileImages,
+                profile.isBaned(),
+                profile.getProfileStatus(),
+                profileImageList,
                 profile.getNickName(),
                 profile.getIntroduction(),
                 profile.getGender(),
