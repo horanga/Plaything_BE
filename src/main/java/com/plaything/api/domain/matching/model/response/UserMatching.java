@@ -1,9 +1,12 @@
-package com.plaything.api.domain.user.model.response;
+package com.plaything.api.domain.matching.model.response;
 
 import com.plaything.api.domain.repository.entity.user.ProfileImage;
 import com.plaything.api.domain.repository.entity.user.profile.PersonalityTrait;
 import com.plaything.api.domain.repository.entity.user.profile.RelationshipPreference;
 import com.plaything.api.domain.user.constants.PrimaryRole;
+import com.plaything.api.domain.user.model.response.PersonalityTraitResponse;
+import com.plaything.api.domain.user.model.response.ProfileImageResponse;
+import com.plaything.api.domain.user.model.response.RelationshipPreferenceResponse;
 import com.querydsl.core.Tuple;
 import io.swagger.v3.oas.annotations.media.Schema;
 
