@@ -2,16 +2,17 @@ package com.plaything.api.domain.user.service;
 
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorCode;
+import com.plaything.api.domain.matching.model.request.MatchRequest;
+import com.plaything.api.domain.matching.model.request.MatchRequestForOthers;
+import com.plaything.api.domain.matching.model.response.UserMatching;
+import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.entity.user.UserViolationStats;
 import com.plaything.api.domain.repository.entity.user.profile.Profile;
 import com.plaything.api.domain.repository.repo.monitor.UserViolationStatsRepository;
 import com.plaything.api.domain.repository.repo.query.UserQueryRepository;
 import com.plaything.api.domain.repository.repo.user.UserRepository;
-import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.user.constants.MatchingRelationship;
 import com.plaything.api.domain.user.constants.PersonalityTraitConstant;
-import com.plaything.api.domain.user.model.request.MatchRequest;
-import com.plaything.api.domain.user.model.response.UserMatching;
 import com.plaything.api.domain.user.model.response.UserSearchResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,16 +42,22 @@ public class UserServiceV1 {
 
         Profile profile = userByName.getProfile();
 
-        if(profile.isProfileImagesEmpty()){
-            throw new CustomException(ErrorCode.MATCHING_FAIL_WITHOUT_IMAGE);
-        }
+        validateRequest(profile);
 
-        if(profile.isBaned()){
-            throw new CustomException(ErrorCode.MATCHING_FAIL_WITH_BAN_PROFILE);
+        if (profile.isSwitch() || profile.isETC()) {
+            MatchRequestForOthers matchRequest
+                    = MatchRequestForOthers.from(profile.getPrimaryRole(), lastId, profile.getNickName());
+            return userQueryRepository.searchUser(matchRequest);
+
         }
 
         PersonalityTraitConstant partnerTrait = MatchingRelationship.getPartner(profile);
-        MatchRequest matchRequest = MatchRequest.from(partnerTrait, lastId, user);
+        MatchRequest matchRequest =
+                MatchRequest.from(
+                        profile.getPrimaryRole(),
+                        partnerTrait,
+                        lastId,
+                        profile.getNickName());
         return userQueryRepository.searchUser(matchRequest);
     }
 
@@ -59,7 +66,7 @@ public class UserServiceV1 {
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
     }
 
-    public User findById(long id){
+    public User findById(long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
     }
@@ -77,6 +84,17 @@ public class UserServiceV1 {
             userViolationStatsRepository.save(userViolationStats);
         } else {
             violationStats.get().increaseBannedProfileCount();
+        }
+    }
+
+
+    private void validateRequest(Profile profile) {
+        if (profile.isProfileImagesEmpty()) {
+            throw new CustomException(ErrorCode.MATCHING_FAIL_WITHOUT_IMAGE);
+        }
+
+        if (profile.isBaned()) {
+            throw new CustomException(ErrorCode.MATCHING_FAIL_WITH_BAN_PROFILE);
         }
     }
 }

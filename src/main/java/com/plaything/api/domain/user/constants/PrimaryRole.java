@@ -1,12 +1,15 @@
 package com.plaything.api.domain.user.constants;
 
+import com.plaything.api.common.exception.CustomException;
+import com.plaything.api.common.exception.ErrorCode;
+
 import java.util.Arrays;
 
 public enum PrimaryRole {
     TOP("FT", "MT", "TOP"),
     BOTTOM("FS", "MS", "BTM"),
     SWITCH("FSW", "MSW", "SW"),
-    OTHER("F_ETC", "M_ETC", "ETC");
+    ETC("F_ETC", "M_ETC", "ETC");
 
     final String female;
 
@@ -20,21 +23,33 @@ public enum PrimaryRole {
         this.etc = etc;
     }
 
-    public String getPrimaryRole(PrimaryRole primaryRole, Gender gender) {
+    public String getPrimaryRole(Gender gender) {
         PrimaryRole[] values = PrimaryRole.values();
 
-        return Arrays.stream(values).filter(i -> i.equals(primaryRole))
+        return Arrays.stream(values).filter(i -> i.equals(this))
                 .map(i -> {
-                            if (gender.equals(Gender.M)) {
-                                return i.male;
-                            }
+                    if (gender.equals(Gender.M)) {
+                        return i.male;
+                    }
 
-                            if (gender.equals(Gender.F)){
-                                return i.female;
-                            }
+                    if (gender.equals(Gender.F)) {
+                        return i.female;
+                    }
 
-                            return i.etc;
-                            }).findFirst().get();
+                    return i.etc;
+                }).findFirst().get();
+    }
+
+    public PrimaryRole getOpposite() {
+        if (this.equals(TOP)) {
+            return BOTTOM;
+        }
+
+        if (this.equals(BOTTOM)) {
+            return TOP;
+        }
+
+        throw new CustomException(ErrorCode.NOT_EXIST_OPPOSITE_PRIMARY);
     }
 }
 

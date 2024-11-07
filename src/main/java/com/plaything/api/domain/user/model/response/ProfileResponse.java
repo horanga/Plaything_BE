@@ -3,7 +3,6 @@ package com.plaything.api.domain.user.model.response;
 import com.plaything.api.domain.repository.entity.user.ProfileImage;
 import com.plaything.api.domain.repository.entity.user.profile.Profile;
 import com.plaything.api.domain.user.constants.Gender;
-import com.plaything.api.domain.user.constants.PrimaryRole;
 import com.plaything.api.domain.user.constants.ProfileStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -33,7 +32,7 @@ public record ProfileResponse(
         Gender gender,
 
         @Schema(description = "대표 성향")
-        PrimaryRole primaryRole,
+        String primaryRole,
 
         @Schema(description = "나이")
         int age,
@@ -46,7 +45,7 @@ public record ProfileResponse(
 
 ) {
 
-    public static ProfileResponse toResponse(Profile profile, List<ProfileImage> profileImages){
+    public static ProfileResponse toResponse(Profile profile, List<ProfileImage> profileImages) {
 
         List<ProfileImageResponse> profileImageList =
                 profileImages.stream()
@@ -62,6 +61,8 @@ public record ProfileResponse(
                 .map(RelationshipPreferenceResponse::toResponse)
                 .toList();
 
+        String primaryRole = profile.getPrimaryRole().getPrimaryRole(profile.getGender());
+
         return new ProfileResponse(
                 profile.isPrivate(),
                 profile.isBaned(),
@@ -70,7 +71,7 @@ public record ProfileResponse(
                 profile.getNickName(),
                 profile.getIntroduction(),
                 profile.getGender(),
-                profile.getPrimaryRole(),
+                primaryRole,
                 profile.calculateAge(),
                 personalityTraitList,
                 relationshipPreferenceList);

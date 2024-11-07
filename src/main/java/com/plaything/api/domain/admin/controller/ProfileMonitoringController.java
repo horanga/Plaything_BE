@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "admin Profile Monitoring API", description = "V1 Profile Monitoring API")
+@Tag(name = "Admin Profile Monitoring API", description = "V1 Profile Monitoring API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/admin/profiles")

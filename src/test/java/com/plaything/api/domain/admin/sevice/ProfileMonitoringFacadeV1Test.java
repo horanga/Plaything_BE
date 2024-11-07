@@ -26,7 +26,6 @@ import java.util.List;
 import static com.plaything.api.domain.user.constants.Gender.M;
 import static com.plaything.api.domain.user.constants.ProfileStatus.NEW;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
 @SpringBootTest
@@ -65,8 +64,8 @@ class ProfileMonitoringFacadeV1Test {
                         "잘부탁드려요!",
                         M,
                         PrimaryRole.BOTTOM,
-                        List.of(PersonalityTraitConstant.BOSS),
-                        PersonalityTraitConstant.BOSS,
+                        List.of(PersonalityTraitConstant.SERVANT),
+                        PersonalityTraitConstant.SERVANT,
                         List.of(RelationshipPreferenceConstant.DATE_DS),
                         LocalDate.now());
         profileFacadeV1.registerProfile(profileRegistration, "fnel123");
@@ -77,8 +76,8 @@ class ProfileMonitoringFacadeV1Test {
                         "잘부탁드려요!",
                         M,
                         PrimaryRole.BOTTOM,
-                        List.of(PersonalityTraitConstant.BOSS),
-                        PersonalityTraitConstant.BOSS,
+                        List.of(PersonalityTraitConstant.SERVANT),
+                        PersonalityTraitConstant.SERVANT,
                         List.of(RelationshipPreferenceConstant.DATE_DS),
                         LocalDate.now());
         profileFacadeV1.registerProfile(profileRegistration2, "fnel1234");
@@ -100,8 +99,8 @@ class ProfileMonitoringFacadeV1Test {
                         "잘부탁드려요!",
                         M,
                         PrimaryRole.BOTTOM,
-                        List.of(PersonalityTraitConstant.BOSS),
-                        PersonalityTraitConstant.BOSS,
+                        List.of(PersonalityTraitConstant.SERVANT),
+                        PersonalityTraitConstant.SERVANT,
                         List.of(RelationshipPreferenceConstant.DATE_DS),
                         LocalDate.now());
         profileFacadeV1.registerProfile(profileRegistration, "fnel123");
@@ -112,8 +111,8 @@ class ProfileMonitoringFacadeV1Test {
                         "잘부탁드려요!",
                         M,
                         PrimaryRole.BOTTOM,
-                        List.of(PersonalityTraitConstant.BOSS),
-                        PersonalityTraitConstant.BOSS,
+                        List.of(PersonalityTraitConstant.SERVANT),
+                        PersonalityTraitConstant.SERVANT,
                         List.of(RelationshipPreferenceConstant.DATE_DS),
                         LocalDate.now());
         profileFacadeV1.registerProfile(profileRegistration2, "fnel1234");
@@ -139,8 +138,8 @@ class ProfileMonitoringFacadeV1Test {
                         "잘부탁드려요!",
                         M,
                         PrimaryRole.BOTTOM,
-                        List.of(PersonalityTraitConstant.BOSS),
-                        PersonalityTraitConstant.BOSS,
+                        List.of(PersonalityTraitConstant.SERVANT),
+                        PersonalityTraitConstant.SERVANT,
                         List.of(RelationshipPreferenceConstant.DATE_DS),
                         LocalDate.now());
         profileFacadeV1.registerProfile(profileRegistration, "fnel123");

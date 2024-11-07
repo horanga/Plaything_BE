@@ -1,6 +1,6 @@
 package com.plaything.api.domain.matching.service;
 
-import com.plaything.api.domain.user.model.response.UserMatching;
+import com.plaything.api.domain.matching.model.response.UserMatching;
 import com.plaything.api.domain.user.service.UserServiceV1;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
