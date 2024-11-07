@@ -6,12 +6,12 @@ import com.plaything.api.domain.admin.sevice.ProfileMonitoringServiceV1;
 import com.plaything.api.domain.image.service.S3ImagesServiceV1;
 import com.plaything.api.domain.image.service.model.SavedImage;
 import com.plaything.api.domain.repository.entity.user.ProfileImage;
+import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.entity.user.profile.PersonalityTrait;
 import com.plaything.api.domain.repository.entity.user.profile.Profile;
-import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.entity.user.profile.RelationshipPreference;
 import com.plaything.api.domain.repository.repo.user.ProfileRepository;
-import com.plaything.api.domain.user.constants.PersonalityTraitConstant;
+import com.plaything.api.domain.user.constants.PrimaryRole;
 import com.plaything.api.domain.user.constants.ProfileStatus;
 import com.plaything.api.domain.user.model.request.ProfileRegistration;
 import com.plaything.api.domain.user.model.request.ProfileUpdate;
@@ -53,12 +53,16 @@ public class ProfileFacadeV1 {
         if (user.getProfile() != null) {
             throw new CustomException(ErrorCode.PROFILE_ALREADY_EXIST);
         }
-
+        if (registration.primaryRole().equals(PrimaryRole.TOP) || registration.primaryRole().equals(PrimaryRole.BOTTOM)) {
+            validateTraits(registration);
+        }
         try {
             Profile profile = makesProfile(registration);
             user.setProfile(profile);
             profileRepository.save(profile);
             profileMonitoringServiceV1.saveProfileRecord(profile, user);
+        } catch (CustomException e) {
+            throw new CustomException(ErrorCode.TRAITS_NOT_INCLUDE_PRIMARY);
         } catch (Exception e) {
             throw new CustomException(ErrorCode.PROFILE_REGISTER_FAILED);
         }
@@ -80,7 +84,6 @@ public class ProfileFacadeV1 {
 
         return ProfileResponse.toResponse(profile, profile.getProfileImages());
     }
-
 
     @Transactional
     public void setProfilePrivate(String name) {
@@ -118,6 +121,11 @@ public class ProfileFacadeV1 {
 
     }
 
+    private void validateTraits(ProfileRegistration registration) {
+        registration.personalityTraitConstant().forEach(i -> i.validateRoleCompatibility(registration.primaryRole()));
+    }
+
+
     private Profile makesProfile(ProfileRegistration registration) {
 
         Profile profile = Profile.builder()
@@ -133,7 +141,7 @@ public class ProfileFacadeV1 {
         List<PersonalityTrait> personalityTraitList =
                 registration.personalityTraitConstant().stream()
                         .map(i -> PersonalityTrait.builder().trait(i).profile(profile).build())
-                        .map(i-> i.checkPrimaryTrait(registration.primaryTrait()))
+                        .map(i -> i.checkPrimaryTrait(registration.primaryTrait()))
                         .limit(6)
                         .toList();
 
