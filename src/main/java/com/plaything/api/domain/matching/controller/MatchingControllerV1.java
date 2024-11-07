@@ -2,7 +2,7 @@ package com.plaything.api.domain.matching.controller;
 
 
 import com.plaything.api.domain.matching.service.MatchingServiceV1;
-import com.plaything.api.domain.user.model.response.UserMatching;
+import com.plaything.api.domain.matching.model.response.UserMatching;
 import com.plaything.api.security.JWTProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
