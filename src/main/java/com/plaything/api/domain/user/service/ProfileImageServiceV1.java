@@ -4,16 +4,11 @@ import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorCode;
 import com.plaything.api.domain.image.service.model.SavedImage;
 import com.plaything.api.domain.repository.entity.user.ProfileImage;
-import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.entity.user.profile.Profile;
 import com.plaything.api.domain.repository.repo.user.ProfileImageRepository;
-import com.plaything.api.domain.user.model.response.ProfileImageResponse;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -39,7 +34,7 @@ public class ProfileImageServiceV1 {
         }
     }
 
-    public long checkCountOfImages(Long profileId){
-       return profileImageRepository.countByProfile_Id(profileId);
+    public long checkCountOfImages(Long profileId) {
+        return profileImageRepository.countByProfile_Id(profileId);
     }
 }

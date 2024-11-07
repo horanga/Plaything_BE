@@ -110,7 +110,7 @@ public class ProfileFacadeV1 {
         User user = userServiceV1.findByName(name);
         Profile profile = user.getProfile();
         long countOfImages = profileImageServiceV1.checkCountOfImages(profile.getId());
-        if (countOfImages >= 6 || countOfImages + files.size() > 6) {
+        if (countOfImages >= 3 || countOfImages + files.size() > 3) {
             throw new CustomException(ErrorCode.EXCEED_IMAGE_LIMIT);
         }
 
