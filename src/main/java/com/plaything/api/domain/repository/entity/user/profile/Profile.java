@@ -131,4 +131,12 @@ public class Profile {
     public boolean isProfileImagesEmpty(){
         return this.profileImages.isEmpty();
     }
+
+    public boolean isSwitch(){
+        return this.primaryRole.equals(PrimaryRole.SWITCH);
+    }
+
+    public boolean isETC(){
+        return this.primaryRole.equals(PrimaryRole.ETC);
+    }
 }
