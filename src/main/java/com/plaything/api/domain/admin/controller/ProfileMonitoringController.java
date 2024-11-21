@@ -33,7 +33,7 @@ public class ProfileMonitoringController {
     )
     @GetMapping("/{id}")
     public UserStats getUserStats(
-            @PathVariable("id")Long id
+            @PathVariable("id") Long id
     ) {
         return profileMonitoringFacadeV1.getUserStats(id);
     }
@@ -49,7 +49,7 @@ public class ProfileMonitoringController {
 
     @Operation(
             summary = "Approve profile",
-            description = "유저 프로필 승인하기"
+            description = "유저 프로필 거절하기"
     )
     @PutMapping("/{id}")
     public void rejectProfile(@PathVariable("id") long id,

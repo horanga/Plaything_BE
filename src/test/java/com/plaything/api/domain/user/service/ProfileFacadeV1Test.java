@@ -1,5 +1,6 @@
 package com.plaything.api.domain.user.service;
 
+import com.plaything.api.TestRedisConfig;
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.entity.user.UserCredentials;
@@ -19,6 +20,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -33,6 +35,7 @@ import static com.plaything.api.domain.user.constants.ProfileStatus.NEW;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@Import(TestRedisConfig.class)
 @SpringBootTest
 @Transactional
 class ProfileFacadeV1Test {
@@ -50,8 +53,9 @@ class ProfileFacadeV1Test {
     void setUp() {
 
         User user = User.builder()
-                .name("dusgh123")
+                .loginId("dusgh123")
                 .role(Role.ROLE_USER)
+                .fcmToken("1")
                 .build();
         UserCredentials password = UserCredentials.builder()
                 .hashedPassword("1234")
@@ -85,7 +89,7 @@ class ProfileFacadeV1Test {
 
     @DisplayName("이용자는 대표 성향을 등록할 수 있다.")
     @Test
-    void test() {
+    void test2() {
 
         LocalDate now = LocalDate.now();
         ProfileRegistration profileRegistration = new ProfileRegistration(

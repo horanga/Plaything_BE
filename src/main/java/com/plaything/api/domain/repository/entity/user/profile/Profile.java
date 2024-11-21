@@ -3,9 +3,7 @@ package com.plaything.api.domain.repository.entity.user.profile;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorCode;
-import com.plaything.api.domain.repository.entity.user.ProfileImage;
 import com.plaything.api.domain.user.constants.Gender;
-
 import com.plaything.api.domain.user.constants.PersonalityTraitConstant;
 import com.plaything.api.domain.user.constants.PrimaryRole;
 import com.plaything.api.domain.user.constants.ProfileStatus;
@@ -14,7 +12,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -67,7 +64,6 @@ public class Profile {
     @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL)
     private final List<RelationshipPreference> relationshipPreference = new ArrayList<>();
 
-    @BatchSize(size = 100)
     @Column(nullable = false)
     @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL)
     private final List<ProfileImage> profileImages = new ArrayList<>();
@@ -79,8 +75,8 @@ public class Profile {
             PrimaryRole primaryRole,
             List<PersonalityTrait> personalityTrait,
             List<RelationshipPreference> relationshipPreference
-    ){
-        this.nickName=nickName;
+    ) {
+        this.nickName = nickName;
         this.introduction = introduction;
         this.gender = gender;
         this.primaryRole = primaryRole;
@@ -100,43 +96,47 @@ public class Profile {
         this.profileImages.addAll(profileImages);
     }
 
-    public PersonalityTraitConstant getPrimaryTrait(){
-       return this.personalityTrait.stream().filter(PersonalityTrait::isPrimaryTrait)
-               .map(PersonalityTrait::getTrait)
-               .findFirst()
-               .orElseThrow(()->new CustomException(ErrorCode.NOT_EXIST_PRIMARY_TRAIT));
+    public PersonalityTraitConstant getPrimaryTrait() {
+        return this.personalityTrait.stream().filter(PersonalityTrait::isPrimaryTrait)
+                .map(PersonalityTrait::getTrait)
+                .findFirst()
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_PRIMARY_TRAIT));
     }
 
-    public void setPrivate(){
+    public void setPrivate() {
         this.isPrivate = true;
     }
 
-    public void setPublic(){
+    public void setPublic() {
         this.isPrivate = false;
     }
 
-    public int calculateAge(){
+    public int calculateAge() {
         //만 나이로 표시
-       return LocalDate.now().getYear()- this.birthDate.getYear();
+        return LocalDate.now().getYear() - this.birthDate.getYear();
     }
 
-    public void setBaned(){
+    public void setBaned() {
         this.isBaned = true;
     }
 
-    public void setProfileStatusRejected(){
+    public void setProfileStatusRejected() {
         this.profileStatus = ProfileStatus.REJECTED;
     }
 
-    public boolean isProfileImagesEmpty(){
+    public boolean isProfileImagesEmpty() {
         return this.profileImages.isEmpty();
     }
 
-    public boolean isSwitch(){
+    public boolean isSwitch() {
         return this.primaryRole.equals(PrimaryRole.SWITCH);
     }
 
-    public boolean isETC(){
+    public boolean isETC() {
         return this.primaryRole.equals(PrimaryRole.ETC);
+    }
+
+    public ProfileImage getMainPhoto() {
+        return this.profileImages.stream().filter(ProfileImage::isMainPhoto).findFirst().get();
     }
 }

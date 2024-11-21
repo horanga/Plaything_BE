@@ -49,4 +49,5 @@ public record ProfileRegistration(
         @Schema(description = "생년월일")
         @NotNull
         LocalDate birthDate
-) {}
+) {
+}

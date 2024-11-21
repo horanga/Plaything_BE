@@ -1,6 +1,6 @@
 package com.plaything.api.domain.repository.entity.monitor;
 
-import com.plaything.api.domain.repository.entity.user.ProfileImage;
+import com.plaything.api.domain.repository.entity.user.profile.ProfileImage;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,6 +17,6 @@ public class ProfileImageRegistration {
     private long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "profile_images_id")
+    @JoinColumn(nullable = false, name = "profile_image_id")
     private ProfileImage profileImage;
 }
