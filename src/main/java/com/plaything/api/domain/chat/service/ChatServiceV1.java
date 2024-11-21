@@ -2,15 +2,15 @@ package com.plaything.api.domain.chat.service;
 
 import com.plaything.api.domain.chat.model.Message;
 import com.plaything.api.domain.chat.model.response.ChatListResponse;
-import com.plaything.api.domain.repository.repo.chat.ChatRepository;
-import com.plaything.api.domain.repository.repo.chat.ChatRoomRepository;
 import com.plaything.api.domain.repository.entity.chat.Chat;
 import com.plaything.api.domain.repository.entity.chat.ChatRoom;
+import com.plaything.api.domain.repository.repo.chat.ChatRepository;
+import com.plaything.api.domain.repository.repo.chat.ChatRoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,7 +66,7 @@ public class ChatServiceV1 {
                 .receiver(msg.getTo())
                 .message(msg.getMessage())
                 .chatRoom(chatRoom)
-                .createAt(new Timestamp(System.currentTimeMillis()))
+                .createdAt(LocalDateTime.now())
                 .build();
     }
 }
