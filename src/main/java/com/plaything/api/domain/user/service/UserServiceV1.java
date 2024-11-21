@@ -13,7 +13,6 @@ import com.plaything.api.domain.repository.repo.query.UserQueryRepository;
 import com.plaything.api.domain.repository.repo.user.UserRepository;
 import com.plaything.api.domain.user.constants.MatchingRelationship;
 import com.plaything.api.domain.user.constants.PersonalityTraitConstant;
-import com.plaything.api.domain.user.model.response.UserSearchResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,13 +30,8 @@ public class UserServiceV1 {
     private final UserViolationStatsRepository userViolationStatsRepository;
     private final UserQueryRepository userQueryRepository;
 
-    public UserSearchResponse searchUser(String name, String user) {
-        List<String> nameByNameMatch = userRepository.findNameByNameMatch(name, user);
-        return new UserSearchResponse(ErrorCode.SUCCESS, nameByNameMatch);
-    }
-
-    public List<UserMatching> searchPartner(String user, long lastId) {
-        User userByName = findByName(user);
+    public List<UserMatching> searchPartner(String loginId, long lastId) {
+        User userByName = findByLoginId(loginId);
         //TODO 프로필 거절, 사진 거절
 
         Profile profile = userByName.getProfile();
@@ -61,8 +55,8 @@ public class UserServiceV1 {
         return userQueryRepository.searchUser(matchRequest);
     }
 
-    public User findByName(String name) {
-        return userRepository.findByName(name)
+    public User findByLoginId(String loginId) {
+        return userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
     }
 
@@ -87,6 +81,9 @@ public class UserServiceV1 {
         }
     }
 
+    public User findByProfileNickname(String nickName) {
+        return userRepository.findByProfile_nickName(nickName);
+    }
 
     private void validateRequest(Profile profile) {
         if (profile.isProfileImagesEmpty()) {

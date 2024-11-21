@@ -13,9 +13,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.plaything.api.domain.repository.entity.user.QProfileImage.profileImage;
 import static com.plaything.api.domain.repository.entity.user.profile.QPersonalityTrait.personalityTrait;
 import static com.plaything.api.domain.repository.entity.user.profile.QProfile.profile;
+import static com.plaything.api.domain.repository.entity.user.profile.QProfileImage.profileImage;
 import static com.plaything.api.domain.repository.entity.user.profile.QRelationshipPreference.relationshipPreference1;
 
 @RequiredArgsConstructor
@@ -51,7 +51,7 @@ public class UserQueryRepository {
                                 .map(pref -> new RelationshipPreferenceResponse(pref.getRelationshipPreference()))
                                 .collect(Collectors.toList()),
                         p.getProfileImages().stream()
-                                .map(img -> new ProfileImageResponse(img.getUrl()))
+                                .map(img -> new ProfileImageResponse(img.getUrl(), img.isMainPhoto()))
                                 .collect(Collectors.toList())
                 ))
                 .collect(Collectors.toList());
@@ -81,7 +81,7 @@ public class UserQueryRepository {
                                 .map(pref -> new RelationshipPreferenceResponse(pref.getRelationshipPreference()))
                                 .collect(Collectors.toList()),
                         p.getProfileImages().stream()
-                                .map(img -> new ProfileImageResponse(img.getUrl()))
+                                .map(img -> new ProfileImageResponse(img.getUrl(), img.isMainPhoto()))
                                 .collect(Collectors.toList())
                 ))
                 .collect(Collectors.toList());
