@@ -6,12 +6,9 @@ import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.List;
 
 @Configuration
 @OpenAPIDefinition(
@@ -27,6 +24,7 @@ public class SwaggerConfig {
     public SwaggerConfig(@Value("${swagger.server.url}") String serverUrl) {
         this.serverUrl = serverUrl;
     }
+
     @Bean
     public OpenAPI customOpenAPI() {
         // Security Scheme 정의
@@ -44,4 +42,4 @@ public class SwaggerConfig {
                 .components(new Components().addSecuritySchemes("Authorization", securityScheme))  // Components 추가
                 .addSecurityItem(securityRequirement);
     }
-    }
+}
