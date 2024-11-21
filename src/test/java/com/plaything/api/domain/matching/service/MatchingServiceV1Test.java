@@ -1,11 +1,12 @@
 package com.plaything.api.domain.matching.service;
 
+import com.plaything.api.TestRedisConfig;
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.domain.admin.model.response.ProfileRecordResponse;
 import com.plaything.api.domain.admin.sevice.ProfileMonitoringFacadeV1;
 import com.plaything.api.domain.matching.model.response.UserMatching;
-import com.plaything.api.domain.repository.entity.user.ProfileImage;
 import com.plaything.api.domain.repository.entity.user.User;
+import com.plaything.api.domain.repository.entity.user.profile.ProfileImage;
 import com.plaything.api.domain.repository.repo.user.ProfileImageRepository;
 import com.plaything.api.domain.repository.repo.user.UserRepository;
 import com.plaything.api.domain.user.constants.PersonalityTraitConstant;
@@ -23,6 +24,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -36,6 +38,7 @@ import static com.plaything.api.domain.user.constants.RelationshipPreferenceCons
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@Import(TestRedisConfig.class)
 @Transactional
 @SpringBootTest
 class MatchingServiceV1Test {
@@ -65,13 +68,29 @@ class MatchingServiceV1Test {
 
     @BeforeEach
     void setUp() {
-        user = User.builder().name("fnel123").role(Role.ROLE_USER).build();
+        user = User.builder()
+                .loginId("fnel123")
+                .role(Role.ROLE_USER)
+                .fcmToken("1")
+                .build();
         userRepository.save(user);
-        user2 = User.builder().name("fnel1234").role(Role.ROLE_USER).build();
+        user2 = User.builder()
+                .loginId("fnel1234")
+                .role(Role.ROLE_USER)
+                .fcmToken("1")
+                .build();
         userRepository.save(user2);
-        user3 = User.builder().name("fnel12344").role(Role.ROLE_USER).build();
+        user3 = User.builder()
+                .loginId("fnel12344")
+                .role(Role.ROLE_USER)
+                .fcmToken("1")
+                .build();
         userRepository.save(user3);
-        user4 = User.builder().name("fnel12345").role(Role.ROLE_USER).build();
+        user4 = User.builder()
+                .loginId("fnel12345")
+                .role(Role.ROLE_USER)
+                .fcmToken("1")
+                .build();
         userRepository.save(user4);
     }
 
@@ -439,7 +458,12 @@ class MatchingServiceV1Test {
                 SADIST,
                 List.of(MARRIAGE_DS));
 
-        User user5 = User.builder().name("fnel1239").role(Role.ROLE_USER).build();
+        User user5 =
+                User.builder()
+                        .loginId("fnel1239")
+                        .role(Role.ROLE_USER)
+                        .fcmToken("1")
+                        .build();
         userRepository.save(user5);
         registerProfile(
                 "fnel1239",
