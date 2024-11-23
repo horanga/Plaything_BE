@@ -31,7 +31,7 @@ public class RedisConfig {
                 .commandTimeout(Duration.ofSeconds(2))
                 .build();
 
-        RedisStandaloneConfiguration serverConfig = new RedisStandaloneConfiguration("localhost", 6379);
+        RedisStandaloneConfiguration serverConfig = new RedisStandaloneConfiguration(host, port);
 
         return new LettuceConnectionFactory(serverConfig, clientConfig);
     }
