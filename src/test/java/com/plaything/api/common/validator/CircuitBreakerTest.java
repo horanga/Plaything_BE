@@ -1,19 +1,22 @@
 package com.plaything.api.common.validator;
 
-import com.plaything.api.TestRedisConfig;
 import com.plaything.api.domain.repository.repo.pay.PointKeyRepository;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.lettuce.core.RedisCommandTimeoutException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Objects;
+import java.util.Set;
 
 import static com.plaything.api.common.validator.DuplicateRequestChecker.SIMPLE_CIRCUIT_BREAKER_CONIFG;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -21,7 +24,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
-@Import(TestRedisConfig.class)
 @Transactional
 @SpringBootTest
 public class CircuitBreakerTest {
@@ -37,6 +39,14 @@ public class CircuitBreakerTest {
 
     @SpyBean
     RedisTemplate<String, String> mockRedis;
+
+    @BeforeEach
+    void setUp(){
+        Set<String> keys = mockRedis.keys("*"); // 모든 키 조회
+        if (keys != null && !keys.isEmpty()) {  // null과 빈 set 체크
+            mockRedis.delete(keys);
+        }
+    }
 
     @DisplayName("실패가 누적되면 서킷브레이커가 open이 된다")
     @Test

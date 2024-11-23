@@ -30,7 +30,8 @@ public class DuplicateRequestChecker {
     }
 
     public boolean fallback(String userId, String transactionId, Exception ex) {
-        log.error("Redis check failed, using DB fallback: {}", ex.getMessage());
+        log.error("Redis check failed, using DB fallback. Exception type: {}, Message: {}",
+                ex.getClass().getName(), ex.getMessage());
 
         return !pointKeyRepository.existsByTransactionId(transactionId);
     }

@@ -1,6 +1,5 @@
 package com.plaything.api.domain.matching.service;
 
-import com.plaything.api.TestRedisConfig;
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.domain.admin.model.response.ProfileRecordResponse;
 import com.plaything.api.domain.admin.sevice.ProfileMonitoringFacadeV1;
@@ -24,11 +23,13 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static com.plaything.api.domain.user.constants.Gender.M;
@@ -37,8 +38,6 @@ import static com.plaything.api.domain.user.constants.PrimaryRole.*;
 import static com.plaything.api.domain.user.constants.RelationshipPreferenceConstant.MARRIAGE_DS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-@Import(TestRedisConfig.class)
 @Transactional
 @SpringBootTest
 class MatchingServiceV1Test {
@@ -65,9 +64,9 @@ class MatchingServiceV1Test {
     User user3;
 
     User user4;
-
     @BeforeEach
     void setUp() {
+
         user = User.builder()
                 .loginId("fnel123")
                 .role(Role.ROLE_USER)

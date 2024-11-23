@@ -1,6 +1,5 @@
 package com.plaything.api.domain.user.service;
 
-import com.plaything.api.TestRedisConfig;
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.entity.user.UserCredentials;
@@ -20,12 +19,15 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static com.plaything.api.domain.user.constants.Gender.*;
@@ -34,10 +36,9 @@ import static com.plaything.api.domain.user.constants.PrimaryRole.*;
 import static com.plaything.api.domain.user.constants.ProfileStatus.NEW;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-@Import(TestRedisConfig.class)
-@SpringBootTest
+@Testcontainers
 @Transactional
+@SpringBootTest
 class ProfileFacadeV1Test {
 
     @Autowired
@@ -51,6 +52,7 @@ class ProfileFacadeV1Test {
 
     @BeforeEach
     void setUp() {
+
 
         User user = User.builder()
                 .loginId("dusgh123")

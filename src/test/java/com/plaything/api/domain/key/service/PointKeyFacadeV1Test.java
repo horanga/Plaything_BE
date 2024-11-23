@@ -1,6 +1,5 @@
 package com.plaything.api.domain.key.service;
 
-import com.plaything.api.TestRedisConfig;
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
 import com.plaything.api.domain.auth.model.request.LoginRequest;
@@ -28,9 +27,9 @@ import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -40,6 +39,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 import static com.plaything.api.domain.key.constant.KeyLogStatus.EARN;
 import static com.plaything.api.domain.key.constant.KeyLogStatus.USE;
@@ -55,8 +56,6 @@ import static com.plaything.api.domain.user.constants.PrimaryRole.TOP;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.BDDAssertions.within;
-
-@Import(TestRedisConfig.class)
 @Transactional
 @SpringBootTest
 class PointKeyFacadeV1Test {
@@ -97,11 +96,11 @@ class PointKeyFacadeV1Test {
     @BeforeEach
     void setUp() {
 
-        RedisConnectionFactory connectionFactory = redisTemplate.getConnectionFactory();
-        if (connectionFactory != null) {
-            RedisConnection connection = connectionFactory.getConnection();
-            connection.serverCommands().flushAll(); // 모든 데이터를 초기화
+        Set<String> keys = redisTemplate.keys("*"); // 모든 키 조회
+        if (keys != null && !keys.isEmpty()) {  // null과 빈 set 체크
+            redisTemplate.delete(keys);
         }
+
 
         CreateUserRequest request = new CreateUserRequest("dusgh1234", "1234", "1");
         authServiceV1.creatUser(request);

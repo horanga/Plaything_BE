@@ -1,6 +1,5 @@
 package com.plaything.api.domain.key.service;
 
-import com.plaything.api.TestRedisConfig;
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
 import com.plaything.api.domain.auth.model.request.LoginRequest;
@@ -18,12 +17,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +29,8 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 import static com.plaything.api.domain.key.constant.KeySource.LOGIN_REWARD;
 import static com.plaything.api.domain.key.constant.KeyType.POINT_KEY;
@@ -40,7 +39,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 
-@Import(TestRedisConfig.class)
 @Transactional
 @SpringBootTest
 public class AdPointKeyRollbackTest {
@@ -75,14 +73,14 @@ public class AdPointKeyRollbackTest {
     @BeforeEach
     void setUp() {
 
-        RedisConnectionFactory connectionFactory = redisTemplate.getConnectionFactory();
-        if (connectionFactory != null) {
-            RedisConnection connection = connectionFactory.getConnection();
-            connection.serverCommands().flushAll(); // 모든 데이터를 초기화
+        Set<String> keys = redisTemplate.keys("*"); // 모든 키 조회
+        if (keys != null && !keys.isEmpty()) {  // null과 빈 set 체크
+            redisTemplate.delete(keys);
         }
+
     }
 
-    @AfterEach
+        @AfterEach
     void cleanup() {
         keyLogRepository.deleteAll();
         pointKeyRepository.deleteAll();

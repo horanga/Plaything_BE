@@ -1,6 +1,5 @@
 package com.plaything.api.common.validator;
 
-import com.plaything.api.TestRedisConfig;
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
 import com.plaything.api.domain.auth.service.AuthServiceV1;
@@ -21,11 +20,11 @@ import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -34,6 +33,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static com.plaything.api.domain.user.constants.Gender.M;
@@ -42,7 +43,6 @@ import static com.plaything.api.domain.user.constants.PrimaryRole.TOP;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
-@Import(TestRedisConfig.class)
 @Transactional
 @SpringBootTest
 class DuplicateRequestCheckerTest {
@@ -77,6 +77,12 @@ class DuplicateRequestCheckerTest {
 
     @BeforeEach
     void setUp() {
+
+
+        Set<String> keys = mockRedis.keys("*"); // 모든 키 조회
+        if (keys != null && !keys.isEmpty()) {  // null과 빈 set 체크
+            mockRedis.delete(keys);
+        }
 
         CreateUserRequest request = new CreateUserRequest("dusgh1234", "1234", "1");
         authServiceV1.creatUser(request);

@@ -1,26 +1,25 @@
 package com.plaything.api.domain.auth.service;
 
-import com.plaything.api.TestRedisConfig;
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
 import com.plaything.api.domain.auth.model.request.LoginRequest;
 import com.plaything.api.domain.auth.model.response.LoginResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Objects;
+import java.util.Set;
 
 import static com.plaything.api.common.exception.ErrorCode.SUCCESS;
 import static org.assertj.core.api.Assertions.assertThat;
-
-@Import(TestRedisConfig.class)
 @Transactional
 @SpringBootTest
 class AuthServiceV1Test {
@@ -28,12 +27,15 @@ class AuthServiceV1Test {
     @Autowired
     private AuthServiceV1 authServiceV1;
 
-
     @Autowired
     protected RedisTemplate redisTemplate;
 
     @BeforeEach
     void setUp() {
+        Set<String> keys = redisTemplate.keys("*"); // 모든 키 조회
+        if (keys != null && !keys.isEmpty()) {  // null과 빈 set 체크
+            redisTemplate.delete(keys);
+        }
 
         RedisConnectionFactory connectionFactory = redisTemplate.getConnectionFactory();
         if (connectionFactory != null) {
