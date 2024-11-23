@@ -23,6 +23,11 @@ jobs:
           mkdir -p ./src/main/resources
           echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.properties
 
+      # Firebase 설정 파일 추가
+      - name: Create Firebase config file
+        run: |
+          echo '${{ secrets.FIREBASE_CONFIG }}' > ./src/main/resources/serviceAccountKey.json
+
       - name: Gradle 래퍼에 실행 권한 부여
         run: chmod +x ./gradlew
 

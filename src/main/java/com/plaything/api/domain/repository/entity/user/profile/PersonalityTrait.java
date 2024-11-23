@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(indexes = {
-                @Index(name = "idx_trait", columnList = "trait")
-        }
+        @Index(name = "idx_trait", columnList = "trait")
+}
 )
 @Entity
 public class PersonalityTrait {
@@ -23,6 +23,7 @@ public class PersonalityTrait {
     private long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "profile_id", nullable = false)
     private Profile profile;
 
     @Column(nullable = false)
@@ -32,9 +33,9 @@ public class PersonalityTrait {
     @Column(nullable = false)
     private boolean isPrimaryTrait;
 
-    public PersonalityTrait checkPrimaryTrait(PersonalityTraitConstant primaryTrait){
+    public PersonalityTrait checkPrimaryTrait(PersonalityTraitConstant primaryTrait) {
 
-        if(this.trait.equals(primaryTrait)){
+        if (this.trait.equals(primaryTrait)) {
             this.isPrimaryTrait = true;
         }
 

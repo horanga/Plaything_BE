@@ -3,9 +3,7 @@ package com.plaything.api.domain.user.controller;
 import com.plaything.api.domain.user.model.request.ProfileRegistration;
 import com.plaything.api.domain.user.model.request.ProfileUpdate;
 import com.plaything.api.domain.user.model.response.ProfileResponse;
-import com.plaything.api.domain.user.model.response.UserSearchResponse;
 import com.plaything.api.domain.user.service.ProfileFacadeV1;
-import com.plaything.api.domain.user.service.UserServiceV1;
 import com.plaything.api.security.JWTProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -24,7 +22,6 @@ import java.util.List;
 @RequestMapping("/api/v1/user")
 public class UserControllerV1 {
 
-    private final UserServiceV1 userServiceV1;
     private final ProfileFacadeV1 profileFacadeV1;
 
     @Operation(
@@ -107,34 +104,20 @@ public class UserControllerV1 {
     @SecurityRequirement(name = "Authorization")
     @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void uploadImage(
-            @RequestParam(value = "images") List<MultipartFile> images,
+            @RequestPart(value = "indexOfMainImage") Long indexOfMainImage,
+            @RequestPart(value = "images") List<MultipartFile> images,
             @RequestHeader(value = "Authorization", required = false) String authString
     ) {
         String token = JWTProvider.extractToken(authString);
         String user = JWTProvider.getUserFromToken(token);
-        profileFacadeV1.uploadImages(images, user);
-    }
-    @Operation(
-            summary = "User Name List Search",
-            description = "User Name 기반으로 Like 검색 실행"
-    )
-    @SecurityRequirement(name = "Authorization")
-    @GetMapping("/search/{name}")
-    public UserSearchResponse searchUser(
-            @PathVariable("name") String name,
-            @RequestHeader(value = "Authorization", required = false) String authString
-    ) {
-        String token = JWTProvider.extractToken(authString);
-        String user = JWTProvider.getUserFromToken(token);
-
-        return userServiceV1.searchUser(name, user);
+        profileFacadeV1.uploadImages(images, user, indexOfMainImage);
     }
 
 //
-//    @DeleteMapping("/{userId}/image")
-//    public ResponseEntity<Object> deleteUserImage(@PathVariable Long userId,
+//    @DeleteMapping("/{id}/image")
+//    public ResponseEntity<Object> deleteUserImage(@PathVariable Long id,
 //                                                  @RequestBody DeleteUserImageRequest request) {
-//        userCommandService.deleteUserImage(userId, request.getDeleteImageFilename());
+//        userCommandService.deleteUserImage(id, request.getDeleteImageFilename());
 //        return ResponseEntity.accepted().build();
 //    }
 }

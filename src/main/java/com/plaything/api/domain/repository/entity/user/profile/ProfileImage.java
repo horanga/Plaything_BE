@@ -1,6 +1,5 @@
-package com.plaything.api.domain.repository.entity.user;
+package com.plaything.api.domain.repository.entity.user.profile;
 
-import com.plaything.api.domain.repository.entity.user.profile.Profile;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,6 +21,9 @@ public class ProfileImage {
 
     private String fileName;
 
+    private boolean isMainPhoto;
+
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "profile_id", nullable = false)
     private Profile profile;
 }

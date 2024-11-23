@@ -3,7 +3,7 @@ package com.plaything.api.domain.repository.entity.chat;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Getter
 @Builder
@@ -17,17 +17,17 @@ public class Chat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(nullable = false)
     private String sender;
 
-    @Column
+    @Column(nullable = false)
     private String receiver;
 
-    @Column
+    @Column(nullable = false)
     private String message;
 
-    @Column
-    private Timestamp createAt;
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private ChatRoom chatRoom;

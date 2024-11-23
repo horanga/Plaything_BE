@@ -6,13 +6,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "User 리스트의 프로필")
 public record UserResponse(
         @Schema(description = "user의 id")
-        long userId,
+        long id,
 
         @Schema(description = "로그인 id")
-        String name
+        String loginId
 ) {
 
-    public static UserResponse toResponse(User user){
-        return new UserResponse(user.getId(), user.getName());
+    public static UserResponse toResponse(User user) {
+        return new UserResponse(user.getId(), user.getLoginId());
     }
 }

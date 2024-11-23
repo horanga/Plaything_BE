@@ -23,6 +23,12 @@ repositories {
     mavenCentral()
 }
 
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.cloud:spring-cloud-dependencies:2023.0.3")
+    }
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -66,8 +72,30 @@ dependencies {
     annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+    //Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    //Redis test
+    testImplementation 'org.testcontainers:testcontainers:1.19.3'
+    testImplementation 'org.testcontainers:junit-jupiter:1.19.3'
+    // for resilience4j
+    implementation("org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j")
+    // 아래 의존성 추가하지 않으면 @CircuitBreaker 어노테이션이 동작하지 않음
+    implementation("org.springframework.boot:spring-boot-starter-aop")
+
+    //Firebase
+    implementation group: 'com.google.firebase', name: 'firebase-admin', version: '9.2.0'
+
+    //Fign Client
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+test {
+    jvmArgs '-Djdk.attach.allowAttachSelf=true'
 }

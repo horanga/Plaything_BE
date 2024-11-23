@@ -1,7 +1,6 @@
 package com.plaything.api.domain.repository.entity.monitor;
 
 import com.plaything.api.domain.repository.entity.user.User;
-import com.plaything.api.domain.repository.entity.user.profile.Profile;
 import com.plaything.api.domain.user.constants.ProfileStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -33,5 +32,6 @@ public class ProfileRecord {
     private long profileId;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }

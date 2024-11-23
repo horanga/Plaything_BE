@@ -10,6 +10,7 @@ import com.plaything.api.common.exception.ErrorCode;
 import com.plaything.api.common.generator.IdGenerator;
 import com.plaything.api.domain.image.service.model.SavedImage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import java.util.List;
 import static com.plaything.api.common.constants.Constants.IMAGE_MIME_TYPE;
 import static com.plaything.api.common.constants.Constants.MAX_FILE_SIZE;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class S3ImagesServiceV1 {
@@ -52,7 +54,17 @@ public class S3ImagesServiceV1 {
         return new SavedImage(s3Client.getUrl(bucket, filename).toString(), filename);
     }
 
-    public void deleteImage(String filename) {
+    public void rollbackS3Images(List<SavedImage> list) {
+        list.forEach(i -> {
+            try {
+                this.deleteImage(i.fileName());
+            } catch (Exception e) {
+                log.error("Failed to delete image from S3: {}", i.fileName(), e);
+            }
+        });
+    }
+
+    private void deleteImage(String filename) {
         s3Client.deleteObject(new DeleteObjectRequest(bucket, filename));
     }
 

@@ -11,5 +11,8 @@ public record LoginResponse(
         @Schema(description = "jwt token")
         String token,
         @Schema(description = "프로필 유무")
-        boolean invalidProfile
-) {}
+        boolean invalidProfile,
+        @Schema(description = "일일 포인트 키 지급 여부")
+        boolean dailyRewardProvided
+) {
+}

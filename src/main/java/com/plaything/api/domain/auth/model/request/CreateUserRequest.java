@@ -14,5 +14,11 @@ public record CreateUserRequest(
         @Schema(description = "유저 비밀번호")
         @NotBlank
         @NotNull
-        String password
-) { }
+        String password,
+
+        @Schema(description = "디바이스 fcmToken")
+        @NotBlank
+        @NotNull
+        String fcmToken
+) {
+}

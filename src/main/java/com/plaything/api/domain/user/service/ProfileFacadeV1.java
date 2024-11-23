@@ -5,7 +5,6 @@ import com.plaything.api.common.exception.ErrorCode;
 import com.plaything.api.domain.admin.sevice.ProfileMonitoringServiceV1;
 import com.plaything.api.domain.image.service.S3ImagesServiceV1;
 import com.plaything.api.domain.image.service.model.SavedImage;
-import com.plaything.api.domain.repository.entity.user.ProfileImage;
 import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.entity.user.profile.PersonalityTrait;
 import com.plaything.api.domain.repository.entity.user.profile.Profile;
@@ -15,6 +14,7 @@ import com.plaything.api.domain.user.constants.PrimaryRole;
 import com.plaything.api.domain.user.constants.ProfileStatus;
 import com.plaything.api.domain.user.model.request.ProfileRegistration;
 import com.plaything.api.domain.user.model.request.ProfileUpdate;
+import com.plaything.api.domain.user.model.response.ProfileImageResponse;
 import com.plaything.api.domain.user.model.response.ProfileResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -35,7 +35,8 @@ public class ProfileFacadeV1 {
 
     @Transactional
     public void banProfile(Long profileId, String rejectedReason, User user) {
-        Profile profile = profileRepository.findById(profileId).orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_PROFILE));
+        Profile profile = profileRepository.findById(profileId).
+                orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_PROFILE));
         profile.setBaned();
         profile.setProfileStatusRejected();
 
@@ -45,7 +46,7 @@ public class ProfileFacadeV1 {
 
     @Transactional
     public void registerProfile(ProfileRegistration registration, String name) {
-        User user = userServiceV1.findByName(name);
+        User user = userServiceV1.findByLoginId(name);
 
         //TODO 대표성향을 한개만, 상세 성향은 6개까지만, 선호하는 관계는 모든 선택 가능
         //TODO 중복 안되도록 변경
@@ -74,8 +75,12 @@ public class ProfileFacadeV1 {
 
     }
 
+    public ProfileImageResponse getMainPhoto(String nickName) {
+        return ProfileImageResponse.toResponse(profileImageServiceV1.getMainPhoto(nickName));
+    }
+
     public ProfileResponse getProfile(String name) {
-        User user = userServiceV1.findByName(name);
+        User user = userServiceV1.findByLoginId(name);
         Profile profile = user.getProfile();
 
         if (profile == null) {
@@ -87,38 +92,37 @@ public class ProfileFacadeV1 {
 
     @Transactional
     public void setProfilePrivate(String name) {
-        User user = userServiceV1.findByName(name);
+        User user = userServiceV1.findByLoginId(name);
         Profile profile = user.getProfile();
         profile.setPrivate();
     }
 
     @Transactional
     public void setProfilePublic(String name) {
-        User user = userServiceV1.findByName(name);
+        User user = userServiceV1.findByLoginId(name);
         Profile profile = user.getProfile();
         profile.setPublic();
     }
 
     //TODO 비동기 처리할지 확인하기
-    @Transactional
-    public void uploadImages(List<MultipartFile> files, String name) {
+    public void uploadImages(List<MultipartFile> files, String name, Long indexOfMainImage) {
 
         if (files.size() == 0) {
 
             throw new CustomException(ErrorCode.NO_IMAGE_FAILED);
         }
-        User user = userServiceV1.findByName(name);
+
+        User user = userServiceV1.findByLoginId(name);
         Profile profile = user.getProfile();
-        long countOfImages = profileImageServiceV1.checkCountOfImages(profile.getId());
-        if (countOfImages >= 3 || countOfImages + files.size() > 3) {
-            throw new CustomException(ErrorCode.EXCEED_IMAGE_LIMIT);
-        }
-
+        profileImageServiceV1.checkCountOfImages(files, profile.getId());
         List<SavedImage> savedImages = s3ImagesServiceV1.uploadImages(files);
-        List<ProfileImage> imagesList = savedImages.stream().map(image ->
-                profileImageServiceV1.saveImage(image, profile)).toList();
-        profile.addProfileImages(imagesList);
 
+        try {
+            profileImageServiceV1.saveImages(savedImages, profile, indexOfMainImage);
+        } catch (Exception e) {
+            //롤백 처리
+            s3ImagesServiceV1.rollbackS3Images(savedImages);
+        }
     }
 
     private void validateTraits(ProfileRegistration registration) {
@@ -162,7 +166,7 @@ public class ProfileFacadeV1 {
     //프로필 조회를 위한 api가 아닌 단순 로직에 필요한 메서드
     public Profile getProfileByUser(String name) {
 
-        User user = userServiceV1.findByName(name);
+        User user = userServiceV1.findByLoginId(name);
         Profile profile = user.getProfile();
         if (profile == null) {
             throw new CustomException(ErrorCode.NOT_EXIST_USER);
