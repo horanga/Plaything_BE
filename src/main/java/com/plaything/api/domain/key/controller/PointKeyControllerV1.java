@@ -25,8 +25,8 @@ public class PointKeyControllerV1 {
     private final PointKeyFacadeV1 pointKeyFacadeV1;
 
     @Operation(
-            summary = "Get pointkey",
-            description = "광고 시청 후 포인트 키 받기"
+            summary = "광고 보상 포인트 키 생성",
+            description = "광고 시청 완료 후 포인트 키를 생성하고 지급합니다"
     )
     @SecurityRequirement(name = "Authorization")
     @PostMapping("/create-key")
@@ -41,8 +41,8 @@ public class PointKeyControllerV1 {
     }
 
     @Operation(
-            summary = "Get pointkey log",
-            description = "포인트 키 로그 확인"
+            summary = "포인트 키 사용 내역 조회",
+            description = "사용자의 포인트 키 획득/사용 이력을 조회합니다"
     )
     @SecurityRequirement(name = "Authorization")
     @GetMapping("/get-keylog")
@@ -56,8 +56,8 @@ public class PointKeyControllerV1 {
 
 
     @Operation(
-            summary = "Get pointkey",
-            description = "포인트 키 개수 확인"
+            summary = "보유 포인트 키 수량 조회",
+            description = "현재 사용 가능한 포인트 키의 수량을 조회합니다"
     )
     @SecurityRequirement(name = "Authorization")
     @GetMapping("/get-key")
@@ -70,8 +70,8 @@ public class PointKeyControllerV1 {
     }
 
     @Operation(
-            summary = "use pointkey",
-            description = "매칭을 위한 키 사용"
+            summary = "매칭용 포인트 키 사용",
+            description = "매칭 서비스 이용을 위해 포인트 키를 사용합니다"
     )
     @SecurityRequirement(name = "Authorization")
     @PostMapping("/use-key")
