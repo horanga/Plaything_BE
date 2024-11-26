@@ -90,6 +90,9 @@ dependencies {
     //Fign Client
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
+    //Ahocreasick
+    implementation 'org.ahocorasick:ahocorasick:0.6.3'
+
 }
 
 tasks.named('test') {
