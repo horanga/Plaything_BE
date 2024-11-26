@@ -139,4 +139,12 @@ public class Profile {
     public ProfileImage getMainPhoto() {
         return this.profileImages.stream().filter(ProfileImage::isMainPhoto).findFirst().get();
     }
+
+    public String getPrimaryRoleAsString(){
+        return primaryRole.getPrimaryRole(this.gender);
+    }
+
+    public PrimaryRole getPrimaryRole(){
+        return primaryRole;
+    }
 }

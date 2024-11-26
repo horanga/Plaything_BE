@@ -75,10 +75,6 @@ public class ProfileFacadeV1 {
 
     }
 
-    public ProfileImageResponse getMainPhoto(String nickName) {
-        return ProfileImageResponse.toResponse(profileImageServiceV1.getMainPhoto(nickName));
-    }
-
     public ProfileResponse getProfile(String name) {
         User user = userServiceV1.findByLoginId(name);
         Profile profile = user.getProfile();
