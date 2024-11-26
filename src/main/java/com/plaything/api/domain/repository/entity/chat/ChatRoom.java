@@ -18,8 +18,28 @@ public class ChatRoom {
     private Long id;
 
     @Column
-    private String user1;
+    private String senderNickname;
 
     @Column
-    private String user2;
+    private String receiverNickname;
+
+    @Column
+    private String exitedUserNickname;
+
+    @Column
+    private boolean isClosed = false;
+
+
+    public boolean validateRequester(String name){
+        return senderNickname.equals(name) || receiverNickname.equals(name);
+    }
+
+    public void leaveChatRoom(String nickName){
+        if(this.exitedUserNickname.isBlank()){
+            this.exitedUserNickname = nickName;
+        } else {
+            isClosed = true;
+        }
+    }
+
 }
