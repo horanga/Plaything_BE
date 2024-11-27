@@ -4,6 +4,8 @@ package com.plaything.api;
 import com.plaything.api.common.discord.DiscordAlarm;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.core.registry.EntryAddedEvent;
+import io.github.resilience4j.core.registry.EntryRemovedEvent;
+import io.github.resilience4j.core.registry.EntryReplacedEvent;
 import io.github.resilience4j.core.registry.RegistryEventConsumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,15 +15,10 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
-
-import io.github.resilience4j.core.registry.EntryRemovedEvent;
-import io.github.resilience4j.core.registry.EntryReplacedEvent;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static com.plaything.api.common.discord.constant.MessageFormat.*;
-import static com.plaything.api.common.discord.constant.MessageFormat.CLOSED_BODY;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -38,7 +35,7 @@ public class ApiApplication {
 
     @Bean
     public RegistryEventConsumer<CircuitBreaker> myRegistryEventConsumer() {
-        return new RegistryEventConsumer<CircuitBreaker>() {
+        return new RegistryEventConsumer<>() {
             @Override
             public void onEntryAddedEvent(EntryAddedEvent<CircuitBreaker> entryAddedEvent) {
                 entryAddedEvent.getAddedEntry().getEventPublisher()
@@ -53,14 +50,14 @@ public class ApiApplication {
                                 discordAlarm.sendAlarm(
                                         CIRCUIT_OPEN,
                                         OPEN_TITLE,
-                                        OPEN_BODY+ LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                                        OPEN_BODY + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
                             }
                             if (event.getStateTransition().getFromState() == CircuitBreaker.State.HALF_OPEN
                                     && event.getStateTransition().getToState() == CircuitBreaker.State.CLOSED) {
                                 discordAlarm.sendAlarm(
                                         CIRCUIT_CLOSED,
                                         CLOSED_TITLE,
-                                        CLOSED_BODY+ LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                                        CLOSED_BODY + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
                             }
 
