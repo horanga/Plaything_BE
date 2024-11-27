@@ -56,6 +56,9 @@ public class Profile {
     @Enumerated(EnumType.STRING)
     private ProfileStatus profileStatus;
 
+    @Column
+    private boolean isDeleted;
+
     @Column(nullable = false)
     @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL)
     private final List<PersonalityTrait> personalityTrait = new ArrayList<>();
@@ -140,11 +143,15 @@ public class Profile {
         return this.profileImages.stream().filter(ProfileImage::isMainPhoto).findFirst().get();
     }
 
-    public String getPrimaryRoleAsString(){
+    public String getPrimaryRoleAsString() {
         return primaryRole.getPrimaryRole(this.gender);
     }
 
-    public PrimaryRole getPrimaryRole(){
+    public PrimaryRole getPrimaryRole() {
         return primaryRole;
+    }
+
+    public void delete() {
+        this.isDeleted = true;
     }
 }

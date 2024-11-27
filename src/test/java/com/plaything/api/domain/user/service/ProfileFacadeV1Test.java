@@ -19,15 +19,12 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import static com.plaything.api.domain.user.constants.Gender.*;
@@ -36,6 +33,7 @@ import static com.plaything.api.domain.user.constants.PrimaryRole.*;
 import static com.plaything.api.domain.user.constants.ProfileStatus.NEW;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 @Testcontainers
 @Transactional
 @SpringBootTest
@@ -195,7 +193,7 @@ class ProfileFacadeV1Test {
                 "dusgh123", "hi", gender, primaryRole, traits, primaryTrait, List.of(RelationshipPreferenceConstant.DATE_DS), LocalDate.of(1995, 3, 30));
 
         profileFacadeV1.registerProfile(profileRegistration, "dusgh123");
-        ProfileResponse profile = profileFacadeV1.getProfile("dusgh123");
+        ProfileResponse profile = profileFacadeV1.getProfileByLoginId("dusgh123");
 
         assertThat(profile.age()).isEqualTo(29);
         assertThat(profile.introduction()).isEqualTo("hi");
@@ -498,7 +496,7 @@ class ProfileFacadeV1Test {
         profileFacadeV1.registerProfile(profileRegistration, "dusgh123");
         profileFacadeV1.setProfilePrivate("dusgh123");
 
-        ProfileResponse profile = profileFacadeV1.getProfile("dusgh123");
+        ProfileResponse profile = profileFacadeV1.getProfileByLoginId("dusgh123");
         assertThat(profile.isPrivate()).isTrue();
 
     }

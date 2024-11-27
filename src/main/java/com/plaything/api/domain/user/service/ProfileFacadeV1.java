@@ -14,7 +14,6 @@ import com.plaything.api.domain.user.constants.PrimaryRole;
 import com.plaything.api.domain.user.constants.ProfileStatus;
 import com.plaything.api.domain.user.model.request.ProfileRegistration;
 import com.plaything.api.domain.user.model.request.ProfileUpdate;
-import com.plaything.api.domain.user.model.response.ProfileImageResponse;
 import com.plaything.api.domain.user.model.response.ProfileResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -75,8 +74,8 @@ public class ProfileFacadeV1 {
 
     }
 
-    public ProfileResponse getProfile(String name) {
-        User user = userServiceV1.findByLoginId(name);
+    public ProfileResponse getProfileByLoginId(String loginId) {
+        User user = userServiceV1.findByLoginId(loginId);
         Profile profile = user.getProfile();
 
         if (profile == null) {
@@ -168,5 +167,10 @@ public class ProfileFacadeV1 {
             throw new CustomException(ErrorCode.NOT_EXIST_USER);
         }
         return profile;
+    }
+
+    public void delete(String auth) {
+        userServiceV1.delete(auth);
+
     }
 }
