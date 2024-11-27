@@ -13,5 +13,8 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
             SELECT c FROM ChatRoom c WHERE (c.senderNickname = :user1 AND c.receiverNickname = :user2)
             OR (c.senderNickname = :user2 AND c.receiverNickname = :user1 AND c.isClosed is false)
             """)
-    Optional<ChatRoom> findChatRoomByUsers(@Param("user1") String requestLoginId, @Param("user2") String partner);
+    Optional<ChatRoom> findChatRoomByUsers(
+            @Param("user1") String requestNickname,
+            @Param("user2") String partnerNickname
+    );
 }

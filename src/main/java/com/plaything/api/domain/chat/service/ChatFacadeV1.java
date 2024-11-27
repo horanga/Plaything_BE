@@ -17,6 +17,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -32,21 +35,15 @@ public class ChatFacadeV1 {
 
     private final FilteringService filteringService;
 
-    public ChatRoomResponse getChatRoom(Long id, String requesterLoginId, LocalDate now) {
+    public List<ChatRoomResponse> getChatRooms(String requesterLoginId, Long lastChatRoomId) {
         User user = userRepository.findByLoginId(requesterLoginId)
                 .orElseThrow(() ->
                         new CustomException(ErrorCode.NOT_EXIST_USER));
         String requestNickname = user.getNickname();
-        ChatRoom chatRoom = chatRoomServiceV1.findChatRoom(id);
+        List<ChatRoom> chatRooms = chatRoomServiceV1.findChatRooms(requestNickname, lastChatRoomId);
+        Map<String, Profile> profileMap = getProfileMap(chatRooms, requestNickname);
 
-        if (!chatRoom.validateRequester(requestNickname)) {
-            throw new CustomException(ErrorCode.NOT_AUTHORIZED_CHAT_ROOM_USER);
-        }
-
-        ChatListResponse chatListResponse = chatServiceV1.chatList(requestNickname, chatRoom, null, now);
-        Profile partnerProfile = profileRepository.findByNickName(chatRoom.getReceiverNickname());
-        ChatProfile chatProfile = ChatProfile.toResponse(partnerProfile);
-        return new ChatRoomResponse(chatListResponse, chatProfile);
+        return getChatRoomResponse(chatRooms, profileMap, requestNickname);
     }
 
     public void leaveChatRoom(Long id, String requesterLoginId) {
@@ -58,15 +55,50 @@ public class ChatFacadeV1 {
     }
 
     public ChatListResponse getChatList(String requesterLoginId, Long chatRoomId, Long lastChatId) {
-        ChatRoom chatRoom = chatRoomServiceV1.findChatRoom(chatRoomId);
-        return chatServiceV1.chatList(requesterLoginId, chatRoom, lastChatId, LocalDate.now());
+        User user = userRepository.findByLoginId(requesterLoginId)
+                .orElseThrow(() ->
+                        new CustomException(ErrorCode.NOT_EXIST_USER));
+        String requestNickname = user.getNickname();
+        return chatServiceV1.chatList(chatRoomId, requestNickname, lastChatId, LocalDate.now());
     }
-
 
     public void saveMessage(Message message, LocalDateTime now) {
         filteringService.filterWords(message.message());
         chatServiceV1.saveChatMessage(message, now);
-
     }
 
+    private List<ChatRoomResponse> getChatRoomResponse(List<ChatRoom> chatRooms, Map<String, Profile> profileMap, String requestNickName) {
+
+        return chatRooms.stream().map(i -> {
+            String name;
+            if (i.getSenderNickname().equals(requestNickName)) {
+                name = i.getReceiverNickname();
+            } else {
+                name = i.getSenderNickname();
+            }
+            Profile profile = profileMap.get(name);
+            return new ChatRoomResponse(
+                    i.getId(),
+                    i.getLastChatMessage(),
+                    i.getLastChatMessageAt(),
+                    ChatProfile.toResponse(profile));
+        }).toList();
+    }
+
+    private Map<String, Profile> getProfileMap(List<ChatRoom> chatRooms, String requestNickname) {
+        List<String> partnerNames
+                = chatRooms.stream().map(i -> getPartnerNickname(i, requestNickname)).toList();
+        List<Profile> profileList = profileRepository.findByNickNames(partnerNames);
+        return profileList.stream()
+                .collect(Collectors.toMap(
+                        Profile::getNickName,
+                        profile -> profile
+                ));
+    }
+
+    private String getPartnerNickname(ChatRoom chatRoom, String requesterNickname) {
+        return chatRoom.getSenderNickname().equals(requesterNickname) ?
+                chatRoom.getReceiverNickname()
+                : chatRoom.getSenderNickname();
+    }
 }
