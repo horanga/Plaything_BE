@@ -18,10 +18,10 @@ public class Chat {
     private Long id;
 
     @Column(nullable = false)
-    private String sender;
+    private String senderNickname;
 
     @Column(nullable = false)
-    private String receiver;
+    private String receiverNickname;
 
     @Column(nullable = false)
     private String message;
