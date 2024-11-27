@@ -38,10 +38,10 @@ public class AuthServiceV1 {
 
     @Transactional(rollbackFor = Exception.class)
     public LoginResponse login(LoginRequest loginRequest, LocalDate now, String transactionId) {
-        Optional<User> user = userRepository.findByLoginId(loginRequest.name());
+        Optional<User> user = userRepository.findByLoginId(loginRequest.loginId());
 
         if (!user.isPresent()) {
-            log.error("NOT_EXIST_USER: {}", loginRequest.name());
+            log.error("NOT_EXIST_USER: {}", loginRequest.loginId());
             throw new CustomException(ErrorCode.NOT_EXIST_USER);
         }
 
@@ -58,7 +58,7 @@ public class AuthServiceV1 {
 
         //TODO JWT
 
-        String token = JWTProvider.createToken(loginRequest.name());
+        String token = JWTProvider.createToken(loginRequest.loginId());
 
         //이용자가 프로필을 설정했는지 안했는지 확인
         boolean invalidProfile = user.get().isProfileEmpty();
