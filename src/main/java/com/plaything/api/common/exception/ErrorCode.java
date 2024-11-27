@@ -52,6 +52,8 @@ public enum ErrorCode implements CodeInterFace {
 
     NOT_EXIST_CHATROOM(-1501, "채팅방이 존재하지 않습니다"),
     NOT_AUTHORIZED_CHAT_ROOM_USER(-1502, "채팅방에 속한 사용자가 아닙니다"),
+    PARTNER_ALREADY_LEAVE(-1503, "상대방이 채팅방을 떠났습니다"),
+    CHAT_ROOM_IS_OVER(-1504, "이미 종료된 채팅방입니다"),
 
     BAD_WORDS_FILTER(-1601, "금지된 단어가 포함됐습니다.");
 
