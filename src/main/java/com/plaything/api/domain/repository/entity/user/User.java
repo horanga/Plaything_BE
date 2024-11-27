@@ -27,6 +27,9 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Column
+    private boolean isDeleted;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "User_credentials_id", referencedColumnName = "id")
     private UserCredentials credentials;
@@ -51,7 +54,12 @@ public class User extends BaseEntity {
         return this.profile.getProfileStatus().equals(ProfileStatus.REJECTED);
     }
 
-    public String getNickname(){
+    public String getNickname() {
         return this.profile.getNickName();
+    }
+
+    public void delete() {
+        this.isDeleted = true;
+        profile.delete();
     }
 }
