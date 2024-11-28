@@ -24,8 +24,8 @@ public class ChatRoomQueryRepository {
         BooleanBuilder whereCondition = getBooleanBuilder(requestNickname, lastChatRoomId);
 
         return jpaQueryFactory.selectFrom(chatRoom)
-                .leftJoin(senderProfile).on(senderProfile.nickName.eq(chatRoom.senderNickname))
-                .leftJoin(receiverProfile).on(receiverProfile.nickName.eq(chatRoom.receiverNickname))
+                .innerJoin(senderProfile).on(senderProfile.nickName.eq(chatRoom.senderNickname))
+                .innerJoin(receiverProfile).on(receiverProfile.nickName.eq(chatRoom.receiverNickname))
                 .where(whereCondition)
                 .where(
                         chatRoom.receiverNickname.eq(requestNickname)
