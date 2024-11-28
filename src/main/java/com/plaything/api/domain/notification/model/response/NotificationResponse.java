@@ -6,8 +6,8 @@ import com.plaything.api.domain.repository.entity.notification.Notification;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import static com.plaything.api.domain.notification.constant.NotificationType.MATCHING_REQUEST;
-import static com.plaything.api.domain.notification.model.response.NotificationMessage.MATCHING_REQUEST_BODY;
-import static com.plaything.api.domain.notification.model.response.NotificationMessage.MATCHING_REQUEST_TITLE;
+import static com.plaything.api.domain.notification.constant.NotificationMessage.MATCHING_REQUEST_BODY;
+import static com.plaything.api.domain.notification.constant.NotificationMessage.MATCHING_REQUEST_TITLE;
 
 @Schema(description = "알림")
 public record NotificationResponse(

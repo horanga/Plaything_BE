@@ -1,15 +1,15 @@
 package com.plaything.api.domain.chat.controller;
 
 import com.plaything.api.domain.chat.model.response.ChatListResponse;
-import com.plaything.api.domain.chat.service.ChatServiceV1;
+import com.plaything.api.domain.chat.model.response.ChatRoomResponse;
+import com.plaything.api.domain.chat.service.ChatFacadeV1;
+import com.plaything.api.security.JWTProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Tag(name = "Chat API", description = "V1 Chat API")
 @RestController
@@ -17,19 +17,67 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/chat")
 public class ChatControllerV1 {
 
-    private final ChatServiceV1 chatServiceV1;
+    private final ChatFacadeV1 chatFacadeV1;
 
     @Operation(
-            summary = "채팅 리스트를 가져옵니다.",
-            description = "가장 최근 10개의 채팅 리스트를 가져옵니다."
+            summary = "매칭된 대상들의 채팅방 목록을 조회합니다.",
+            description = """
+                    매칭된 상대 10명과의 채팅방을 조회합니다.
+                    이때 최근 대화 내용 10개까지 같이 조회됩니다.
+                    채팅방 목록의 id 중 가장 작은 것을 보내면 추가로 채팅방을 조회하게 됩니다.
+                    처음 보낼 땐 lastId를 null로 보냅니다.
+                    """
     )
-    @GetMapping("/chat-list")
+    @GetMapping("/chat-rooms")
+    public List<ChatRoomResponse> chatRoom(
+            @RequestHeader(value = "Authorization", required = false) String authString,
+            @RequestParam(value = "lastId", required = false) Long lastChatRoomId
+
+    ) {
+        String token = JWTProvider.extractToken(authString);
+        String user = JWTProvider.getUserFromToken(token);
+        return chatFacadeV1.getChatRooms(user, lastChatRoomId);
+    }
+
+    @Operation(
+            summary = "채팅 내역 10개를 추가로 조회합니다",
+            description = """
+                    채팅방에서 이전 채팅 내역 10개를 가져옵니다.
+                    lastId는 현재 갖고 있는 채팅 메시지 id중 가장 작은 걸 보냅니다.
+                                       
+                    #예외#
+                    (1) 상대방이 나갔을 때 api를 호출하면 '상대방이 나갔다'는 예외
+                    (2) 종료된 채팅방은 '이미 종료된 채팅방'라는 예외
+                    """
+
+    )
+    @GetMapping("/chat-list/{id}")
     public ChatListResponse chatList(
-            @RequestParam("name") @Valid String to,
-            @RequestParam("from") @Valid String from
+            @RequestHeader(value = "Authorization", required = false) String authString,
+            @PathVariable("id") Long id,
+            @RequestParam("lastId") Long lastChatId
 
-    ){
+    ) {
+        String token = JWTProvider.extractToken(authString);
+        String user = JWTProvider.getUserFromToken(token);
+        return chatFacadeV1.getChatList(user, id, lastChatId);
+    }
 
-        return chatServiceV1.chatList(from, to);
+    @Operation(
+            summary = "채팅방을 나갑니다",
+            description = """
+                    채팅방과 함께 최근 10개의 대화 내역을 가져옵니다.
+                    URL에 채팅방 id를 보냅니다.
+                    """
+    )
+    @PutMapping("/leave-chatroom/{id}")
+    public void leaveChatRoom(
+            @RequestHeader(value = "Authorization", required = false) String authString,
+            @PathVariable("id") Long id
+
+    ) {
+        String token = JWTProvider.extractToken(authString);
+        String user = JWTProvider.getUserFromToken(token);
+        chatFacadeV1.leaveChatRoom(id, user);
     }
 }

@@ -65,7 +65,7 @@ public class UserControllerV1 {
     ) {
         String token = JWTProvider.extractToken(authString);
         String user = JWTProvider.getUserFromToken(token);
-        return profileFacadeV1.getProfile(user);
+        return profileFacadeV1.getProfileByLoginId(user);
     }
 
     @Operation(
@@ -113,6 +113,14 @@ public class UserControllerV1 {
         profileFacadeV1.uploadImages(images, user, indexOfMainImage);
     }
 
+    @DeleteMapping("{id}")
+    public void deleteUser(
+            @RequestHeader(value = "Authorization", required = false) String authString
+    ) {
+        String token = JWTProvider.extractToken(authString);
+        String user = JWTProvider.getUserFromToken(token);
+        profileFacadeV1.delete(user);
+    }
 //
 //    @DeleteMapping("/{id}/image")
 //    public ResponseEntity<Object> deleteUserImage(@PathVariable Long id,

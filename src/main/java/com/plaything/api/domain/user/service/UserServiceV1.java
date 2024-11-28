@@ -66,6 +66,12 @@ public class UserServiceV1 {
     }
 
     @Transactional
+    public void delete(String auth) {
+        User user = userRepository.findByLoginId(auth).get();
+        user.delete();
+    }
+
+    @Transactional
     public void increaseBannedProfileCount(User user) {
         Optional<UserViolationStats> violationStats = userViolationStatsRepository.findByUser(user);
         if (violationStats.isEmpty()) {

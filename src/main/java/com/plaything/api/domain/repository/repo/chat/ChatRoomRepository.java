@@ -9,6 +9,12 @@ import java.util.Optional;
 
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
-    @Query("SELECT c FROM ChatRoom c WHERE (c.user1 = :user1 AND c.user2 = :user2) OR (c.user1 = :user2 AND c.user2 = :user1)")
-    Optional<ChatRoom> findChatRoomByUsers(@Param("user1") String user1, @Param("user2") String user2);
+    @Query("""
+            SELECT c FROM ChatRoom c WHERE (c.senderNickname = :user1 AND c.receiverNickname = :user2)
+            OR (c.senderNickname = :user2 AND c.receiverNickname = :user1 AND c.isClosed is false)
+            """)
+    Optional<ChatRoom> findChatRoomByUsers(
+            @Param("user1") String requestNickname,
+            @Param("user2") String partnerNickname
+    );
 }

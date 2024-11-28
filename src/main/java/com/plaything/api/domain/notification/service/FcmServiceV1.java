@@ -9,8 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import static com.plaything.api.domain.notification.model.response.NotificationMessage.MATCHING_REQUEST_BODY;
-import static com.plaything.api.domain.notification.model.response.NotificationMessage.MATCHING_REQUEST_TITLE;
+import static com.plaything.api.domain.notification.constant.NotificationMessage.MATCHING_REQUEST_BODY;
+import static com.plaything.api.domain.notification.constant.NotificationMessage.MATCHING_REQUEST_TITLE;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -38,7 +38,7 @@ public class FcmServiceV1 {
                                 String fckToken) {
 
         return Message.builder().putData("title", requesterProfile.getNickName() + MATCHING_REQUEST_TITLE)
-                .putData("requesterNickname", requesterProfile.getNickName())
+                .putData("me", requesterProfile.getNickName())
                 .putData("profileImage", requesterMainPhoto.url())
                 .putData("body", MATCHING_REQUEST_BODY)
                 .setToken(fckToken)

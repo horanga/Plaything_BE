@@ -61,7 +61,7 @@ public record ProfileResponse(
                 .map(RelationshipPreferenceResponse::toResponse)
                 .toList();
 
-        String primaryRole = profile.getPrimaryRole().getPrimaryRole(profile.getGender());
+        String primaryRole = profile.getPrimaryRoleAsString();
 
         return new ProfileResponse(
                 profile.isPrivate(),

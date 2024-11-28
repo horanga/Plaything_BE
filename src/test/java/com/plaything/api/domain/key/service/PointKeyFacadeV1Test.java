@@ -27,11 +27,8 @@ import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,7 +36,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 import static com.plaything.api.domain.key.constant.KeyLogStatus.EARN;
@@ -48,8 +44,8 @@ import static com.plaything.api.domain.key.constant.KeySource.ADVERTISEMENT_REWA
 import static com.plaything.api.domain.key.constant.KeySource.LOGIN_REWARD;
 import static com.plaything.api.domain.key.constant.KeyType.POINT_KEY;
 import static com.plaything.api.domain.notification.constant.NotificationType.MATCHING_REQUEST;
-import static com.plaything.api.domain.notification.model.response.NotificationMessage.MATCHING_REQUEST_BODY;
-import static com.plaything.api.domain.notification.model.response.NotificationMessage.MATCHING_REQUEST_TITLE;
+import static com.plaything.api.domain.notification.constant.NotificationMessage.MATCHING_REQUEST_BODY;
+import static com.plaything.api.domain.notification.constant.NotificationMessage.MATCHING_REQUEST_TITLE;
 import static com.plaything.api.domain.user.constants.Gender.M;
 import static com.plaything.api.domain.user.constants.PersonalityTraitConstant.HUNTER;
 import static com.plaything.api.domain.user.constants.PrimaryRole.TOP;

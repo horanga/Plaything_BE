@@ -40,7 +40,6 @@ public enum ErrorCode implements CodeInterFace {
     AD_VIEW_TIME_NOT_EXPIRED(-901, "AD_VIEW_TIME_NOT_EXPIRED"),
     POINT_KEY_SAVED_FAILED(-902, "POINT KEY SAVED FAILED"),
 
-
     NOT_EXIST_AVAILABLE_POINT_KEY(-1001, "NOT EXIST AVAILABLE POINT KEY"),
 
     LOG_SAVED_FAILED(-1101, "LOG SAVED FAILED"),
@@ -49,9 +48,16 @@ public enum ErrorCode implements CodeInterFace {
 
     MESSAGE_CREATION_FAILED(-1301, "MESSAGE CREATION FAILED"),
 
-    TRANSACTION_ALREADY_PROCESSED(-1401, "TRANSACTION ALREADY PROCESSED");
+    TRANSACTION_ALREADY_PROCESSED(-1401, "TRANSACTION ALREADY PROCESSED"),
+
+    NOT_EXIST_CHATROOM(-1501, "채팅방이 존재하지 않습니다"),
+    NOT_AUTHORIZED_CHAT_ROOM_USER(-1502, "채팅방에 속한 사용자가 아닙니다"),
+    PARTNER_ALREADY_LEAVE(-1503, "상대방이 채팅방을 떠났습니다"),
+    CHAT_ROOM_IS_OVER(-1504, "이미 종료된 채팅방입니다"),
+
+    BAD_WORDS_FILTER(-1601, "금지된 단어가 포함됐습니다.");
+
 
     private final Integer code;
     private final String message;
-
 }
