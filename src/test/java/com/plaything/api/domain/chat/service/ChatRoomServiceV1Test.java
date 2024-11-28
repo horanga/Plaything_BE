@@ -1,6 +1,8 @@
 package com.plaything.api.domain.chat.service;
 
 import com.plaything.api.common.exception.CustomException;
+import com.plaything.api.domain.admin.model.response.ProfileRecordResponse;
+import com.plaything.api.domain.admin.sevice.ProfileMonitoringFacadeV1;
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
 import com.plaything.api.domain.auth.service.AuthServiceV1;
 import com.plaything.api.domain.chat.model.reqeust.Message;
@@ -16,6 +18,7 @@ import com.plaything.api.domain.user.constants.PrimaryRole;
 import com.plaything.api.domain.user.constants.RelationshipPreferenceConstant;
 import com.plaything.api.domain.user.model.request.ProfileRegistration;
 import com.plaything.api.domain.user.service.ProfileFacadeV1;
+import com.plaything.api.domain.user.service.UserServiceV1;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -57,6 +60,12 @@ class ChatRoomServiceV1Test {
 
     @Autowired
     private ChatRoomRepository chatRoomRepository;
+
+    @Autowired
+    private ProfileMonitoringFacadeV1 profileMonitoringFacadeV1;
+
+    @Autowired
+    private UserServiceV1 userServiceV1;
 
     @BeforeEach
     void setUp() {
@@ -434,6 +443,66 @@ class ChatRoomServiceV1Test {
         List<ChatRoomResponse> chatRooms2 = chatFacadeV1.getChatRooms("dusgh12", null);
         assertThat(chatRooms.size()).isEqualTo(3);
         assertThat(chatRooms2.size()).isEqualTo(0);
+    }
+
+    @DisplayName("밴 당한 유저와의 채팅방은 조회되지 않는다")
+    @Test
+    void test10() {
+
+        createUser("dusgh12", "연1");
+        createUser("dusgh123", "연2");
+
+        sendMessage("알렉1", "연1", "hi~");
+        sendMessage("알렉1", "연2", "hello");
+        sendMessage("알렉1", "알렉2", "hi");
+
+        List<ChatRoomResponse> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
+        List<ProfileRecordResponse> records = profileMonitoringFacadeV1.getRecords();
+
+        profileMonitoringFacadeV1.rejectProfile(records.get(1).recordId(), "부적절한 사진");
+
+        List<ChatRoomResponse> chatRooms2 = chatFacadeV1.getChatRooms("dusgh1234", null);
+        assertThat(chatRooms.size()).isEqualTo(3);
+        assertThat(chatRooms2.size()).isEqualTo(2);
+
+        assertThat(chatRooms2.get(0).lastChatMessage()).isEqualTo("hello");
+        assertThat(chatRooms2.get(0).chatProfile().primaryRole()).isEqualTo("MT");
+        assertThat(chatRooms2.get(0).chatProfile().nickName()).isEqualTo("연2");
+
+        assertThat(chatRooms2.get(1).lastChatMessage()).isEqualTo("hi~");
+        assertThat(chatRooms2.get(1).chatProfile().primaryRole()).isEqualTo("MT");
+        assertThat(chatRooms2.get(1).chatProfile().nickName()).isEqualTo("연1");
+
+    }
+
+    @DisplayName("탈퇴한 유저와의 채팅방은 조회되지 않는다")
+    @Test
+    void test11() {
+
+        createUser("dusgh12", "연1");
+        createUser("dusgh123", "연2");
+
+        sendMessage("알렉1", "연1", "hi~");
+        sendMessage("알렉1", "연2", "hello");
+        sendMessage("알렉1", "알렉2", "hi");
+
+        List<ChatRoomResponse> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
+
+        userServiceV1.delete("dusgh12345");
+
+        List<ChatRoomResponse> chatRooms2 = chatFacadeV1.getChatRooms("dusgh1234", null);
+        assertThat(chatRooms.size()).isEqualTo(3);
+        assertThat(chatRooms2.size()).isEqualTo(2);
+
+        assertThat(chatRooms2.get(0).lastChatMessage()).isEqualTo("hello");
+        assertThat(chatRooms2.get(0).chatProfile().primaryRole()).isEqualTo("MT");
+        assertThat(chatRooms2.get(0).chatProfile().nickName()).isEqualTo("연2");
+
+
+        assertThat(chatRooms2.get(1).lastChatMessage()).isEqualTo("hi~");
+        assertThat(chatRooms2.get(1).chatProfile().primaryRole()).isEqualTo("MT");
+        assertThat(chatRooms2.get(1).chatProfile().nickName()).isEqualTo("연1");
+
     }
 
     private void createUser(String loginId, String nickName) {
