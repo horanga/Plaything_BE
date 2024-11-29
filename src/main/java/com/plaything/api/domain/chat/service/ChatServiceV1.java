@@ -8,7 +8,6 @@ import com.plaything.api.domain.repository.entity.chat.ChatRoom;
 import com.plaything.api.domain.repository.repo.chat.ChatRepository;
 import com.plaything.api.domain.repository.repo.chat.ChatRoomRepository;
 import com.plaything.api.domain.repository.repo.query.ChatQueryRepository;
-import com.plaything.api.domain.repository.repo.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +21,7 @@ import java.util.Optional;
 @Service
 public class ChatServiceV1 {
 
-    private final UserRepository userRepository;
+    private final ChatRateLimiter chatRateLimiter;
 
     private final ChatQueryRepository chatQueryRepository;
 
@@ -49,7 +48,7 @@ public class ChatServiceV1 {
     //웹소켓은 트랜잭션 경계가 명확하지 않다. 하나의 커넥션으로만 처리돼서
     @Transactional(transactionManager = "createChatTransactionManger")
     public Chat saveChatMessage(Message msg, LocalDateTime now) {
-
+        chatRateLimiter.checkRate(msg.senderNickname());
         Optional<ChatRoom> chatRoomByUsers = chatRoomRepository.findChatRoomByUsers(msg.senderNickname(), msg.receiverNickname());
 
         if (chatRoomByUsers.isEmpty()) {
