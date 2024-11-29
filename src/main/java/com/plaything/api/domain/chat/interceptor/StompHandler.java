@@ -6,11 +6,14 @@ import com.plaything.api.domain.user.model.response.ProfileResponse;
 import com.plaything.api.domain.user.service.ProfileFacadeV1;
 import com.plaything.api.security.JWTProvider;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -22,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class StompHandler implements ChannelInterceptor {
 
 
+    private static final Logger log = LoggerFactory.getLogger(StompHandler.class);
     private final Map<String, String[]> sessionUserMap = new ConcurrentHashMap<>();
     private final Map<String, String[]> matchingMap = new ConcurrentHashMap<>();
     private final ProfileFacadeV1 profileFacadeV1;
@@ -129,5 +133,14 @@ public class StompHandler implements ChannelInterceptor {
             return parts[2];
         }
         throw new IllegalArgumentException("Invalid destination format");
+    }
+
+    @Scheduled(cron = "0 0 5 * * *")
+    private void cleanupMap() {
+
+        sessionUserMap.clear();
+        matchingMap.clear();
+        log.info("stomp 데이터 삭제");
+
     }
 }
