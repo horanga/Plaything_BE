@@ -74,6 +74,7 @@ public class ProfileFacadeV1 {
 
     }
 
+    @Transactional(readOnly = true)
     public ProfileResponse getProfileByLoginId(String loginId) {
         User user = userServiceV1.findByLoginId(loginId);
         Profile profile = user.getProfile();
