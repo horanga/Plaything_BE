@@ -4,7 +4,6 @@ import com.plaything.api.domain.chat.model.reqeust.Message;
 import com.plaything.api.domain.chat.service.ChatFacadeV1;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
@@ -18,12 +17,9 @@ public class WssControllerV1 {
 
     private final ChatFacadeV1 chatFacadeV1;
 
-    @MessageMapping("/chat/message/{from}")
+    @MessageMapping("/chat/message")
     @SendTo("/sub/chat")
-    public Message receiveMessage(
-            @DestinationVariable String from,
-            Message msg
-    ) {
+    public Message receiveMessage(Message msg) {
         chatFacadeV1.saveMessage(msg, LocalDateTime.now());
         return msg;
     }
