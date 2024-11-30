@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import java.time.LocalDateTime;
@@ -17,14 +17,13 @@ import java.time.LocalDateTime;
 public class WssControllerV1 {
 
     private final ChatFacadeV1 chatFacadeV1;
+    private final SimpMessagingTemplate messagingTemplate;
 
-    @MessageMapping("/chat/message/{from}")
-    @SendTo("/sub/chat")
-    public Message receiveMessage(
-            @DestinationVariable String from,
-            Message msg
-    ) {
+
+    @MessageMapping("/chat/message/{to}")
+    public void receiveMessage(@DestinationVariable String to, Message msg) {
+        // nativeHeaders에서 Authorization 헤더 추출
         chatFacadeV1.saveMessage(msg, LocalDateTime.now());
-        return msg;
+        messagingTemplate.convertAndSendToUser(to, "/chat", msg);
     }
 }

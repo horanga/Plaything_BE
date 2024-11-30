@@ -13,6 +13,9 @@ import com.plaything.api.domain.repository.entity.user.profile.Profile;
 import com.plaything.api.domain.repository.repo.user.ProfileRepository;
 import com.plaything.api.domain.repository.repo.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -25,6 +28,7 @@ import java.util.stream.Collectors;
 @Service
 public class ChatFacadeV1 {
 
+    private static final Logger log = LoggerFactory.getLogger(ChatFacadeV1.class);
     private final UserRepository userRepository;
 
     private final ChatRoomServiceV1 chatRoomServiceV1;
@@ -34,6 +38,8 @@ public class ChatFacadeV1 {
     private final ProfileRepository profileRepository;
 
     private final FilteringService filteringService;
+
+    private final ChatRateLimiter chatRateLimiter;
 
     public List<ChatRoomResponse> getChatRooms(String requesterLoginId, Long lastChatRoomId) {
         User user = userRepository.findByLoginId(requesterLoginId)
@@ -83,6 +89,12 @@ public class ChatFacadeV1 {
                     i.getLastChatMessageAt(),
                     ChatProfile.toResponse(profile));
         }).toList();
+    }
+
+    @Scheduled(cron = "${schedules.cron.data.cleanup}")
+    public void cleanupChatRateDate() {
+        chatRateLimiter.cleanupOldData();
+        log.info("채팅 rate 삭제:" + LocalDateTime.now());
     }
 
     private Map<String, Profile> getProfileMap(List<ChatRoom> chatRooms, String requestNickname) {
