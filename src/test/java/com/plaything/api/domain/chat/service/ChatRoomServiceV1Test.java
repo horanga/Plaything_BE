@@ -20,6 +20,7 @@ import com.plaything.api.domain.user.model.request.ProfileRegistration;
 import com.plaything.api.domain.user.service.ProfileFacadeV1;
 import com.plaything.api.domain.user.service.UserServiceV1;
 import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -67,6 +68,14 @@ class ChatRoomServiceV1Test {
     @Autowired
     private UserServiceV1 userServiceV1;
 
+    @Autowired
+    private ChatRateLimiter rateLimiter;
+
+    @AfterEach
+    void cleanUp() {
+        rateLimiter.cleanupOldData();
+    }
+
     @BeforeEach
     void setUp() {
         CreateUserRequest request = new CreateUserRequest("dusgh1234", "1234", "1");
@@ -107,12 +116,13 @@ class ChatRoomServiceV1Test {
             String partnerNickname,
             String partnerRole,
             String mainPhotoUrl
-    ) {
+    ) throws InterruptedException {
 
         LocalDateTime now = LocalDateTime.now();
         for (int i = 0; i < 10; i++) {
             Message msg = new Message(sender, receiver, "안녕" + i);
             chatServiceV1.saveChatMessage(msg, now);
+            Thread.sleep(1000);
         }
 
         Message msg = new Message(sender, receiver, "안녕하십니까!");
@@ -156,12 +166,13 @@ class ChatRoomServiceV1Test {
             String sender,
             String receiver,
             String senderLoginId
-    ) {
+    ) throws InterruptedException {
 
         LocalDateTime now = LocalDateTime.now();
         for (int i = 0; i < 10; i++) {
             Message msg = new Message(sender, receiver, "안녕" + i);
             chatServiceV1.saveChatMessage(msg, now);
+            Thread.sleep(1000);
         }
 
         Message msg = new Message(sender, receiver, "안녕하십니까!");
@@ -210,11 +221,12 @@ class ChatRoomServiceV1Test {
 
     @DisplayName("채팅방 목록을 조회하면 10개의 최신 채팅방과 ")
     @Test
-    void test4() {
+    void test4() throws InterruptedException {
 
         for (int i = 1; i <= 30; i++) {
             createUser("dusgh" + i, "연" + i);
             sendMessage("알렉1", "연" + i, String.valueOf(i));
+            Thread.sleep(900);
         }
 
 
@@ -317,13 +329,14 @@ class ChatRoomServiceV1Test {
 
     @DisplayName("상대방이 채팅방을 나가면 채팅방에 정보에 표시된다")
     @Test
-    void test5() {
+    void test5() throws InterruptedException {
         createUser("dusgh12", "연1");
         createUser("dusgh123", "연2");
 
 
         sendMessage("알렉1", "연1", "hi~");
         sendMessage("알렉1", "연2", "hello");
+        Thread.sleep(1000);
         sendMessage("알렉1", "알렉2", "hi");
 
         List<ChatRoomResponse> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
@@ -355,13 +368,14 @@ class ChatRoomServiceV1Test {
 
     @DisplayName("이미 종료된 채팅방은 조회하지 못한다")
     @Test
-    void test6() {
+    void test6() throws InterruptedException {
         createUser("dusgh12", "연1");
         createUser("dusgh123", "연2");
 
 
         sendMessage("알렉1", "연1", "hi~");
         sendMessage("알렉1", "연2", "hello");
+        Thread.sleep(1000);
         sendMessage("알렉1", "알렉2", "hi");
 
         List<ChatRoomResponse> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
@@ -386,12 +400,13 @@ class ChatRoomServiceV1Test {
 
     @DisplayName("종료된 채팅방은 채팅 내역을 조회할 수 없다")
     @Test
-    void test7() {
+    void test7() throws InterruptedException {
         createUser("dusgh12", "연1");
         createUser("dusgh123", "연2");
 
         sendMessage("알렉1", "연1", "hi~");
         sendMessage("알렉1", "연2", "hello");
+        Thread.sleep(1000);
         sendMessage("알렉1", "알렉2", "hi");
 
         List<ChatRoomResponse> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
@@ -428,13 +443,14 @@ class ChatRoomServiceV1Test {
 
     @DisplayName("자신이 나간 채팅 내역을 조회할 수 없다")
     @Test
-    void test9() {
+    void test9() throws InterruptedException {
 
         createUser("dusgh12", "연1");
         createUser("dusgh123", "연2");
 
         sendMessage("알렉1", "연1", "hi~");
         sendMessage("알렉1", "연2", "hello");
+        Thread.sleep(1000);
         sendMessage("알렉1", "알렉2", "hi");
 
         List<ChatRoomResponse> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
