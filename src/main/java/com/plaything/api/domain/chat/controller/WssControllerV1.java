@@ -22,7 +22,6 @@ public class WssControllerV1 {
 
     @MessageMapping("/chat/message/{to}")
     public void receiveMessage(@DestinationVariable String to, Message msg) {
-        // nativeHeaders에서 Authorization 헤더 추출
         chatFacadeV1.saveMessage(msg, LocalDateTime.now());
         messagingTemplate.convertAndSendToUser(to, "/chat", msg);
     }
