@@ -70,7 +70,7 @@ public class ProfileFacadeV1 {
 
     @Transactional
     public void updateProfile(ProfileUpdate update, String user) {
-        Profile profile = getProfileByUser(user);
+        Profile profile = getProfileByUserLoginId(user);
 
     }
 
@@ -81,6 +81,10 @@ public class ProfileFacadeV1 {
 
         if (profile == null) {
             throw new CustomException(ErrorCode.NOT_EXIST_PROFILE);
+        }
+
+        if (profile.isBaned()) {
+            throw new CustomException(ErrorCode.NOT_AUTHORIZED_PROFILE);
         }
 
         return ProfileResponse.toResponse(profile, profile.getProfileImages());
@@ -160,9 +164,9 @@ public class ProfileFacadeV1 {
     }
 
     //프로필 조회를 위한 api가 아닌 단순 로직에 필요한 메서드
-    public Profile getProfileByUser(String name) {
+    public Profile getProfileByUserLoginId(String loginId) {
 
-        User user = userServiceV1.findByLoginId(name);
+        User user = userServiceV1.findByLoginId(loginId);
         Profile profile = user.getProfile();
         if (profile == null) {
             throw new CustomException(ErrorCode.NOT_EXIST_USER);

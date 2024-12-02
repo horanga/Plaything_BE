@@ -77,7 +77,7 @@ class ProfileFacadeV1Test {
 
         profileFacadeV1.registerProfile(profileRegistration, "dusgh123");
 
-        Profile profile = profileFacadeV1.getProfileByUser("dusgh123");
+        Profile profile = profileFacadeV1.getProfileByUserLoginId("dusgh123");
 
         assertThat(profile.getNickName()).isEqualTo("dusgh123");
         assertThat(profile.getGender()).isEqualTo(M);
@@ -97,7 +97,7 @@ class ProfileFacadeV1Test {
 
         profileFacadeV1.registerProfile(profileRegistration, "dusgh123");
 
-        Profile profile = profileFacadeV1.getProfileByUser("dusgh123");
+        Profile profile = profileFacadeV1.getProfileByUserLoginId("dusgh123");
 
         assertThat(profile.getNickName()).isEqualTo("dusgh123");
         assertThat(profile.getGender()).isEqualTo(M);

@@ -10,7 +10,11 @@ import java.util.List;
 
 @Schema(description = "User 프로필")
 public record ProfileResponse(
-        @Schema(description = "프로필 비공개")
+
+        @Schema(description = "프로필 id")
+        Long id,
+
+        @Schema(description = "프로필 비공개 여부")
         boolean isPrivate,
 
         @Schema(description = "프로필 밴 여부")
@@ -64,6 +68,7 @@ public record ProfileResponse(
         String primaryRole = profile.getPrimaryRoleAsString();
 
         return new ProfileResponse(
+                profile.getId(),
                 profile.isPrivate(),
                 profile.isBaned(),
                 profile.getProfileStatus(),
