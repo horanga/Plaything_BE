@@ -12,7 +12,7 @@ public enum ErrorCode implements CodeInterFace {
     // USER 가입 or 로그인
     USER_ALREADY_EXISTS("USER_ALREADY_EXISTS"),
     USER_SAVED_FAILED("USER_SAVED_FAILED"),
-    NOT_EXIST_USER("NOT_EXIST_USER"),
+    NOT_EXIST_USER("존재하지 않는 회원입니다"),
     MIS_MATCH_PASSWORD("MIS_MATCH_PASSWORD"),
 
     //JWT 토큰
@@ -30,10 +30,11 @@ public enum ErrorCode implements CodeInterFace {
     NO_IMAGE_FAILED("NO_IMAGE_FAILED"),
 
     //프로필 조회 or 등록
-    NOT_EXIST_PROFILE("NOT_EXIST_PROFILE"),
+    NOT_EXIST_PROFILE("프로필이 존재하지 않는 회원입니다"),
     PROFILE_REGISTER_FAILED("PROFILE_REGISTER_FAILED"),
     PROFILE_ALREADY_EXIST("PROFILE ALREADY EXIST"),
     NOT_EXIST_PROFILE_RECORD("NOT EXIST PROFILE RECORD"),
+    NOT_AUTHORIZED_PROFILE("부적절한 프로필로 비활성화된 회원입니다"),
 
     //프로필 성향
     NOT_EXIST_PRIMARY_TRAIT("NOT EXIST PRIMARY TRAIT"),
@@ -76,8 +77,12 @@ public enum ErrorCode implements CodeInterFace {
     CHAT_ROOM_IS_OVER("이미 종료된 채팅방입니다"),
     TOO_MANY_CHAT_RATE("짧은 시간에 너무 많은 채팅 메시지를 보냈습니다"),
     NOT_AUTHORIZED_SUBSCRIBE("채널 구독 권한이 없습니다"),
-    NOT_AUTHORIZED_USER("메시지 발신자가 일치하지 않습니다"),
+    NOT_AUTHORIZED_USER("메시지 발신자가 세션 회원과 일치하지 않습니다"),
     NOT_MATCHING_PARTNER("매칭된 파트너가 아닙니다"),
+    NOT_EXIST_MATCHING_PARTNER("매칭 파트너가 없습니다"),
+    NOT_CONNECTED_STOMP("STOMP에 채팅 연결이 된 회원이 아닙니다"),
+    NOT_AUTHORIZED_CHAT("인증 토큰이 없어 처리가 불가능합니다"),
+    CONNECTION_ALREADY_EXIST("이미 웹소켓 연결이 된 상태입니다"),
 
     //메시지 검사
     BAD_WORDS_FILTER("금지된 단어가 포함됐습니다.");
