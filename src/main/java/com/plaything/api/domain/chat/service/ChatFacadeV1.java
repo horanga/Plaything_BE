@@ -65,6 +65,7 @@ public class ChatFacadeV1 {
                 .orElseThrow(() ->
                         new CustomException(ErrorCode.NOT_EXIST_USER));
         String requestNickname = user.getNickname();
+        chatRoomServiceV1.checkChatRomm(chatRoomId, requestNickname);
         return chatServiceV1.chatList(chatRoomId, requestNickname, lastChatId, LocalDate.now());
     }
 
@@ -90,6 +91,11 @@ public class ChatFacadeV1 {
                     ChatProfile.toResponse(profile));
         }).toList();
     }
+
+    public ChatRoom findByUsers(String senderNickName, String receiverNickname) {
+        return chatRoomServiceV1.findByUsers(senderNickName, receiverNickname);
+    }
+
 
     @Scheduled(cron = "${schedules.cron.data.cleanup}")
     public void cleanupChatRateDate() {

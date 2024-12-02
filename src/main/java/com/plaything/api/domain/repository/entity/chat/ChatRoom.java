@@ -2,7 +2,6 @@ package com.plaything.api.domain.repository.entity.chat;
 
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorCode;
-import com.plaything.api.domain.chat.model.reqeust.Message;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,6 +41,15 @@ public class ChatRoom {
     private LocalDateTime lastChatMessageAt;
 
     @Column
+    private boolean hasNewChat;
+
+    @Column
+    private LocalDateTime lastChatCheckedAt;
+
+    @Column
+    String lastChatSender;
+
+    @Column
     private boolean isClosed = false;
 
 
@@ -50,7 +58,7 @@ public class ChatRoom {
     }
 
     public void hasPartnerLeave() {
-        if (!this.exitedUserNickname.isEmpty()) {
+        if (this.exitedUserNickname != null) {
             throw new CustomException(ErrorCode.PARTNER_ALREADY_LEAVE);
         }
     }
@@ -69,9 +77,19 @@ public class ChatRoom {
         }
     }
 
-    public void updateLastMessage(Message message, LocalDateTime createdAt) {
-        this.lastChatMessage = message.message();
+    public void updateLastMessage(String sender, String message, LocalDateTime createdAt) {
+        this.lastChatMessage = message;
         this.lastChatMessageAt = createdAt;
+        this.lastChatSender = sender;
+        if (!this.hasNewChat) {
+            this.hasNewChat = true;
+        }
     }
 
+    public void getMessages(String nickName) {
+        if (this.hasNewChat && !this.lastChatSender.equals(nickName)) {
+            this.hasNewChat = false;
+        }
+        this.lastChatCheckedAt = LocalDateTime.now();
+    }
 }

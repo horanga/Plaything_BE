@@ -42,8 +42,8 @@ public class ChatControllerV1 {
             summary = "채팅 내역 10개를 추가로 조회합니다",
             description = """
                     채팅방에서 이전 채팅 내역 10개를 가져옵니다.
-                    lastId는 현재 갖고 있는 채팅 메시지 id중 가장 작은 걸 보냅니다.
-                    처음 보낼 땐 lastId를 null로 보냅니다.
+                    lastChatId는 현재 갖고 있는 채팅 메시지 id중 가장 작은 걸 보냅니다.
+                    가장 최근 채팅 목록을 가져올 땐 lastChatId를 null로 보냅니다.
                                         
                     #예외#
                     (1) 상대방이 나갔을 때 api를 호출하면 '상대방이 나갔다'는 예외
@@ -51,16 +51,16 @@ public class ChatControllerV1 {
                     """
 
     )
-    @GetMapping("/chat-list/{id}")
+    @GetMapping("/chat-list/{chatRoomId}")
     public ChatListResponse chatList(
             @RequestHeader(value = "Authorization", required = false) String authString,
-            @PathVariable("id") Long id,
-            @RequestParam("lastId") Long lastChatId
+            @PathVariable("chatRoomId") Long chatRoomId,
+            @RequestParam(value = "lastChatId", required = false) Long lastChatId
 
     ) {
         String token = JWTProvider.extractToken(authString);
         String user = JWTProvider.getUserFromToken(token);
-        return chatFacadeV1.getChatList(user, id, lastChatId);
+        return chatFacadeV1.getChatList(user, chatRoomId, lastChatId);
     }
 
     @Operation(

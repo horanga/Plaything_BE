@@ -7,6 +7,8 @@ import com.plaything.api.domain.auth.model.request.CreateUserRequest;
 import com.plaything.api.domain.auth.service.AuthServiceV1;
 import com.plaything.api.domain.chat.model.reqeust.Message;
 import com.plaything.api.domain.chat.model.response.ChatRoomResponse;
+import com.plaything.api.domain.index.model.response.IndexResponse;
+import com.plaything.api.domain.index.service.IndexServiceV1;
 import com.plaything.api.domain.repository.entity.chat.Chat;
 import com.plaything.api.domain.repository.entity.chat.ChatRoom;
 import com.plaything.api.domain.repository.entity.user.profile.Profile;
@@ -70,6 +72,9 @@ class ChatRoomServiceV1Test {
 
     @Autowired
     private ChatRateLimiter rateLimiter;
+
+    @Autowired
+    private IndexServiceV1 indexServiceV1;
 
     @AfterEach
     void cleanUp() {
@@ -518,6 +523,50 @@ class ChatRoomServiceV1Test {
         assertThat(chatRooms2.get(1).lastChatMessage()).isEqualTo("hi~");
         assertThat(chatRooms2.get(1).chatProfile().primaryRole()).isEqualTo("MT");
         assertThat(chatRooms2.get(1).chatProfile().nickName()).isEqualTo("연1");
+
+    }
+
+    @DisplayName("메시지를 보내면 새로운 메시지 표시가 뜬다")
+    @Test
+    void test12() {
+
+        createUser("dusgh12", "연1");
+        createUser("dusgh123", "연2");
+
+        sendMessage("알렉1", "연1", "hi~");
+
+        IndexResponse index1 = indexServiceV1.refreshIndex("dusgh12");
+        IndexResponse index2 = indexServiceV1.refreshIndex("dusgh1234");
+
+        assertThat(index1.hasNewChat()).isTrue();
+        assertThat(index2.hasNewChat()).isFalse();
+
+    }
+
+    @DisplayName("메시지를 조회하면 새로운 메시지 표시가 사라진다")
+    @Test
+    void test13() {
+
+        createUser("dusgh12", "연1");
+        createUser("dusgh123", "연2");
+
+        sendMessage("알렉1", "연1", "hi~");
+        ChatRoom chatRoom = chatRoomRepository.findChatRoomByUsers("알렉1", "연1").get();
+        chatFacadeV1.getChatList("dusgh1234", chatRoom.getId(), null);
+
+        IndexResponse index1 = indexServiceV1.refreshIndex("dusgh12");
+        IndexResponse index2 = indexServiceV1.refreshIndex("dusgh1234");
+
+        assertThat(index1.hasNewChat()).isTrue();
+        assertThat(index2.hasNewChat()).isFalse();
+
+        chatFacadeV1.getChatList("dusgh12", chatRoom.getId(), null);
+
+        IndexResponse index3 = indexServiceV1.refreshIndex("dusgh12");
+        IndexResponse index4 = indexServiceV1.refreshIndex("dusgh1234");
+
+        assertThat(index3.hasNewChat()).isFalse();
+        assertThat(index4.hasNewChat()).isFalse();
 
     }
 

@@ -18,3 +18,4 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
             @Param("user2") String partnerNickname
     );
 }
+

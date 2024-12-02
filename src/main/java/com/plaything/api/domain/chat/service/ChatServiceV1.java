@@ -33,12 +33,6 @@ public class ChatServiceV1 {
     public ChatListResponse chatList(Long chatRoomId, String requestNickName, Long lastId, LocalDate now) {
 
         List<Chat> chats = chatQueryRepository.findChat(chatRoomId, lastId, now);
-        ChatRoom chatRoom = chats.get(0).getChatRoom();
-
-        //검증을 이 순서대로 해야 종료된 채팅방이라는 메시지를 전달해줄 수 있다
-        chatRoom.isOver();
-        chatRoom.hasPartnerLeave();
-
         List<MessageResponse> res = chats.stream()
                 .map(i -> MessageResponse.toResponse(i, requestNickName))
                 .toList();
@@ -52,21 +46,18 @@ public class ChatServiceV1 {
         Optional<ChatRoom> chatRoomByUsers = chatRoomRepository.findChatRoomByUsers(msg.senderNickname(), msg.receiverNickname());
 
         if (chatRoomByUsers.isEmpty()) {
-
             //TODO 예외처리
             ChatRoom chatRoom = ChatRoom.builder()
                     .senderNickname(msg.senderNickname())
                     .receiverNickname(msg.receiverNickname())
                     .build();
-
-            ChatRoom chatRoomByFirst = chatRoomRepository.save(chatRoom);
+            chatRoom.updateLastMessage(msg.senderNickname(), msg.message(), LocalDateTime.now());
             Chat chat = chat(msg, chatRoom, now);
-            chatRoomByFirst.updateLastMessage(msg, chat.getCreatedAt());
+            chatRoomRepository.save(chatRoom);
             return chatRepository.save(chat);
-
         }
         Chat chat = chat(msg, chatRoomByUsers.get(), now);
-        chatRoomByUsers.get().updateLastMessage(msg, chat.getCreatedAt());
+        chatRoomByUsers.get().updateLastMessage(msg.senderNickname(), msg.message(), LocalDateTime.now());
         return chatRepository.save(chat);
     }
 

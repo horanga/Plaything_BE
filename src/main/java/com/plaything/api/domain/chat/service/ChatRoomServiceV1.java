@@ -25,6 +25,22 @@ public class ChatRoomServiceV1 {
         return chatRoomQueryRepository.findChatRooms(requestNickname, lastChatRoomId);
     }
 
+    public ChatRoom findByUsers(String senderNickname, String receiverNickname) {
+        return chatRoomRepository.findChatRoomByUsers(senderNickname, receiverNickname)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_CHATROOM));
+    }
+
+    @Transactional
+    public void checkChatRomm(Long chatRoomId, String nickName) {
+
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_CHATROOM));
+        //검증을 이 순서대로 해야 종료된 채팅방이라는 메시지를 전달해줄 수 있다
+        chatRoom.isOver();
+        chatRoom.hasPartnerLeave();
+        chatRoom.getMessages(nickName);
+    }
+
+
     @Transactional
     public void leaveRoom(Long id, String requestNickName) {
 
@@ -36,6 +52,10 @@ public class ChatRoomServiceV1 {
             throw new CustomException(ErrorCode.NOT_AUTHORIZED_CHAT_ROOM_USER);
         }
         chatRoom.leaveChatRoom(requestNickName);
+    }
+
+    public void hasNewChat() {
+
     }
 
 }
