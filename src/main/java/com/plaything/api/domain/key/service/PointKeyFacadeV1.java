@@ -29,7 +29,7 @@ public class PointKeyFacadeV1 {
     private final DuplicateRequestChecker duplicateRequestChecker;
 
     public void createPointKeyForAd(String loginId, AdRewardRequest request, LocalDateTime now, String transactionId) {
-        if(!duplicateRequestChecker.checkDuplicateRequest(loginId, transactionId)){
+        if (!duplicateRequestChecker.checkDuplicateRequest(loginId, transactionId)) {
             throw new CustomException(ErrorCode.TRANSACTION_ALREADY_PROCESSED);
         }
 
@@ -38,14 +38,14 @@ public class PointKeyFacadeV1 {
     }
 
     public boolean createPointKeyForLogin(User user, String transactionId, LocalDate now) {
-        if(!duplicateRequestChecker.checkDuplicateRequest(user.getLoginId(), transactionId)){
+        if (!duplicateRequestChecker.checkDuplicateRequest(user.getLoginId(), transactionId)) {
             throw new CustomException(ErrorCode.TRANSACTION_ALREADY_PROCESSED);
         }
         return pointKeyServiceV1.createPointKeyForLogin(user, REWARD_COUNT_FOR_FIRST_LOGIN, now, transactionId);
     }
 
     public void usePointKeyForMatching(String requesterLoginId, MatchingRequest matchingRequest, String transactionId) {
-        if(!duplicateRequestChecker.checkDuplicateRequest(requesterLoginId, transactionId)){
+        if (!duplicateRequestChecker.checkDuplicateRequest(requesterLoginId, transactionId)) {
             throw new CustomException(ErrorCode.TRANSACTION_ALREADY_PROCESSED);
         }
 
@@ -57,12 +57,8 @@ public class PointKeyFacadeV1 {
         Profile requesterProfile = requester.getProfile();
         User partner = userServiceV1.findByProfileNickname(matchingRequest.partnerNickname());
         pointKeyServiceV1.usePointKey(requester, requesterProfile, partner, transactionId);
-
         //fcm 토큰 검증
-
-
     }
-
 
     public List<PointKeyLog> getPointKeyLog(String name) {
         return pointKeyLogServiceV1.getPointKeyLog(name);

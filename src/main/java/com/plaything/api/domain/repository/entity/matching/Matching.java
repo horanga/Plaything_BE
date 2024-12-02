@@ -11,6 +11,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(indexes = {
+        @Index(name = "idx_senderNickname", columnList = "senderNickname"),
+        @Index(name = "idx_receiverNickname", columnList = "receiverNickname")
+})
 @Entity
 public class Matching extends BaseEntity {
 
@@ -19,8 +23,14 @@ public class Matching extends BaseEntity {
     private long id;
 
     @Column(nullable = false)
-    private long senderId;
+    private String senderNickname;
 
     @Column(nullable = false)
-    private long receiverId;
+    private String receiverNickname;
+
+    @Column
+    private boolean isMatched;
+
+    @Column
+    private boolean isOvered;
 }
