@@ -148,9 +148,9 @@ class FilteringServiceTest {
 //        for (int i = 0; i < iterations; i++) {
 //            long startTime = System.nanoTime();
 //
-//            for (String message : messages) {
+//            for (String chat : messages) {
 //                try {
-//                    filteringService.filterWords(message);
+//                    filteringService.filterWords(chat);
 //                } catch (CustomException e) {
 //                    // 예외는 무시하고 계속 진행
 //                }

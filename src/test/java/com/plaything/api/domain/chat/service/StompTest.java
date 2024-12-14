@@ -5,7 +5,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
 import com.plaything.api.domain.auth.service.AuthServiceV1;
-import com.plaything.api.domain.chat.model.reqeust.Message;
+import com.plaything.api.domain.chat.model.reqeust.ChatRequest;
 import com.plaything.api.domain.index.model.response.IndexResponse;
 import com.plaything.api.domain.index.service.IndexServiceV1;
 import com.plaything.api.domain.repository.entity.chat.ChatRoom;
@@ -13,6 +13,7 @@ import com.plaything.api.domain.repository.entity.matching.Matching;
 import com.plaything.api.domain.repository.repo.chat.ChatRepository;
 import com.plaything.api.domain.repository.repo.chat.ChatRoomRepository;
 import com.plaything.api.domain.repository.repo.matching.MatchingRepository;
+import com.plaything.api.domain.repository.repo.monitor.ProfileRecordRepository;
 import com.plaything.api.domain.repository.repo.user.ProfileRepository;
 import com.plaything.api.domain.repository.repo.user.UserRepository;
 import com.plaything.api.domain.user.constants.PersonalityTraitConstant;
@@ -21,6 +22,7 @@ import com.plaything.api.domain.user.constants.RelationshipPreferenceConstant;
 import com.plaything.api.domain.user.model.request.ProfileRegistration;
 import com.plaything.api.domain.user.service.ProfileFacadeV1;
 import com.plaything.api.security.JWTProvider;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,7 +36,6 @@ import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
 import org.springframework.test.context.transaction.TestTransaction;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
@@ -83,6 +84,9 @@ public class StompTest {
 
     @Autowired
     private IndexServiceV1 indexServiceV1;
+
+    @Autowired
+    private ProfileRecordRepository profileRecordRepository;
 
 
     @BeforeEach
@@ -133,8 +137,13 @@ public class StompTest {
         chatRepository.deleteAll();
         chatRoomRepository.deleteAll();
         matchingRepository.deleteAll();
-        profileRepository.deleteAll();
+        // profile_record는 user를 참조하므로 먼저 삭제
+        profileRecordRepository.deleteAll();  // profile_record 레포지토리 추가 필요
+        // user는 profile을 참조하므로 user 먼저 삭제
         userRepository.deleteAll();
+        // 마지막으로 profile 삭제
+        profileRepository.deleteAll();
+
         TestTransaction.flagForCommit();
         TestTransaction.end();
     }
@@ -156,7 +165,7 @@ public class StompTest {
         ).get(10, TimeUnit.SECONDS);
 
         // 메시지 구독 설정
-        CompletableFuture<Message> messageFuture = new CompletableFuture<>();
+        CompletableFuture<ChatRequest> messageFuture = new CompletableFuture<>();
         StompHeaders subscribeHeaders = new StompHeaders();
         subscribeHeaders.setDestination("/user/alex/chat");
         subscribeHeaders.add("Authorization", "Bearer " + token);
@@ -164,12 +173,12 @@ public class StompTest {
         receiverSession.subscribe(subscribeHeaders, new StompFrameHandler() {
             @Override
             public Type getPayloadType(StompHeaders headers) {
-                return Message.class;
+                return ChatRequest.class;
             }
 
             @Override
             public void handleFrame(StompHeaders headers, Object payload) {
-                messageFuture.complete((Message) payload);
+                messageFuture.complete((ChatRequest) payload);
             }
         });
 
@@ -186,19 +195,18 @@ public class StompTest {
         ).get(15, TimeUnit.SECONDS);
 
         // when
-        Message testMessage = new Message("발신자", "alex", "test message");
+        ChatRequest testChatRequest = new ChatRequest(1, "발신자", "alex", "test chat");
         StompHeaders sendHeaders = new StompHeaders();
-        sendHeaders.setDestination("/pub/chat/message/alex");
+        sendHeaders.setDestination("/pub/chat/chat/alex");
         sendHeaders.add("Authorization", "Bearer " + token2);
 
-        senderSession.send(sendHeaders, testMessage);
+        senderSession.send(sendHeaders, testChatRequest);
 
         // then
-        Message receivedMessage = messageFuture.get(10, TimeUnit.SECONDS);
-        assertThat(receivedMessage.message()).isEqualTo("test message");
-        assertThat(receivedMessage.senderNickname()).isEqualTo("발신자");
-        assertThat(receivedMessage.receiverNickname()).isEqualTo("alex");
-        cleanUpData();
+        ChatRequest receivedChatRequest = messageFuture.get(10, TimeUnit.SECONDS);
+        assertThat(receivedChatRequest.chat()).isEqualTo("test chat");
+        assertThat(receivedChatRequest.senderNickname()).isEqualTo("발신자");
+        assertThat(receivedChatRequest.receiverNickname()).isEqualTo("alex");
 
     }
 
@@ -230,7 +238,7 @@ public class StompTest {
                 }
         ).get(15, TimeUnit.SECONDS);
 
-        CompletableFuture<Message> messageFuture = new CompletableFuture<>();
+        CompletableFuture<ChatRequest> messageFuture = new CompletableFuture<>();
         StompHeaders subscribeHeaders = new StompHeaders();
         subscribeHeaders.setDestination("/user/alex2/chat");
         subscribeHeaders.add("Authorization", "Bearer " + token2);
@@ -238,22 +246,22 @@ public class StompTest {
         receiverSession.subscribe(subscribeHeaders, new StompFrameHandler() {
             @Override
             public Type getPayloadType(StompHeaders headers) {
-                return Message.class;
+                return ChatRequest.class;
             }
 
             @Override
             public void handleFrame(StompHeaders headers, Object payload) {
-                messageFuture.complete((Message) payload);
+                messageFuture.complete((ChatRequest) payload);
             }
         });
 
         // when
-        Message testMessage = new Message("alex", "alex2", "test message");
+        ChatRequest testChatRequest = new ChatRequest(1, "alex", "alex2", "test chat");
         StompHeaders sendHeaders = new StompHeaders();
-        sendHeaders.setDestination("/pub/chat/message/alex2");
+        sendHeaders.setDestination("/pub/chat/chat/alex2");
         sendHeaders.add("Authorization", "Bearer " + token);
 
-        senderSession.send(sendHeaders, testMessage);
+        senderSession.send(sendHeaders, testChatRequest);
 
         Thread.sleep(5000);
         TestTransaction.flagForCommit();
@@ -267,7 +275,6 @@ public class StompTest {
 
         assertThat(noti1.hasNewChat()).isFalse();
         assertThat(noti2.hasNewChat()).isTrue();
-        cleanUpData();
 
     }
 
