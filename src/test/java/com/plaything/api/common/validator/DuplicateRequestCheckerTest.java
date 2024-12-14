@@ -7,6 +7,7 @@ import com.plaything.api.domain.image.service.model.SavedImage;
 import com.plaything.api.domain.key.model.request.AdRewardRequest;
 import com.plaything.api.domain.key.model.request.MatchingRequest;
 import com.plaything.api.domain.key.service.PointKeyFacadeV1;
+import com.plaything.api.domain.matching.service.MatchingFacadeV1;
 import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.entity.user.profile.Profile;
 import com.plaything.api.domain.repository.repo.pay.PointKeyRepository;
@@ -20,7 +21,6 @@ import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -33,7 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -73,6 +72,9 @@ class DuplicateRequestCheckerTest {
 
     @Autowired
     private EntityManager em;
+
+    @Autowired
+    private MatchingFacadeV1 matchingFacadeV1;
 
 
     @BeforeEach
@@ -180,9 +182,9 @@ class DuplicateRequestCheckerTest {
 
         em.flush();
         em.clear();
-        pointKeyFacadeV1.usePointKeyForMatching("dusgh1234", matchingRequest, transactionId);
+        matchingFacadeV1.createMatching("dusgh1234", matchingRequest, transactionId);
 
-        assertThatThrownBy(() -> pointKeyFacadeV1.usePointKeyForMatching("dusgh1234", matchingRequest, transactionId))
+        assertThatThrownBy(() -> matchingFacadeV1.createMatching("dusgh1234", matchingRequest, transactionId))
                 .isInstanceOf(CustomException.class).hasMessage("TRANSACTION ALREADY PROCESSED");
 
         verify(pointKeyRepository, times(2)).existsByTransactionId(transactionId);
