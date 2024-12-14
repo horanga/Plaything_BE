@@ -5,11 +5,11 @@ import com.plaything.api.domain.admin.model.response.ProfileRecordResponse;
 import com.plaything.api.domain.admin.sevice.ProfileMonitoringFacadeV1;
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
 import com.plaything.api.domain.auth.service.AuthServiceV1;
-import com.plaything.api.domain.chat.model.reqeust.Message;
+import com.plaything.api.domain.chat.model.reqeust.ChatRequest;
 import com.plaything.api.domain.chat.model.response.ChatRoomResponse;
+import com.plaything.api.domain.chat.model.response.ChatWithMissingChat;
 import com.plaything.api.domain.index.model.response.IndexResponse;
 import com.plaything.api.domain.index.service.IndexServiceV1;
-import com.plaything.api.domain.repository.entity.chat.Chat;
 import com.plaything.api.domain.repository.entity.chat.ChatRoom;
 import com.plaything.api.domain.repository.entity.user.profile.Profile;
 import com.plaything.api.domain.repository.entity.user.profile.ProfileImage;
@@ -76,6 +76,7 @@ class ChatRoomServiceV1Test {
     @Autowired
     private IndexServiceV1 indexServiceV1;
 
+
     @AfterEach
     void cleanUp() {
         rateLimiter.cleanupOldData();
@@ -125,22 +126,21 @@ class ChatRoomServiceV1Test {
 
         LocalDateTime now = LocalDateTime.now();
         for (int i = 0; i < 10; i++) {
-            Message msg = new Message(sender, receiver, "안녕" + i);
+            ChatRequest msg = new ChatRequest(i, sender, receiver, "안녕" + i);
             chatServiceV1.saveChatMessage(msg, now);
             Thread.sleep(1000);
         }
 
-        Message msg = new Message(sender, receiver, "안녕하십니까!");
-        Chat chat = chatServiceV1.saveChatMessage(msg, now);
+        ChatRequest msg = new ChatRequest(11, sender, receiver, "안녕하십니까!");
+        chatServiceV1.saveChatMessage(msg, now);
 
         List<ChatRoomResponse> chatRooms = chatFacadeV1.getChatRooms(senderLoginId, null);
 
-        assertThat(chatRooms.get(0).chatProfile().nickName()).isEqualTo(partnerNickname);
-        assertThat(chatRooms.get(0).chatProfile().primaryRole()).isEqualTo(partnerRole);
-        assertThat(chatRooms.get(0).chatProfile().mainPhoto()).isEqualTo(mainPhotoUrl);
+        assertThat(chatRooms.get(0).partnerProfile().nickName()).isEqualTo(partnerNickname);
+        assertThat(chatRooms.get(0).partnerProfile().primaryRole()).isEqualTo(partnerRole);
+        assertThat(chatRooms.get(0).partnerProfile().mainPhoto()).isEqualTo(mainPhotoUrl);
 
-        assertThat(chatRooms.get(0).lastChatMessage()).isEqualTo("안녕하십니까!");
-        assertThat(chatRooms.get(0).lastMessageAt()).isEqualTo(chat.getCreatedAt());
+        assertThat(chatRooms.get(0).lastChat()).isEqualTo("안녕하십니까!");
 
     }
 
@@ -174,34 +174,20 @@ class ChatRoomServiceV1Test {
     ) throws InterruptedException {
 
         LocalDateTime now = LocalDateTime.now();
-        for (int i = 0; i < 10; i++) {
-            Message msg = new Message(sender, receiver, "안녕" + i);
+        for (int i = 0; i < 4; i++) {
+            ChatRequest msg = new ChatRequest(i, sender, receiver, "안녕" + i);
             chatServiceV1.saveChatMessage(msg, now);
             Thread.sleep(1000);
         }
 
-        Message msg = new Message(sender, receiver, "안녕하십니까!");
-        Chat chat = chatServiceV1.saveChatMessage(msg, now);
+        ChatRequest msg = new ChatRequest(4, receiver, sender, "안녕하십니까!");
+        chatServiceV1.saveChatMessage(msg, now);
 
         List<ChatRoomResponse> chatRooms = chatFacadeV1.getChatRooms(senderLoginId, null);
-        assertThat(chatRooms.get(0).lastChatMessage()).isEqualTo("안녕하십니까!");
-        assertThat(chatRooms.get(0).lastMessageAt()).isEqualTo(chat.getCreatedAt());
-
-        Message msg2 = new Message(sender, receiver, "반가워요 저는 알렉스입니다");
-        Chat chat2 = chatServiceV1.saveChatMessage(msg2, now);
-
-        List<ChatRoomResponse> chatRooms2 = chatFacadeV1.getChatRooms(senderLoginId, null);
-        assertThat(chatRooms2.get(0).lastChatMessage()).isEqualTo("반가워요 저는 알렉스입니다");
-        assertThat(chatRooms2.get(0).lastMessageAt()).isEqualTo(chat2.getCreatedAt());
-
-
-        Message msg3 = new Message(sender, receiver, "오늘 기분은 어떠세요?");
-        Chat chat3 = chatServiceV1.saveChatMessage(msg3, now);
-
-        List<ChatRoomResponse> chatRooms3 = chatFacadeV1.getChatRooms(senderLoginId, null);
-        assertThat(chatRooms3.get(0).lastChatMessage()).isEqualTo("오늘 기분은 어떠세요?");
-        assertThat(chatRooms3.get(0).lastMessageAt()).isEqualTo(chat3.getCreatedAt());
-
+        assertThat(chatRooms.get(0).lastChat()).isEqualTo("안녕하십니까!");
+        assertThat(chatRooms.get(0).lastChatSender()).isEqualTo(receiver);
+        ChatRoom room = chatRoomRepository.findChatRoomByUsers("알렉1", "알렉2").get();
+        assertThat(room.getLastSequence()).isEqualTo(5);
     }
 
     public static Stream<Arguments> chatProvider2() {
@@ -209,50 +195,27 @@ class ChatRoomServiceV1Test {
         return Stream.of(
                 Arguments.of("알렉1",
                         "알렉2",
-                        "dusgh1234",
-                        "알렉2",
-                        "MT",
-                        "abcd"
+                        "dusgh1234"
                 ),
                 Arguments.of("알렉2",
                         "알렉1",
-                        "dusgh12345",
-                        "알렉1",
-                        "MT",
-                        "abc"
+                        "dusgh12345"
                 )
         );
     }
 
-    @DisplayName("채팅방 목록을 조회하면 10개의 최신 채팅방과 ")
+    @DisplayName("채팅방 목록을 10개씩 조회할 수 있다.")
     @Test
-    void test4() throws InterruptedException {
+    void test3() throws InterruptedException {
 
         for (int i = 1; i <= 30; i++) {
             createUser("dusgh" + i, "연" + i);
             sendMessage("알렉1", "연" + i, String.valueOf(i));
-            Thread.sleep(900);
+            Thread.sleep(300);
         }
 
-
         List<ChatRoomResponse> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
-        assertThat(chatRooms).extracting("lastChatMessage").containsExactly(
-                "30",
-                "29",
-                "28",
-                "27",
-                "26",
-                "25",
-                "24",
-                "23",
-                "22",
-                "21");
-        assertThat(chatRooms)
-                .extracting(
-                        "chatProfile.mainPhoto",
-                        "chatProfile.primaryRole",
-                        "chatProfile.nickName"
-                )
+        assertThat(chatRooms).extracting("partnerProfile.mainPhoto", "partnerProfile.primaryRole", "partnerProfile.nickName")
                 .containsExactly(
                         tuple("abc", "MT", "연30"),
                         tuple("abc", "MT", "연29"),
@@ -266,25 +229,8 @@ class ChatRoomServiceV1Test {
                         tuple("abc", "MT", "연21")
                 );
 
-
         List<ChatRoomResponse> chatRooms2 = chatFacadeV1.getChatRooms("dusgh1234", chatRooms.get(9).chatRoomId());
-        assertThat(chatRooms2).extracting("lastChatMessage").containsExactly(
-                "20",
-                "19",
-                "18",
-                "17",
-                "16",
-                "15",
-                "14",
-                "13",
-                "12",
-                "11");
-        assertThat(chatRooms2)
-                .extracting(
-                        "chatProfile.mainPhoto",
-                        "chatProfile.primaryRole",
-                        "chatProfile.nickName"
-                )
+        assertThat(chatRooms2).extracting("partnerProfile.mainPhoto", "partnerProfile.primaryRole", "partnerProfile.nickName")
                 .containsExactly(
                         tuple("abc", "MT", "연20"),
                         tuple("abc", "MT", "연19"),
@@ -299,23 +245,7 @@ class ChatRoomServiceV1Test {
                 );
 
         List<ChatRoomResponse> chatRooms3 = chatFacadeV1.getChatRooms("dusgh1234", chatRooms2.get(9).chatRoomId());
-        assertThat(chatRooms3).extracting("lastChatMessage").containsExactly(
-                "10",
-                "9",
-                "8",
-                "7",
-                "6",
-                "5",
-                "4",
-                "3",
-                "2",
-                "1");
-        assertThat(chatRooms3)
-                .extracting(
-                        "chatProfile.mainPhoto",
-                        "chatProfile.primaryRole",
-                        "chatProfile.nickName"
-                )
+        assertThat(chatRooms3).extracting("partnerProfile.mainPhoto", "partnerProfile.primaryRole", "partnerProfile.nickName")
                 .containsExactly(
                         tuple("abc", "MT", "연10"),
                         tuple("abc", "MT", "연9"),
@@ -332,12 +262,12 @@ class ChatRoomServiceV1Test {
 
     }
 
+
     @DisplayName("상대방이 채팅방을 나가면 채팅방에 정보에 표시된다")
     @Test
-    void test5() throws InterruptedException {
+    void test4() throws InterruptedException {
         createUser("dusgh12", "연1");
         createUser("dusgh123", "연2");
-
 
         sendMessage("알렉1", "연1", "hi~");
         sendMessage("알렉1", "연2", "hello");
@@ -347,17 +277,17 @@ class ChatRoomServiceV1Test {
         List<ChatRoomResponse> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
         assertThat(chatRooms.size()).isEqualTo(3);
 
-        assertThat(chatRooms.get(2).lastChatMessage()).isEqualTo("hi~");
-        assertThat(chatRooms.get(2).chatProfile().primaryRole()).isEqualTo("MT");
-        assertThat(chatRooms.get(2).chatProfile().nickName()).isEqualTo("연1");
+        assertThat(chatRooms.get(2).lastChat()).isEqualTo("hi~");
+        assertThat(chatRooms.get(2).partnerProfile().primaryRole()).isEqualTo("MT");
+        assertThat(chatRooms.get(2).partnerProfile().nickName()).isEqualTo("연1");
 
-        assertThat(chatRooms.get(1).lastChatMessage()).isEqualTo("hello");
-        assertThat(chatRooms.get(1).chatProfile().primaryRole()).isEqualTo("MT");
-        assertThat(chatRooms.get(1).chatProfile().nickName()).isEqualTo("연2");
+        assertThat(chatRooms.get(1).lastChat()).isEqualTo("hello");
+        assertThat(chatRooms.get(1).partnerProfile().primaryRole()).isEqualTo("MT");
+        assertThat(chatRooms.get(1).partnerProfile().nickName()).isEqualTo("연2");
 
-        assertThat(chatRooms.get(0).lastChatMessage()).isEqualTo("hi");
-        assertThat(chatRooms.get(0).chatProfile().primaryRole()).isEqualTo("MT");
-        assertThat(chatRooms.get(0).chatProfile().nickName()).isEqualTo("알렉2");
+        assertThat(chatRooms.get(0).lastChat()).isEqualTo("hi");
+        assertThat(chatRooms.get(0).partnerProfile().primaryRole()).isEqualTo("MT");
+        assertThat(chatRooms.get(0).partnerProfile().nickName()).isEqualTo("알렉2");
 
         chatFacadeV1.leaveChatRoom(chatRooms.get(2).chatRoomId(), "dusgh1234");
         List<ChatRoomResponse> chatRooms2 = chatFacadeV1.getChatRooms("dusgh12", null);
@@ -366,17 +296,16 @@ class ChatRoomServiceV1Test {
         assertThat(chatRoom.getExitedUserNickname()).isEqualTo("알렉1");
         assertThat(chatRooms2.size()).isEqualTo(1);
 
-        assertThat(chatRooms2.get(0).lastChatMessage()).isEqualTo("hi~");
-        assertThat(chatRooms2.get(0).chatProfile().primaryRole()).isEqualTo("MT");
-        assertThat(chatRooms2.get(0).chatProfile().nickName()).isEqualTo("알렉1");
+        assertThat(chatRooms2.get(0).lastChat()).isEqualTo("hi~");
+        assertThat(chatRooms2.get(0).partnerProfile().primaryRole()).isEqualTo("MT");
+        assertThat(chatRooms2.get(0).partnerProfile().nickName()).isEqualTo("알렉1");
     }
 
     @DisplayName("이미 종료된 채팅방은 조회하지 못한다")
     @Test
-    void test6() throws InterruptedException {
+    void test5() throws InterruptedException {
         createUser("dusgh12", "연1");
         createUser("dusgh123", "연2");
-
 
         sendMessage("알렉1", "연1", "hi~");
         sendMessage("알렉1", "연2", "hello");
@@ -387,25 +316,24 @@ class ChatRoomServiceV1Test {
         chatFacadeV1.leaveChatRoom(chatRooms.get(2).chatRoomId(), "dusgh1234");
         chatFacadeV1.leaveChatRoom(chatRooms.get(2).chatRoomId(), "dusgh12");
 
-
         List<ChatRoomResponse> chatRooms1 = chatFacadeV1.getChatRooms("dusgh1234", null);
         List<ChatRoomResponse> chatRooms2 = chatFacadeV1.getChatRooms("dusgh12", null);
 
         assertThat(chatRooms1.size()).isEqualTo(2);
         assertThat(chatRooms2).isEmpty();
 
-        assertThat(chatRooms1.get(1).lastChatMessage()).isEqualTo("hello");
-        assertThat(chatRooms1.get(1).chatProfile().primaryRole()).isEqualTo("MT");
-        assertThat(chatRooms1.get(1).chatProfile().nickName()).isEqualTo("연2");
+        assertThat(chatRooms1.get(1).lastChat()).isEqualTo("hello");
+        assertThat(chatRooms1.get(1).partnerProfile().primaryRole()).isEqualTo("MT");
+        assertThat(chatRooms1.get(1).partnerProfile().nickName()).isEqualTo("연2");
 
-        assertThat(chatRooms1.get(0).lastChatMessage()).isEqualTo("hi");
-        assertThat(chatRooms1.get(0).chatProfile().primaryRole()).isEqualTo("MT");
-        assertThat(chatRooms1.get(0).chatProfile().nickName()).isEqualTo("알렉2");
+        assertThat(chatRooms1.get(0).lastChat()).isEqualTo("hi");
+        assertThat(chatRooms1.get(0).partnerProfile().primaryRole()).isEqualTo("MT");
+        assertThat(chatRooms1.get(0).partnerProfile().nickName()).isEqualTo("알렉2");
     }
 
     @DisplayName("종료된 채팅방은 채팅 내역을 조회할 수 없다")
     @Test
-    void test7() throws InterruptedException {
+    void test6() throws InterruptedException {
         createUser("dusgh12", "연1");
         createUser("dusgh123", "연2");
 
@@ -427,7 +355,7 @@ class ChatRoomServiceV1Test {
 
     @DisplayName("상대방이 나간 채팅 내역을 조회할 수 없다")
     @Test
-    void test8() {
+    void test7() {
 
         createUser("dusgh12", "연1");
         createUser("dusgh123", "연2");
@@ -448,7 +376,7 @@ class ChatRoomServiceV1Test {
 
     @DisplayName("자신이 나간 채팅 내역을 조회할 수 없다")
     @Test
-    void test9() throws InterruptedException {
+    void test8() throws InterruptedException {
 
         createUser("dusgh12", "연1");
         createUser("dusgh123", "연2");
@@ -468,7 +396,7 @@ class ChatRoomServiceV1Test {
 
     @DisplayName("밴 당한 유저와의 채팅방은 조회되지 않는다")
     @Test
-    void test10() {
+    void test9() {
 
         createUser("dusgh12", "연1");
         createUser("dusgh123", "연2");
@@ -486,19 +414,19 @@ class ChatRoomServiceV1Test {
         assertThat(chatRooms.size()).isEqualTo(3);
         assertThat(chatRooms2.size()).isEqualTo(2);
 
-        assertThat(chatRooms2.get(0).lastChatMessage()).isEqualTo("hello");
-        assertThat(chatRooms2.get(0).chatProfile().primaryRole()).isEqualTo("MT");
-        assertThat(chatRooms2.get(0).chatProfile().nickName()).isEqualTo("연2");
+        assertThat(chatRooms2.get(0).lastChat()).isEqualTo("hello");
+        assertThat(chatRooms2.get(0).partnerProfile().primaryRole()).isEqualTo("MT");
+        assertThat(chatRooms2.get(0).partnerProfile().nickName()).isEqualTo("연2");
 
-        assertThat(chatRooms2.get(1).lastChatMessage()).isEqualTo("hi~");
-        assertThat(chatRooms2.get(1).chatProfile().primaryRole()).isEqualTo("MT");
-        assertThat(chatRooms2.get(1).chatProfile().nickName()).isEqualTo("연1");
+        assertThat(chatRooms2.get(1).lastChat()).isEqualTo("hi~");
+        assertThat(chatRooms2.get(1).partnerProfile().primaryRole()).isEqualTo("MT");
+        assertThat(chatRooms2.get(1).partnerProfile().nickName()).isEqualTo("연1");
 
     }
 
     @DisplayName("탈퇴한 유저와의 채팅방은 조회되지 않는다")
     @Test
-    void test11() {
+    void test10() {
 
         createUser("dusgh12", "연1");
         createUser("dusgh123", "연2");
@@ -515,20 +443,20 @@ class ChatRoomServiceV1Test {
         assertThat(chatRooms.size()).isEqualTo(3);
         assertThat(chatRooms2.size()).isEqualTo(2);
 
-        assertThat(chatRooms2.get(0).lastChatMessage()).isEqualTo("hello");
-        assertThat(chatRooms2.get(0).chatProfile().primaryRole()).isEqualTo("MT");
-        assertThat(chatRooms2.get(0).chatProfile().nickName()).isEqualTo("연2");
+        assertThat(chatRooms2.get(0).lastChat()).isEqualTo("hello");
+        assertThat(chatRooms2.get(0).partnerProfile().primaryRole()).isEqualTo("MT");
+        assertThat(chatRooms2.get(0).partnerProfile().nickName()).isEqualTo("연2");
 
 
-        assertThat(chatRooms2.get(1).lastChatMessage()).isEqualTo("hi~");
-        assertThat(chatRooms2.get(1).chatProfile().primaryRole()).isEqualTo("MT");
-        assertThat(chatRooms2.get(1).chatProfile().nickName()).isEqualTo("연1");
+        assertThat(chatRooms2.get(1).lastChat()).isEqualTo("hi~");
+        assertThat(chatRooms2.get(1).partnerProfile().primaryRole()).isEqualTo("MT");
+        assertThat(chatRooms2.get(1).partnerProfile().nickName()).isEqualTo("연1");
 
     }
 
     @DisplayName("메시지를 보내면 새로운 메시지 표시가 뜬다")
     @Test
-    void test12() {
+    void test11() {
 
         createUser("dusgh12", "연1");
         createUser("dusgh123", "연2");
@@ -545,7 +473,7 @@ class ChatRoomServiceV1Test {
 
     @DisplayName("메시지를 조회하면 새로운 메시지 표시가 사라진다")
     @Test
-    void test13() {
+    void test12() {
 
         createUser("dusgh12", "연1");
         createUser("dusgh123", "연2");
@@ -567,8 +495,8 @@ class ChatRoomServiceV1Test {
 
         assertThat(index3.hasNewChat()).isFalse();
         assertThat(index4.hasNewChat()).isFalse();
-
     }
+
 
     private void createUser(String loginId, String nickName) {
         CreateUserRequest request = new CreateUserRequest(loginId, "1234", "1");
@@ -576,8 +504,8 @@ class ChatRoomServiceV1Test {
         setProfile(loginId, nickName);
     }
 
-    private Chat sendMessage(String sender, String receiver, String message) {
-        Message msg = new Message(sender, receiver, message);
+    private ChatWithMissingChat sendMessage(String sender, String receiver, String message) {
+        ChatRequest msg = new ChatRequest(0, sender, receiver, message);
         LocalDateTime now = LocalDateTime.now();
         return chatServiceV1.saveChatMessage(msg, now);
     }

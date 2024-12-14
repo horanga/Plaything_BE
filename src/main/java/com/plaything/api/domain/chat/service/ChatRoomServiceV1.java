@@ -15,6 +15,8 @@ import java.util.List;
 @Service
 public class ChatRoomServiceV1 {
 
+    private final int START_OF_THE_CHAT_SEQUENCE = 0;
+
     private final ChatRoomRepository chatRoomRepository;
 
     private final ChatRoomQueryRepository chatRoomQueryRepository;
@@ -53,6 +55,15 @@ public class ChatRoomServiceV1 {
         }
         chatRoom.leaveChatRoom(requestNickName);
     }
+
+    public void creatChatRoom(String senderNickname, String receiverNickname) {
+        ChatRoom chatRoom = ChatRoom.builder()
+                .receiverNickname(senderNickname)
+                .senderNickname(receiverNickname)
+                .lastSequence(START_OF_THE_CHAT_SEQUENCE).build();
+        chatRoomRepository.save(chatRoom);
+    }
+
 
     public void hasNewChat() {
 

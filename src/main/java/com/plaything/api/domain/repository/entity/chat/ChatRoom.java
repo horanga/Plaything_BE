@@ -15,8 +15,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(indexes = {
-        @Index(name = "idx_receiver_last_msg", columnList = "receiverNickname,lastChatMessageAt"),
-        @Index(name = "idx_sender_last_msg", columnList = "senderNickname,lastChatMessageAt")
+        @Index(name = "idx_receiver_msg", columnList = "receiverNickname,lastChatAt"),
+        @Index(name = "idx_sender_msg", columnList = "senderNickname,lastChatAt")
 })
 @Entity
 public class ChatRoom {
@@ -35,10 +35,10 @@ public class ChatRoom {
     private String exitedUserNickname;
 
     @Column
-    private String lastChatMessage;
+    private String lastChat;
 
     @Column
-    private LocalDateTime lastChatMessageAt;
+    private LocalDateTime lastChatAt;
 
     @Column
     private boolean hasNewChat;
@@ -50,8 +50,13 @@ public class ChatRoom {
     String lastChatSender;
 
     @Column
+    private int lastSequence;
+
+    @Column
     private boolean isClosed = false;
 
+    @Version
+    private Long version;
 
     public boolean validateRequester(String name) {
         return senderNickname.equals(name) || receiverNickname.equals(name);
@@ -77,10 +82,11 @@ public class ChatRoom {
         }
     }
 
-    public void updateLastMessage(String sender, String message, LocalDateTime createdAt) {
-        this.lastChatMessage = message;
-        this.lastChatMessageAt = createdAt;
+    public void updateLastMessage(String sender, String message, LocalDateTime createdAt, int newSequence) {
+        this.lastChat = message;
+        this.lastChatAt = createdAt;
         this.lastChatSender = sender;
+        this.lastSequence = newSequence;
         if (!this.hasNewChat) {
             this.hasNewChat = true;
         }
