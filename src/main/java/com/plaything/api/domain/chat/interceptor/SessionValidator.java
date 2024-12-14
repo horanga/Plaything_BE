@@ -4,7 +4,7 @@ import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorCode;
 import com.plaything.api.domain.matching.model.response.MatchingResponse;
 import com.plaything.api.domain.matching.service.MatchingServiceV1;
-import com.plaything.api.domain.user.model.response.ProfileResponse;
+import com.plaything.api.domain.repository.entity.user.profile.Profile;
 import com.plaything.api.domain.user.service.ProfileFacadeV1;
 import com.plaything.api.domain.user.service.UserServiceV1;
 import com.plaything.api.security.JWTProvider;
@@ -61,8 +61,8 @@ public class SessionValidator {
         }
 
         String loginId = getLoginId(authHeader);
-        ProfileResponse profileByLoginId = profileFacadeV1.getProfileByLoginId(loginId);
-        String[] userInfo = new String[]{profileByLoginId.nickName(), loginId}; //[0] 닉네임, [1] 로그인 id
+        Profile profile = profileFacadeV1.getProfileByUserLoginId(loginId);
+        String[] userInfo = new String[]{profile.getNickName(), loginId}; //[0] 닉네임, [1] 로그인 id
         sessionUserMap.put(sessionId, userInfo);
     }
 
@@ -139,6 +139,11 @@ public class SessionValidator {
         userServiceV1.findByLoginId(user);
 
         return user;
+    }
+
+    public void clean() {
+        sessionUserMap.clear();
+        matchingMap.clear();
     }
 
     @Scheduled(cron = "0 0 5 * * *")
