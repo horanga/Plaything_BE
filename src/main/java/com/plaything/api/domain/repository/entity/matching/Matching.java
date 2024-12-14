@@ -33,4 +33,8 @@ public class Matching extends BaseEntity {
 
     @Column
     private boolean isOvered;
+
+    public void acceptMatching() {
+        this.isMatched = true;
+    }
 }

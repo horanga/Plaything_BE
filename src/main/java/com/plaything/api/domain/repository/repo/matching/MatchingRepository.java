@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface MatchingRepository extends JpaRepository<Matching, Long> {
     @Query("""
@@ -14,5 +15,7 @@ public interface MatchingRepository extends JpaRepository<Matching, Long> {
             AND (m.isMatched = true AND m.isOvered = false)
             """)
     List<Matching> findSuccessAndNotOveMatching(@Param("nickname") String nickname);
+
+    Optional<Matching> findBySenderNicknameAndReceiverNickname(String nickname, String receiverNickname);
 
 }

@@ -5,12 +5,9 @@ import com.plaything.api.common.exception.ErrorCode;
 import com.plaything.api.domain.key.constant.KeySource;
 import com.plaything.api.domain.key.constant.PointStatus;
 import com.plaything.api.domain.key.model.request.AdRewardRequest;
-import com.plaything.api.domain.matching.service.MatchingServiceV1;
-import com.plaything.api.domain.notification.service.NotificationServiceV1;
 import com.plaything.api.domain.repository.entity.pay.PointKey;
 import com.plaything.api.domain.repository.entity.pay.UserRewardActivity;
 import com.plaything.api.domain.repository.entity.user.User;
-import com.plaything.api.domain.repository.entity.user.profile.Profile;
 import com.plaything.api.domain.repository.repo.pay.PointKeyRepository;
 import com.plaything.api.domain.repository.repo.pay.UserRewardActivityRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +22,6 @@ import java.util.Optional;
 import static com.plaything.api.domain.key.constant.KeySource.ADVERTISEMENT_REWARD;
 import static com.plaything.api.domain.key.constant.KeySource.LOGIN_REWARD;
 import static com.plaything.api.domain.key.constant.PointStatus.USED;
-import static com.plaything.api.domain.notification.constant.NotificationType.MATCHING_REQUEST;
 
 @RequiredArgsConstructor
 @Service
@@ -35,8 +31,8 @@ public class PointKeyServiceV1 {
     private final PointKeyRepository pointKeyRepository;
     private final AdLogServiceV1 adLogServiceV1;
     private final PointKeyLogServiceV1 pointKeyLogServiceV1;
-    private final NotificationServiceV1 notificationServiceV1;
-    private final MatchingServiceV1 matchingServiceV1;
+
+
     //TODO 외부 PG사와 연동하면 복구 작업 필요함
 //    try {
 //        // 1. 외부 PG사 결제 처리
@@ -99,8 +95,7 @@ public class PointKeyServiceV1 {
         return pointKeyRepository.countAvailablePointKey(loginId);
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    public void usePointKey(User requester, Profile requesterProfile, User partner, String transactionId) {
+    public void usePointKey(User requester, User partner, String transactionId) {
         PointKey usedKey = PointKey.builder()
                 .user(requester)
                 .transactionId(transactionId)
@@ -109,15 +104,6 @@ public class PointKeyServiceV1 {
                 .build();
         pointKeyRepository.save(usedKey);
         pointKeyLogServiceV1.createKeyUsageLog(requester, partner, usedKey);
-        matchingServiceV1.createMatchingLog(requesterProfile.getNickName(), partner.getProfile().getNickName());
-        try {
-            notificationServiceV1.saveNotification(
-                    MATCHING_REQUEST,
-                    requesterProfile,
-                    partner);
-        } catch (IOException e) {
-            throw new CustomException(ErrorCode.NOTIFICATION_SAVED_FAILED);
-        }
     }
 
     private UserRewardActivity validateForAd(User user, LocalDateTime now) {
