@@ -2,13 +2,14 @@ package com.plaything.api.domain.index.service;
 
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
 import com.plaything.api.domain.auth.service.AuthServiceV1;
-import com.plaything.api.domain.chat.model.reqeust.Message;
+import com.plaything.api.domain.chat.model.reqeust.ChatRequest;
 import com.plaything.api.domain.chat.service.ChatFacadeV1;
 import com.plaything.api.domain.user.constants.PersonalityTraitConstant;
 import com.plaything.api.domain.user.constants.PrimaryRole;
 import com.plaything.api.domain.user.constants.RelationshipPreferenceConstant;
 import com.plaything.api.domain.user.model.request.ProfileRegistration;
 import com.plaything.api.domain.user.service.ProfileFacadeV1;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ import java.util.List;
 
 import static com.plaything.api.domain.user.constants.Gender.M;
 
+@Transactional
 @SpringBootTest
 class IndexServiceV1Test {
 
@@ -66,7 +68,7 @@ class IndexServiceV1Test {
     @Test
     void test1() {
 
-        chatFacadeV1.saveMessage(new Message("alex", "alex2", "hi"), LocalDateTime.now());
+        chatFacadeV1.saveMessage(new ChatRequest(1, "alex", "alex2", "hi"), LocalDateTime.now());
         indexServiceV1.refreshIndex("dusgh1234");
 
     }
