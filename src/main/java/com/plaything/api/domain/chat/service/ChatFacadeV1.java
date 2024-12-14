@@ -2,10 +2,11 @@ package com.plaything.api.domain.chat.service;
 
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorCode;
-import com.plaything.api.domain.chat.model.reqeust.Message;
-import com.plaything.api.domain.chat.model.response.ChatListResponse;
+import com.plaything.api.domain.chat.model.reqeust.ChatRequest;
+import com.plaything.api.domain.chat.model.response.ChatList;
 import com.plaything.api.domain.chat.model.response.ChatProfile;
 import com.plaything.api.domain.chat.model.response.ChatRoomResponse;
+import com.plaything.api.domain.chat.model.response.ChatWithMissingChat;
 import com.plaything.api.domain.filtering.service.FilteringService;
 import com.plaything.api.domain.repository.entity.chat.ChatRoom;
 import com.plaything.api.domain.repository.entity.user.User;
@@ -60,7 +61,7 @@ public class ChatFacadeV1 {
         chatRoomServiceV1.leaveRoom(id, requestNickname);
     }
 
-    public ChatListResponse getChatList(String requesterLoginId, Long chatRoomId, Long lastChatId) {
+    public ChatList getChatList(String requesterLoginId, Long chatRoomId, Long lastChatId) {
         User user = userRepository.findByLoginId(requesterLoginId)
                 .orElseThrow(() ->
                         new CustomException(ErrorCode.NOT_EXIST_USER));
@@ -69,9 +70,10 @@ public class ChatFacadeV1 {
         return chatServiceV1.chatList(chatRoomId, requestNickname, lastChatId, LocalDate.now());
     }
 
-    public void saveMessage(Message message, LocalDateTime now) {
-        filteringService.filterWords(message.message());
-        chatServiceV1.saveChatMessage(message, now);
+    public ChatWithMissingChat saveMessage(ChatRequest chatRequest, LocalDateTime now) {
+        filteringService.filterWords(chatRequest.chat());
+        chatRateLimiter.checkRate(chatRequest.senderNickname());
+        return chatServiceV1.saveChatMessage(chatRequest, now);
     }
 
     private List<ChatRoomResponse> getChatRoomResponse(List<ChatRoom> chatRooms, Map<String, Profile> profileMap, String requestNickName) {
@@ -86,8 +88,9 @@ public class ChatFacadeV1 {
             Profile profile = profileMap.get(name);
             return new ChatRoomResponse(
                     i.getId(),
-                    i.getLastChatMessage(),
-                    i.getLastChatMessageAt(),
+                    i.getLastChat(),
+                    i.getLastChatAt(),
+                    i.getLastChatSender(),
                     ChatProfile.toResponse(profile));
         }).toList();
     }

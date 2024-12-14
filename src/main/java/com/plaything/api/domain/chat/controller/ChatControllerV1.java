@@ -1,6 +1,6 @@
 package com.plaything.api.domain.chat.controller;
 
-import com.plaything.api.domain.chat.model.response.ChatListResponse;
+import com.plaything.api.domain.chat.model.response.ChatList;
 import com.plaything.api.domain.chat.model.response.ChatRoomResponse;
 import com.plaything.api.domain.chat.service.ChatFacadeV1;
 import com.plaything.api.security.JWTProvider;
@@ -52,7 +52,7 @@ public class ChatControllerV1 {
 
     )
     @GetMapping("/chat-list/{chatRoomId}")
-    public ChatListResponse chatList(
+    public ChatList chatList(
             @RequestHeader(value = "Authorization", required = false) String authString,
             @PathVariable("chatRoomId") Long chatRoomId,
             @RequestParam(value = "lastChatId", required = false) Long lastChatId

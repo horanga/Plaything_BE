@@ -10,7 +10,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "chat")
+@Table(indexes = {
+        @Index(name = "idx_chatroom_sequence", columnList = "chatRoom_id, sequence"),
+        @Index(name = "idx_chatroom_createdat", columnList = "chatRoom_id, createdAt")
+})
 public class Chat {
 
     @Id
@@ -29,6 +32,10 @@ public class Chat {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column
+    private int sequence;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private ChatRoom chatRoom;
+
 }

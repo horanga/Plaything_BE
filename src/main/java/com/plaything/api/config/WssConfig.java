@@ -30,14 +30,12 @@ public class WssConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         //pub, sub 경로 지정
-
         //응답을 내려주는 경로
         registry.enableSimpleBroker("/user")
                 .setTaskScheduler(taskScheduler())
-                .setHeartbeatValue(new long[]{30000, 30000});
+                .setHeartbeatValue(new long[]{10000, 10000});
         registry.setUserDestinationPrefix("/user");
         registry.setApplicationDestinationPrefixes("/pub");
-
     }
 
     public TaskScheduler taskScheduler() {
@@ -53,15 +51,12 @@ public class WssConfig implements WebSocketMessageBrokerConfigurer {
                         "https://fe-chat.vercel.app",
                         "https://fe-chat-jeongs-projects-496987bc.vercel.app",
                         "https://jiangxy.github.io");
-// 클라이언트가 웹 소켓을 사용할 수 없는 환경에서 방어 로직 -->프록시나 방화벽으로 차단될 때
-// 롱폴링을 대신 사용하게 됨
-
     }
 
     @Override
     public void configureWebSocketTransport(WebSocketTransportRegistration registration) {
         registration.setMessageSizeLimit(128 * 1024)
-                .setSendTimeLimit(15 * 1000)
+                .setSendTimeLimit(2 * 10000)
                 .setSendBufferSizeLimit(512 * 1024)
                 .addDecoratorFactory(handler -> new WebSocketHandlerDecorator(handler) {
                     @Override
