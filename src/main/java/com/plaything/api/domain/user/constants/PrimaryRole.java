@@ -49,7 +49,7 @@ public enum PrimaryRole {
             return TOP;
         }
 
-        throw new CustomException(ErrorCode.NOT_EXIST_OPPOSITE_PRIMARY);
+        throw new CustomException(ErrorCode.NOT_EXIST_OPPOSITE_PRIMARY_PARTNER);
     }
 }
 
