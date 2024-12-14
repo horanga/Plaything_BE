@@ -109,7 +109,7 @@ public class ProfileFacadeV1 {
 
         if (files.size() == 0) {
 
-            throw new CustomException(ErrorCode.NO_IMAGE_FAILED);
+            throw new CustomException(ErrorCode.IMAGE_REQUIRED);
         }
 
         User user = userServiceV1.findByLoginId(name);
@@ -170,6 +170,10 @@ public class ProfileFacadeV1 {
         Profile profile = user.getProfile();
         if (profile == null) {
             throw new CustomException(ErrorCode.NOT_EXIST_USER);
+        }
+
+        if (profile.isBaned()) {
+            throw new CustomException(ErrorCode.NOT_AUTHORIZED_PROFILE);
         }
         return profile;
     }

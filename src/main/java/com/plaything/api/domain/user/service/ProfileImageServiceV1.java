@@ -47,7 +47,7 @@ public class ProfileImageServiceV1 {
     public void checkCountOfImages(List<MultipartFile> files, Long profileId) {
         long countOfImages = profileImageRepository.countByProfile_Id(profileId);
         if (countOfImages >= 3 || countOfImages + files.size() > 3) {
-            throw new CustomException(ErrorCode.EXCEED_IMAGE_LIMIT);
+            throw new CustomException(ErrorCode.IMAGE_COUNT_EXCEEDED);
         }
     }
 

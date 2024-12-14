@@ -22,7 +22,7 @@ public class NotificationServiceV1 {
             NotificationType type,
             Profile requesterProfile,
             User receiver
-    ) throws IOException {
+    ) throws IOException, RuntimeException {
         Notification notification = Notification.builder()
                 .type(type)
                 .requesterNickName(requesterProfile.getNickName())
