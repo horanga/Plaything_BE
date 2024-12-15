@@ -26,9 +26,10 @@ public class RedisConfig {
     public RedisConnectionFactory redisConnectionFactory() {
         LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
                 .clientOptions(ClientOptions.builder()
-                        .disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS)  // 연결이 없으면 바로 명령어 거절// 자동 재연결 비활성화
+                        .disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS)
+                        .autoReconnect(true)
                         .build())
-                .commandTimeout(Duration.ofSeconds(2))
+                .commandTimeout(Duration.ofSeconds(5))
                 .build();
 
         RedisStandaloneConfiguration serverConfig = new RedisStandaloneConfiguration(host, port);
