@@ -77,7 +77,7 @@ class ProfileFacadeV1Test {
 
         profileFacadeV1.registerProfile(profileRegistration, "dusgh123");
 
-        Profile profile = profileFacadeV1.getProfileByUserLoginId("dusgh123");
+        Profile profile = profileFacadeV1.getProfileByLoginIdNotDTO("dusgh123");
 
         assertThat(profile.getNickName()).isEqualTo("dusgh123");
         assertThat(profile.getGender()).isEqualTo(M);
@@ -97,7 +97,7 @@ class ProfileFacadeV1Test {
 
         profileFacadeV1.registerProfile(profileRegistration, "dusgh123");
 
-        Profile profile = profileFacadeV1.getProfileByUserLoginId("dusgh123");
+        Profile profile = profileFacadeV1.getProfileByLoginIdNotDTO("dusgh123");
 
         assertThat(profile.getNickName()).isEqualTo("dusgh123");
         assertThat(profile.getGender()).isEqualTo(M);
@@ -345,7 +345,7 @@ class ProfileFacadeV1Test {
                 "dusgh123", "hi", M, primaryRole, traits, primaryTrait, List.of(RelationshipPreferenceConstant.DATE_DS), LocalDate.of(1995, 3, 30));
 
         assertThatThrownBy(() -> profileFacadeV1.registerProfile(profileRegistration, "dusgh123"))
-                .isInstanceOf(CustomException.class).hasMessage("ROLE MISMATCH");
+                .isInstanceOf(CustomException.class).hasMessage("대표성향과 일치하지 않는 세부성향입니다");
     }
 
     public static Stream<Arguments> traitProvider() {
@@ -483,7 +483,7 @@ class ProfileFacadeV1Test {
                 "dusgh123", "hi", M, TOP, List.of(HUNTER), SADIST, List.of(RelationshipPreferenceConstant.DATE_DS), LocalDate.of(1995, 3, 30));
 
         assertThatThrownBy(() -> profileFacadeV1.registerProfile(profileRegistration, "dusgh123"))
-                .isInstanceOf(CustomException.class).hasMessage("TRAITS NOT INCLUDE PRIMARY TRAIT");
+                .isInstanceOf(CustomException.class).hasMessage("대표성향을 선택하지 않았습니다");
 
     }
 

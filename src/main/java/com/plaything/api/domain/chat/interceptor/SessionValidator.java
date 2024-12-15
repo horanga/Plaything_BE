@@ -61,7 +61,7 @@ public class SessionValidator {
         }
 
         String loginId = getLoginId(authHeader);
-        Profile profile = profileFacadeV1.getProfileByUserLoginId(loginId);
+        Profile profile = profileFacadeV1.getProfileByLoginIdNotDTO(loginId);
         String[] userInfo = new String[]{profile.getNickName(), loginId}; //[0] 닉네임, [1] 로그인 id
         sessionUserMap.put(sessionId, userInfo);
     }

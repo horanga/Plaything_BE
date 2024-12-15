@@ -16,7 +16,7 @@ public class IndexServiceV1 {
 
     //TODO 추후 레디스로 변경
     public IndexResponse refreshIndex(String loginId) {
-        Profile profile = profileFacadeV1.getProfileByUserLoginId(loginId);
+        Profile profile = profileFacadeV1.getProfileByLoginIdNotDTO(loginId);
         boolean newChat = chatRoomQueryRepository.findNewChat(profile.getNickName());
         return new IndexResponse(newChat);
     }
