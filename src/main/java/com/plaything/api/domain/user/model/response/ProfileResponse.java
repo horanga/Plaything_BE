@@ -49,12 +49,8 @@ public record ProfileResponse(
 
 ) {
 
-    public static ProfileResponse toResponse(Profile profile, List<ProfileImage> profileImages) {
+    public static ProfileResponse toResponse(Profile profile, List<ProfileImageResponse> profileImages) {
 
-        List<ProfileImageResponse> profileImageList =
-                profileImages.stream()
-                        .map(ProfileImageResponse::toResponse)
-                        .toList();
 
         List<PersonalityTraitResponse> personalityTraitList
                 = profile.getPersonalityTrait().stream()
@@ -72,7 +68,7 @@ public record ProfileResponse(
                 profile.isPrivate(),
                 profile.isBaned(),
                 profile.getProfileStatus(),
-                profileImageList,
+                profileImages,
                 profile.getNickName(),
                 profile.getIntroduction(),
                 profile.getGender(),

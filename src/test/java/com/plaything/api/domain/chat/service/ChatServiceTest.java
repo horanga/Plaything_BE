@@ -83,7 +83,7 @@ public class ChatServiceTest {
         profileFacadeV1.registerProfile(profileRegistration, "dusgh1234");
 
         Profile profile1 = profileRepository.findByNickName("알렉1");
-        ProfileImage image1 = ProfileImage.builder().profile(profile1).url("abc").isMainPhoto(true).build();
+        ProfileImage image1 = ProfileImage.builder().profile(profile1).isMainPhoto(true).build();
         profile1.addProfileImages(List.of(image1));
 
         ProfileRegistration profileRegistration2 = new ProfileRegistration(
@@ -93,7 +93,7 @@ public class ChatServiceTest {
 
         Profile profile2 = profileRepository.findByNickName("알렉2");
 
-        ProfileImage image2 = ProfileImage.builder().profile(profile2).url("abcd").isMainPhoto(true).build();
+        ProfileImage image2 = ProfileImage.builder().profile(profile2).isMainPhoto(true).build();
         profile2.addProfileImages(List.of(image2));
 
     }

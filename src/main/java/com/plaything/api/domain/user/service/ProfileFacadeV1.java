@@ -14,7 +14,9 @@ import com.plaything.api.domain.user.constants.PrimaryRole;
 import com.plaything.api.domain.user.constants.ProfileStatus;
 import com.plaything.api.domain.user.model.request.ProfileRegistration;
 import com.plaything.api.domain.user.model.request.ProfileUpdate;
+import com.plaything.api.domain.user.model.response.ProfileImageResponse;
 import com.plaything.api.domain.user.model.response.ProfileResponse;
+import com.plaything.api.domain.user.util.ImageUrlGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,17 +33,7 @@ public class ProfileFacadeV1 {
     private final UserServiceV1 userServiceV1;
     private final ProfileImageServiceV1 profileImageServiceV1;
     private final ProfileMonitoringServiceV1 profileMonitoringServiceV1;
-
-    @Transactional
-    public void banProfile(Long profileId, String rejectedReason, User user) {
-        Profile profile = profileRepository.findById(profileId).
-                orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_PROFILE));
-        profile.setBaned();
-        profile.setProfileStatusRejected();
-
-        profileMonitoringServiceV1.saveRejectedProfile(profile, user, rejectedReason);
-        userServiceV1.increaseBannedProfileCount(user);
-    }
+    private final ImageUrlGenerator imageUrlGenerator;
 
     @Transactional
     public void registerProfile(ProfileRegistration registration, String name) {
@@ -70,7 +62,7 @@ public class ProfileFacadeV1 {
 
     @Transactional
     public void updateProfile(ProfileUpdate update, String user) {
-        Profile profile = getProfileByUserLoginId(user);
+        Profile profile = getProfileByLoginIdNotDTO(user);
 
     }
 
@@ -87,7 +79,10 @@ public class ProfileFacadeV1 {
             throw new CustomException(ErrorCode.NOT_AUTHORIZED_PROFILE);
         }
 
-        return ProfileResponse.toResponse(profile, profile.getProfileImages());
+        List<ProfileImageResponse> profileImageResponseList = profile.getProfileImages().stream().map(i -> new ProfileImageResponse(imageUrlGenerator.getImageUrl(i.getFileName()),
+                i.isMainPhoto())).toList();
+
+        return ProfileResponse.toResponse(profile, profileImageResponseList);
     }
 
     @Transactional
@@ -102,6 +97,17 @@ public class ProfileFacadeV1 {
         User user = userServiceV1.findByLoginId(name);
         Profile profile = user.getProfile();
         profile.setPublic();
+    }
+
+    @Transactional
+    public void banProfile(Long profileId, String rejectedReason, User user) {
+        Profile profile = profileRepository.findById(profileId).
+                orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_PROFILE));
+        profile.setBaned();
+        profile.setProfileStatusRejected();
+
+        profileMonitoringServiceV1.saveRejectedProfile(profile, user, rejectedReason);
+        userServiceV1.increaseBannedProfileCount(user);
     }
 
     //TODO 비동기 처리할지 확인하기
@@ -164,7 +170,7 @@ public class ProfileFacadeV1 {
     }
 
     //프로필 조회를 위한 api가 아닌 단순 로직에 필요한 메서드
-    public Profile getProfileByUserLoginId(String loginId) {
+    public Profile getProfileByLoginIdNotDTO(String loginId) {
 
         User user = userServiceV1.findByLoginId(loginId);
         Profile profile = user.getProfile();

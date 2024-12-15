@@ -566,7 +566,7 @@ class MatchingServiceV1Test {
         assertThat(room.getLastSequence()).isEqualTo(0);
         assertThat(room.getSenderNickname()).isEqualTo("연호1");
         assertThat(room.getReceiverNickname()).isEqualTo("연호2");
-        
+
     }
 
 
@@ -578,7 +578,7 @@ class MatchingServiceV1Test {
     //이미지가 없거나, 유저다 밴당하면 매칭에 x
 
     private void addImage(User user) {
-        ProfileImage image = ProfileImage.builder().fileName("aa").url("aa").profile(user.getProfile()).build();
+        ProfileImage image = ProfileImage.builder().fileName("aa").profile(user.getProfile()).build();
 
         profileImageRepository.save(image);
 

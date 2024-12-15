@@ -80,7 +80,7 @@ public class S3ImagesServiceV1 {
 
             s3Client.putObject(new PutObjectRequest(bucket, filename,
                     new ByteArrayInputStream(resizedImageBytes), objectMetadata)
-                    .withCannedAcl(CannedAccessControlList.PublicRead));
+                    .withCannedAcl(CannedAccessControlList.Private));
 
             return filename;
         } catch (IOException e) {

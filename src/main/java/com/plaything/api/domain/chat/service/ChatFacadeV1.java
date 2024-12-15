@@ -13,6 +13,7 @@ import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.entity.user.profile.Profile;
 import com.plaything.api.domain.repository.repo.user.ProfileRepository;
 import com.plaything.api.domain.repository.repo.user.UserRepository;
+import com.plaything.api.domain.user.util.ImageUrlGenerator;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,8 @@ public class ChatFacadeV1 {
     private final FilteringService filteringService;
 
     private final ChatRateLimiter chatRateLimiter;
+
+    private final ImageUrlGenerator urlGenerator;
 
     public List<ChatRoomResponse> getChatRooms(String requesterLoginId, Long lastChatRoomId) {
         User user = userRepository.findByLoginId(requesterLoginId)
@@ -91,7 +94,7 @@ public class ChatFacadeV1 {
                     i.getLastChat(),
                     i.getLastChatAt(),
                     i.getLastChatSender(),
-                    ChatProfile.toResponse(profile));
+                    ChatProfile.toResponse(profile, urlGenerator.getImageUrl(profile.getMainPhotoFileName())));
         }).toList();
     }
 
