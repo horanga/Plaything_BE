@@ -6,7 +6,9 @@ import com.plaything.api.domain.repository.entity.notification.Notification;
 import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.entity.user.profile.Profile;
 import com.plaything.api.domain.repository.repo.notification.NotificationRepository;
+import com.plaything.api.domain.user.util.ImageUrlGenerator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -16,17 +18,19 @@ import java.util.List;
 @Service
 public class NotificationServiceV1 {
 
+    private final ImageUrlGenerator urlGenerator;
+
     private final NotificationRepository notificationRepository;
 
     public void saveNotification(
             NotificationType type,
             Profile requesterProfile,
             User receiver
-    ) throws IOException {
+    ) throws IOException, RuntimeException {
         Notification notification = Notification.builder()
                 .type(type)
                 .requesterNickName(requesterProfile.getNickName())
-                .requesterMainPhoto(requesterProfile.getMainPhoto().getUrl())
+                .requesterMainPhoto(urlGenerator.getImageUrl(requesterProfile.getMainPhotoFileName()))
                 .receiver(receiver)
                 .build();
         notificationRepository.save(notification);

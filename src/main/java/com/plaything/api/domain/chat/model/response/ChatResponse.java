@@ -6,36 +6,41 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 
 
-public record MessageResponse(
+public record ChatResponse(
         @Schema(description = "메시지 id")
         Long id,
 
         @Schema(description = "메시지 발송자 닉네임")
-        String sendNickname,
+        String senderNickname,
 
         @Schema(description = "메시지 내용")
         String message,
 
         @Schema(description = "메시지 생성 시간")
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+
+        @Schema(description = "메시지 순서")
+        int sequence
 ) {
 
-    public static MessageResponse toResponse(Chat chat, String nickName) {
+    public static ChatResponse toResponse(Chat chat, String nickName) {
 
 
         if (nickName.equals(chat.getSenderNickname())) {
-            return new MessageResponse(
+            return new ChatResponse(
                     chat.getId(),
                     chat.getSenderNickname(),
                     chat.getMessage(),
-                    chat.getCreatedAt());
+                    chat.getCreatedAt(),
+                    chat.getSequence());
         }
 
-        return new MessageResponse(
+        return new ChatResponse(
                 chat.getId(),
                 chat.getSenderNickname(),
                 chat.getMessage(),
-                chat.getCreatedAt());
+                chat.getCreatedAt(),
+                chat.getSequence());
     }
 }
 

@@ -10,7 +10,11 @@ import java.util.List;
 
 @Schema(description = "User 프로필")
 public record ProfileResponse(
-        @Schema(description = "프로필 비공개")
+
+        @Schema(description = "프로필 id")
+        Long id,
+
+        @Schema(description = "프로필 비공개 여부")
         boolean isPrivate,
 
         @Schema(description = "프로필 밴 여부")
@@ -45,12 +49,8 @@ public record ProfileResponse(
 
 ) {
 
-    public static ProfileResponse toResponse(Profile profile, List<ProfileImage> profileImages) {
+    public static ProfileResponse toResponse(Profile profile, List<ProfileImageResponse> profileImages) {
 
-        List<ProfileImageResponse> profileImageList =
-                profileImages.stream()
-                        .map(ProfileImageResponse::toResponse)
-                        .toList();
 
         List<PersonalityTraitResponse> personalityTraitList
                 = profile.getPersonalityTrait().stream()
@@ -64,10 +64,11 @@ public record ProfileResponse(
         String primaryRole = profile.getPrimaryRoleAsString();
 
         return new ProfileResponse(
+                profile.getId(),
                 profile.isPrivate(),
                 profile.isBaned(),
                 profile.getProfileStatus(),
-                profileImageList,
+                profileImages,
                 profile.getNickName(),
                 profile.getIntroduction(),
                 profile.getGender(),

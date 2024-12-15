@@ -139,8 +139,10 @@ public class Profile {
         return this.primaryRole.equals(PrimaryRole.ETC);
     }
 
-    public ProfileImage getMainPhoto() {
-        return this.profileImages.stream().filter(ProfileImage::isMainPhoto).findFirst().get();
+    public String getMainPhotoFileName() {
+        ProfileImage profileImage = this.profileImages.stream().filter(ProfileImage::isMainPhoto).findFirst().get();
+
+        return profileImage.getFileName();
     }
 
     public String getPrimaryRoleAsString() {

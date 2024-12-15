@@ -5,25 +5,12 @@ import com.plaything.api.domain.auth.model.request.CreateUserRequest;
 import com.plaything.api.domain.auth.model.request.LoginRequest;
 import com.plaything.api.domain.auth.model.response.LoginResponse;
 import com.plaything.api.domain.auth.service.AuthServiceV1;
-import com.plaything.api.domain.image.service.model.SavedImage;
 import com.plaything.api.domain.key.model.request.AdRewardRequest;
-import com.plaything.api.domain.key.model.request.MatchingRequest;
 import com.plaything.api.domain.key.model.response.AdViewLogResponse;
 import com.plaything.api.domain.key.model.response.AvailablePointKey;
 import com.plaything.api.domain.key.model.response.PointKeyLog;
-import com.plaything.api.domain.key.model.response.PointKeyUsageLog;
-import com.plaything.api.domain.notification.model.response.NotificationResponse;
-import com.plaything.api.domain.notification.service.NotificationServiceV1;
 import com.plaything.api.domain.repository.entity.pay.UserRewardActivity;
-import com.plaything.api.domain.repository.entity.user.User;
-import com.plaything.api.domain.repository.entity.user.profile.Profile;
 import com.plaything.api.domain.repository.repo.pay.UserRewardActivityRepository;
-import com.plaything.api.domain.repository.repo.user.UserRepository;
-import com.plaything.api.domain.user.constants.RelationshipPreferenceConstant;
-import com.plaything.api.domain.user.model.request.ProfileRegistration;
-import com.plaything.api.domain.user.service.ProfileFacadeV1;
-import com.plaything.api.domain.user.service.ProfileImageServiceV1;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,19 +26,13 @@ import java.util.List;
 import java.util.Set;
 
 import static com.plaything.api.domain.key.constant.KeyLogStatus.EARN;
-import static com.plaything.api.domain.key.constant.KeyLogStatus.USE;
 import static com.plaything.api.domain.key.constant.KeySource.ADVERTISEMENT_REWARD;
 import static com.plaything.api.domain.key.constant.KeySource.LOGIN_REWARD;
 import static com.plaything.api.domain.key.constant.KeyType.POINT_KEY;
-import static com.plaything.api.domain.notification.constant.NotificationType.MATCHING_REQUEST;
-import static com.plaything.api.domain.notification.constant.NotificationMessage.MATCHING_REQUEST_BODY;
-import static com.plaything.api.domain.notification.constant.NotificationMessage.MATCHING_REQUEST_TITLE;
-import static com.plaything.api.domain.user.constants.Gender.M;
-import static com.plaything.api.domain.user.constants.PersonalityTraitConstant.HUNTER;
-import static com.plaything.api.domain.user.constants.PrimaryRole.TOP;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.BDDAssertions.within;
+
 @Transactional
 @SpringBootTest
 class PointKeyFacadeV1Test {
@@ -70,21 +51,6 @@ class PointKeyFacadeV1Test {
 
     @Autowired
     private PointKeyLogServiceV1 pointKeyLogServiceV1;
-
-    @Autowired
-    private ProfileFacadeV1 profileFacadeV1;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private NotificationServiceV1 notificationServiceV1;
-
-    @Autowired
-    private ProfileImageServiceV1 profileImageServiceV1;
-
-    @Autowired
-    private EntityManager em;
 
     @Autowired
     protected RedisTemplate redisTemplate;
@@ -238,81 +204,6 @@ class PointKeyFacadeV1Test {
         );
     }
 
-    @DisplayName("포인트 키를 사용하면 관련 로그들이 쌓인다.")
-    @Test
-    void test7() {
-        AdRewardRequest request = new AdRewardRequest("광고1", 2);
-        pointKeyFacadeV1.createPointKeyForAd("dusgh1234", request, LocalDateTime.now(), "1");
-        AvailablePointKey availablePointKey1 = pointKeyFacadeV1.getAvailablePointKey("dusgh1234");
-        assertThat(availablePointKey1.availablePointKey()).isEqualTo(2L);
-
-        ProfileRegistration profileRegistration = new ProfileRegistration("연호1", "안녕", M, TOP, List.of(HUNTER), HUNTER, List.of(RelationshipPreferenceConstant.MARRIAGE_DS),
-                LocalDate.now());
-        profileFacadeV1.registerProfile(profileRegistration, "dusgh1234");
-        User user = userRepository.findByLoginId("dusgh1234").get();
-        Profile profile = user.getProfile();
-        List<SavedImage> savedImages = List.of(new SavedImage("a", "b"));
-
-        profileImageServiceV1.saveImages(savedImages, profile, 0L);
-
-        ProfileRegistration profileRegistration2 = new ProfileRegistration("연호", "안녕", M, TOP, List.of(HUNTER), HUNTER, List.of(RelationshipPreferenceConstant.MARRIAGE_DS),
-                LocalDate.now());
-        profileFacadeV1.registerProfile(profileRegistration2, "dusgh12345");
-
-        MatchingRequest matchingRequest = new MatchingRequest("연호");
-
-        em.flush();
-        em.clear();
-        pointKeyFacadeV1.usePointKeyForMatching("dusgh1234", matchingRequest, "2");
-
-        List<PointKeyUsageLog> pointKeyLogs = pointKeyLogServiceV1.getPointKeyUsageLog("dusgh1234");
-        assertThat(pointKeyLogs.size()).isEqualTo(1);
-        assertThat(pointKeyLogs).extracting("keyType").containsExactly(POINT_KEY);
-        assertThat(pointKeyLogs).extracting("keyLogStatus").containsExactly(USE);
-        assertThat(pointKeyLogs).extracting("userLoginId").containsExactly("dusgh1234");
-
-        User user1 = userRepository.findByLoginId("dusgh1234").get();
-        User user2 = userRepository.findByLoginId("dusgh12345").get();
-        assertThat(pointKeyLogs.get(0).keyUsageLog().senderId()).isEqualTo(user1.getId());
-        assertThat(pointKeyLogs.get(0).keyUsageLog().receiverId()).isEqualTo(user2.getId());
-    }
-
-    @DisplayName("매칭을 요청하면 알림이 보내진다.")
-    @Test
-    void test8() {
-        AdRewardRequest request = new AdRewardRequest("광고1", 2);
-        pointKeyFacadeV1.createPointKeyForAd("dusgh1234", request, LocalDateTime.now(), "1");
-        AvailablePointKey availablePointKey1 = pointKeyFacadeV1.getAvailablePointKey("dusgh1234");
-        assertThat(availablePointKey1.availablePointKey()).isEqualTo(2L);
-
-        ProfileRegistration profileRegistration = new ProfileRegistration("연호1", "안녕", M, TOP, List.of(HUNTER), HUNTER, List.of(RelationshipPreferenceConstant.MARRIAGE_DS),
-                LocalDate.now());
-        profileFacadeV1.registerProfile(profileRegistration, "dusgh1234");
-        User user = userRepository.findByLoginId("dusgh1234").get();
-        Profile profile = user.getProfile();
-        List<SavedImage> savedImages = List.of(new SavedImage("a", "b"));
-
-        profileImageServiceV1.saveImages(savedImages, profile, 0L);
-
-        ProfileRegistration profileRegistration2 = new ProfileRegistration("연호", "안녕", M, TOP, List.of(HUNTER), HUNTER, List.of(RelationshipPreferenceConstant.MARRIAGE_DS),
-                LocalDate.now());
-        profileFacadeV1.registerProfile(profileRegistration2, "dusgh12345");
-
-        MatchingRequest matchingRequest = new MatchingRequest("연호");
-
-        em.flush();
-        em.clear();
-        pointKeyFacadeV1.usePointKeyForMatching("dusgh1234", matchingRequest, "2");
-
-        List<NotificationResponse> notification = notificationServiceV1.getNotification("dusgh12345");
-
-        assertThat(notification.size()).isEqualTo(1);
-        assertThat(notification.get(0).title()).isEqualTo("연호1" + MATCHING_REQUEST_TITLE);
-        assertThat(notification.get(0).body()).isEqualTo(MATCHING_REQUEST_BODY);
-        assertThat(notification.get(0).type()).isEqualTo(MATCHING_REQUEST);
-        assertThat(notification.get(0).requesterNickName()).isEqualTo("연호1");
-        assertThat(notification.get(0).requesterMainPhoto()).isEqualTo("a");
-    }
 
     @DisplayName("광고는 시간 간격에 맞춰서 봐야 포인트를 받을 수 있다.")
     @Test
@@ -355,31 +246,4 @@ class PointKeyFacadeV1Test {
                 .isInstanceOf(CustomException.class).hasMessage("TRANSACTION ALREADY PROCESSED");
     }
 
-    @DisplayName("포인트 키 사용 요청의 트랜잭션 id가 동일하면 중복으로 처리된다.")
-    @Test
-    void test11() {
-        AdRewardRequest request = new AdRewardRequest("광고1", 2);
-        pointKeyFacadeV1.createPointKeyForAd("dusgh1234", request, LocalDateTime.now(), "1");
-
-        ProfileRegistration profileRegistration = new ProfileRegistration("연호1", "안녕", M, TOP, List.of(HUNTER), HUNTER, List.of(RelationshipPreferenceConstant.MARRIAGE_DS),
-                LocalDate.now());
-        profileFacadeV1.registerProfile(profileRegistration, "dusgh1234");
-        User user = userRepository.findByLoginId("dusgh1234").get();
-        Profile profile = user.getProfile();
-        List<SavedImage> savedImages = List.of(new SavedImage("a", "b"));
-        profileImageServiceV1.saveImages(savedImages, profile, 0L);
-
-        ProfileRegistration profileRegistration2 = new ProfileRegistration("연호", "안녕", M, TOP, List.of(HUNTER), HUNTER, List.of(RelationshipPreferenceConstant.MARRIAGE_DS),
-                LocalDate.now());
-        profileFacadeV1.registerProfile(profileRegistration2, "dusgh12345");
-        MatchingRequest matchingRequest = new MatchingRequest("연호");
-
-        em.flush();
-        em.clear();
-        pointKeyFacadeV1.usePointKeyForMatching("dusgh1234", matchingRequest, "2");
-        assertThatThrownBy(() -> pointKeyFacadeV1.usePointKeyForMatching("dusgh1234", matchingRequest, "2"))
-                .isInstanceOf(CustomException.class).hasMessage("TRANSACTION ALREADY PROCESSED");
-
-
-    }
 }

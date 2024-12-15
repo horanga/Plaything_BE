@@ -10,12 +10,15 @@ public record ChatRoomResponse(
         Long chatRoomId,
 
         @Schema(description = "최신 채팅 메시지")
-        String lastChatMessage,
+        String lastChat,
 
-        @Schema(description = "최신 채팅 메시지")
-        LocalDateTime lastMessageAt,
+        @Schema(description = "최신 채팅 메시지 시간")
+        LocalDateTime lastChatAt,
 
-        @Schema(description = "상대방 프로필")
-        ChatProfile chatProfile
+        @Schema(description = "최신 채팅 보낸 사람")
+        String lastChatSender,
+
+        @Schema(description = "파트너 프로필")
+        ChatProfile partnerProfile
 ) {
 }

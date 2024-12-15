@@ -14,9 +14,9 @@ public record ChatProfile(
         String nickName
 ) {
 
-    public static ChatProfile toResponse(Profile profile) {
+    public static ChatProfile toResponse(Profile profile, String imageUrl) {
         return new ChatProfile(
-                profile.getMainPhoto().getUrl(),
+                imageUrl,
                 profile.getPrimaryRoleAsString(),
                 profile.getNickName());
 

@@ -39,7 +39,7 @@ public class FcmServiceV1 {
 
         return Message.builder().putData("title", requesterProfile.getNickName() + MATCHING_REQUEST_TITLE)
                 .putData("me", requesterProfile.getNickName())
-                .putData("profileImage", requesterMainPhoto.url())
+                .putData("profileImage", requesterMainPhoto.getUrl())
                 .putData("body", MATCHING_REQUEST_BODY)
                 .setToken(fckToken)
                 .build();

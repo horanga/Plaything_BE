@@ -25,7 +25,6 @@ public class ProfileImageServiceV1 {
 
         IntStream.range(0, images.size())
                 .mapToObj(i -> ProfileImage.builder()
-                        .url(images.get(i).url())
                         .fileName(images.get(i).fileName())
                         .profile(profile)
                         .isMainPhoto(i == indexOfMainImage)
@@ -40,14 +39,10 @@ public class ProfileImageServiceV1 {
                 });
     }
 
-    public ProfileImage getMainPhoto(String nickName) {
-        return profileImageRepository.findByProfile_NickNameAndIsMainPhoto(nickName, true);
-    }
-
     public void checkCountOfImages(List<MultipartFile> files, Long profileId) {
         long countOfImages = profileImageRepository.countByProfile_Id(profileId);
         if (countOfImages >= 3 || countOfImages + files.size() > 3) {
-            throw new CustomException(ErrorCode.EXCEED_IMAGE_LIMIT);
+            throw new CustomException(ErrorCode.IMAGE_COUNT_EXCEEDED);
         }
     }
 

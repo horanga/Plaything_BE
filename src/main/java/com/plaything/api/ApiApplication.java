@@ -14,6 +14,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -25,6 +26,7 @@ import static com.plaything.api.common.discord.constant.MessageFormat.*;
 @SpringBootApplication
 @EnableJpaAuditing
 @EnableFeignClients
+@EnableScheduling
 public class ApiApplication {
 
     private final DiscordAlarm discordAlarm;

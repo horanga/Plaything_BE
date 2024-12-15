@@ -2,7 +2,6 @@ package com.plaything.api.domain.repository.entity.chat;
 
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorCode;
-import com.plaything.api.domain.chat.model.reqeust.Message;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,8 +15,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(indexes = {
-        @Index(name = "idx_receiver_last_msg", columnList = "receiverNickname,lastChatMessageAt"),
-        @Index(name = "idx_sender_last_msg", columnList = "senderNickname,lastChatMessageAt")
+        @Index(name = "idx_receiver_msg", columnList = "receiverNickname,lastChatAt"),
+        @Index(name = "idx_sender_msg", columnList = "senderNickname,lastChatAt")
 })
 @Entity
 public class ChatRoom {
@@ -36,21 +35,35 @@ public class ChatRoom {
     private String exitedUserNickname;
 
     @Column
-    private String lastChatMessage;
+    private String lastChat;
 
     @Column
-    private LocalDateTime lastChatMessageAt;
+    private LocalDateTime lastChatAt;
+
+    @Column
+    private boolean hasNewChat;
+
+    @Column
+    private LocalDateTime lastChatCheckedAt;
+
+    @Column
+    String lastChatSender;
+
+    @Column
+    private int lastSequence;
 
     @Column
     private boolean isClosed = false;
 
+    @Version
+    private Long version;
 
     public boolean validateRequester(String name) {
         return senderNickname.equals(name) || receiverNickname.equals(name);
     }
 
     public void hasPartnerLeave() {
-        if (!this.exitedUserNickname.isEmpty()) {
+        if (this.exitedUserNickname != null) {
             throw new CustomException(ErrorCode.PARTNER_ALREADY_LEAVE);
         }
     }
@@ -69,9 +82,20 @@ public class ChatRoom {
         }
     }
 
-    public void updateLastMessage(Message message, LocalDateTime createdAt) {
-        this.lastChatMessage = message.message();
-        this.lastChatMessageAt = createdAt;
+    public void updateLastMessage(String sender, String message, LocalDateTime createdAt, int newSequence) {
+        this.lastChat = message;
+        this.lastChatAt = createdAt;
+        this.lastChatSender = sender;
+        this.lastSequence = newSequence;
+        if (!this.hasNewChat) {
+            this.hasNewChat = true;
+        }
     }
 
+    public void getMessages(String nickName) {
+        if (this.hasNewChat && !this.lastChatSender.equals(nickName)) {
+            this.hasNewChat = false;
+        }
+        this.lastChatCheckedAt = LocalDateTime.now();
+    }
 }

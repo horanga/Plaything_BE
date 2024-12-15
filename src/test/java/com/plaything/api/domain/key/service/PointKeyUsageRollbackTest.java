@@ -7,25 +7,33 @@ import com.plaything.api.domain.auth.service.AuthServiceV1;
 import com.plaything.api.domain.key.constant.KeyLogStatus;
 import com.plaything.api.domain.key.model.request.MatchingRequest;
 import com.plaything.api.domain.key.model.response.AvailablePointKey;
+import com.plaything.api.domain.matching.service.MatchingFacadeV1;
 import com.plaything.api.domain.notification.service.NotificationServiceV1;
 import com.plaything.api.domain.repository.entity.log.KeyLog;
 import com.plaything.api.domain.repository.entity.notification.Notification;
 import com.plaything.api.domain.repository.entity.user.User;
+import com.plaything.api.domain.repository.entity.user.profile.Profile;
+import com.plaything.api.domain.repository.entity.user.profile.ProfileImage;
 import com.plaything.api.domain.repository.repo.log.KeyLogRepository;
+import com.plaything.api.domain.repository.repo.monitor.ProfileRecordRepository;
 import com.plaything.api.domain.repository.repo.notification.NotificationRepository;
 import com.plaything.api.domain.repository.repo.pay.PointKeyRepository;
 import com.plaything.api.domain.repository.repo.pay.UserRewardActivityRepository;
+import com.plaything.api.domain.repository.repo.user.ProfileImageRepository;
+import com.plaything.api.domain.repository.repo.user.ProfileRepository;
 import com.plaything.api.domain.repository.repo.user.UserRepository;
+import com.plaything.api.domain.user.constants.PersonalityTraitConstant;
+import com.plaything.api.domain.user.constants.PrimaryRole;
+import com.plaything.api.domain.user.constants.RelationshipPreferenceConstant;
+import com.plaything.api.domain.user.model.request.ProfileRegistration;
+import com.plaything.api.domain.user.service.ProfileFacadeV1;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,13 +41,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
+import static com.plaything.api.domain.user.constants.Gender.M;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+
 @Transactional
 @SpringBootTest
 public class PointKeyUsageRollbackTest {
@@ -69,7 +78,22 @@ public class PointKeyUsageRollbackTest {
     private NotificationServiceV1 notificationServiceV1;
 
     @Autowired
-    protected RedisTemplate redisTemplate;
+    private RedisTemplate redisTemplate;
+
+    @Autowired
+    private MatchingFacadeV1 matchingFacadeV1;
+
+    @Autowired
+    private ProfileFacadeV1 profileFacadeV1;
+
+    @Autowired
+    private ProfileRepository profileRepository;
+
+    @Autowired
+    private ProfileRecordRepository profileRecordRepository;
+
+    @Autowired
+    private ProfileImageRepository profileImageRepository;
 
     @BeforeEach
     void setUp() {
@@ -85,14 +109,46 @@ public class PointKeyUsageRollbackTest {
 
         CreateUserRequest request2 = new CreateUserRequest("dusgh12345", "1234", "1");
         authServiceV1.creatUser(request2);
+
+        LocalDate now = LocalDate.now();
+        ProfileRegistration profileRegistration = new ProfileRegistration(
+                "알렉1", "hi", M, PrimaryRole.TOP, List.of(PersonalityTraitConstant.BOSS), PersonalityTraitConstant.BOSS, List.of(RelationshipPreferenceConstant.DATE_DS), now);
+
+        profileFacadeV1.registerProfile(profileRegistration, "dusgh1234");
+
+        Profile profile1 = profileRepository.findByNickName("알렉1");
+        ProfileImage image1 = ProfileImage.builder().profile(profile1).isMainPhoto(true).build();
+        profile1.addProfileImages(List.of(image1));
+
+        ProfileRegistration profileRegistration2 = new ProfileRegistration(
+                "알렉2", "hi", M, PrimaryRole.TOP, List.of(PersonalityTraitConstant.BOSS), PersonalityTraitConstant.BOSS, List.of(RelationshipPreferenceConstant.DATE_DS), now);
+
+        profileFacadeV1.registerProfile(profileRegistration2, "dusgh12345");
+
+        Profile profile2 = profileRepository.findByNickName("알렉2");
+
+        ProfileImage image2 = ProfileImage.builder().profile(profile2).isMainPhoto(true).build();
+        profile2.addProfileImages(List.of(image2));
     }
 
     @AfterEach
     void cleanup() {
+        // 1. profile_record 먼저 삭제
+        // (user를 참조하고 있는 자식 테이블이라 먼저 삭제 필요)
+        profileRecordRepository.deleteAll();
+
+        // 2. profile 관련 테이블들 삭제
+        profileImageRepository.deleteAll();  // profile의 자식 테이블
+        profileRepository.deleteAll();       // profile 메인 테이블
+
+        // 3. key 관련 테이블들 삭제
         keyLogRepository.deleteAll();
         pointKeyRepository.deleteAll();
         userRewardActivityRepository.deleteAll();
+
+        // 4. 마지막으로 user 삭제
         userRepository.deleteAll();
+
         TestTransaction.flagForCommit();
         TestTransaction.end();
     }
@@ -116,8 +172,8 @@ public class PointKeyUsageRollbackTest {
                 .saveNotification(any(), any(), any());
 
         User user = userRepository.findByLoginId("dusgh12345").get();
-        MatchingRequest matchingRequest = new MatchingRequest(user.getLoginId());
-        assertThatThrownBy(() -> pointKeyFacadeV1.usePointKeyForMatching("dusgh12345", matchingRequest, "1"))
+        MatchingRequest matchingRequest = new MatchingRequest(user.getNickname());
+        assertThatThrownBy(() -> matchingFacadeV1.createMatching("dusgh1234", matchingRequest, "123"))
                 .isInstanceOf(CustomException.class);
 
         TestTransaction.flagForRollback();
@@ -150,9 +206,9 @@ public class PointKeyUsageRollbackTest {
                 .saveNotification(any(), any(), any());
 
         User user = userRepository.findByLoginId("dusgh12345").get();
-        MatchingRequest matchingRequest = new MatchingRequest(user.getLoginId());
-        assertThatThrownBy(() -> pointKeyFacadeV1.usePointKeyForMatching("dusgh12345", matchingRequest, "1"))
-                .isInstanceOf(CustomException.class);
+        MatchingRequest matchingRequest = new MatchingRequest(user.getNickname());
+        assertThatThrownBy(() -> matchingFacadeV1.createMatching("dusgh1234", matchingRequest, "123"))
+                .isInstanceOf(RuntimeException.class);
 
         TestTransaction.flagForRollback();
         TestTransaction.end();

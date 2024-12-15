@@ -17,8 +17,6 @@ public class ProfileImage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private String url;
-
     private String fileName;
 
     private boolean isMainPhoto;

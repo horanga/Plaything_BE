@@ -93,6 +93,9 @@ dependencies {
     //Ahocreasick
     implementation 'org.ahocorasick:ahocorasick:0.6.3'
 
+    //retry
+    implementation 'org.springframework.retry:spring-retry'
+
 }
 
 tasks.named('test') {
