@@ -1,5 +1,7 @@
 package com.plaything.api.domain.chat.service;
 
+import com.plaything.api.common.exception.CustomException;
+import com.plaything.api.common.exception.ErrorCode;
 import com.plaything.api.domain.chat.model.reqeust.ChatRequest;
 import com.plaything.api.domain.chat.model.reqeust.ChatWithSequence;
 import com.plaything.api.domain.chat.model.response.ChatList;
@@ -21,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
@@ -53,20 +54,7 @@ public class ChatServiceV1 {
     public ChatWithMissingChat saveChatMessage(ChatRequest msg, LocalDateTime now) {
         Optional<ChatRoom> chatRoomByUsers = chatRoomRepository.findChatRoomByUsers(msg.senderNickname(), msg.receiverNickname());
 
-        if (chatRoomByUsers.isEmpty()) {
-            //TODO 예외처리
-            ChatRoom chatRoom = ChatRoom.builder()
-                    .senderNickname(msg.senderNickname())
-                    .receiverNickname(msg.receiverNickname())
-                    .build();
-            chatRoom.updateLastMessage(msg.senderNickname(), msg.chat(), LocalDateTime.now(), 1);
-            Chat chat = chat(msg, chatRoom, now, 1);
-            chatRoomRepository.save(chatRoom);
-            chatRepository.save(chat);
-            return new ChatWithMissingChat(ChatWithSequence.from(msg, 1, now), Collections.emptyList());
-        }
-
-        ChatRoom room = chatRoomByUsers.get();
+        ChatRoom room = chatRoomByUsers.orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_MATCHING));
         int newSequence = room.getLastSequence() + 1;
         Chat chat = chat(msg, chatRoomByUsers.get(), now, newSequence);
         chatRepository.save(chat);
