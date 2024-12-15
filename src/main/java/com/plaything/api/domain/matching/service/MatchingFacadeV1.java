@@ -35,7 +35,7 @@ public class MatchingFacadeV1 {
         Profile requesterProfile = requester.getProfile();
         User partner = userServiceV1.findByProfileNickname(matchingRequest.partnerNickname());
         //fcm 토큰 검증
-        matchingServiceV1.creatMatching(requester, requesterProfile, partner, transactionId);
+        matchingServiceV1.creatMatching(requester, partner, transactionId);
     }
 
 

@@ -9,7 +9,6 @@ import com.plaything.api.domain.matching.model.response.UserMatching;
 import com.plaything.api.domain.notification.service.NotificationServiceV1;
 import com.plaything.api.domain.repository.entity.matching.Matching;
 import com.plaything.api.domain.repository.entity.user.User;
-import com.plaything.api.domain.repository.entity.user.profile.Profile;
 import com.plaything.api.domain.repository.repo.matching.MatchingRepository;
 import com.plaything.api.domain.user.service.UserServiceV1;
 import lombok.RequiredArgsConstructor;
@@ -37,13 +36,13 @@ public class MatchingServiceV1 {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void creatMatching(User requester, Profile requesterProfile, User partner, String transactionId) {
+    public void creatMatching(User requester, User partner, String transactionId) {
         pointKeyServiceV1.usePointKey(requester, partner, transactionId);
         createMatchingLog(requester.getNickname(), partner.getProfile().getNickName());
         try {
             notificationServiceV1.saveNotification(
                     MATCHING_REQUEST,
-                    requesterProfile,
+                    requester.getProfile(),
                     partner);
         } catch (IOException e) {
             throw new CustomException(ErrorCode.NOTIFICATION_SAVED_FAILED);
