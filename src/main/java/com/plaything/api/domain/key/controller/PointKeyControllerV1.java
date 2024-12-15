@@ -1,7 +1,6 @@
 package com.plaything.api.domain.key.controller;
 
 import com.plaything.api.domain.key.model.request.AdRewardRequest;
-import com.plaything.api.domain.key.model.request.MatchingRequest;
 import com.plaything.api.domain.key.model.response.AvailablePointKey;
 import com.plaything.api.domain.key.model.response.PointKeyLog;
 import com.plaything.api.domain.key.service.PointKeyFacadeV1;
@@ -69,19 +68,4 @@ public class PointKeyControllerV1 {
         return pointKeyFacadeV1.getAvailablePointKey(user);
     }
 
-    @Operation(
-            summary = "매칭용 포인트 키 사용",
-            description = "매칭 서비스 이용을 위해 포인트 키를 사용합니다"
-    )
-    @SecurityRequirement(name = "Authorization")
-    @PostMapping("/use-key")
-    public void usePointKey(
-            @RequestHeader(value = "Authorization", required = false) String authString,
-            @RequestBody MatchingRequest matchingRequest,
-            @RequestHeader("Transaction-ID") String transactionId
-    ) {
-        String token = JWTProvider.extractToken(authString);
-        String user = JWTProvider.getUserFromToken(token);
-        pointKeyFacadeV1.usePointKeyForMatching(user, matchingRequest, transactionId);
-    }
 }

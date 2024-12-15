@@ -4,7 +4,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 
 @Schema(description = "채팅 전송")
-public record Message(
+public record ChatRequest(
+        @Schema(description = "클라이언트가 보유한 마지막 메시지 sequence")
+        int lastChatSequence,
 
         @Schema(description = "요청자 닉네임")
         String senderNickname,
@@ -13,7 +15,7 @@ public record Message(
         String receiverNickname,
 
         @Schema(description = "메시지 내용")
-        String message
+        String chat
 ) {
 }
 

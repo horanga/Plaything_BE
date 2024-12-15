@@ -103,7 +103,7 @@ public class S3ImagesServiceV1 {
 
     private void validateImage(MultipartFile file) {
         long size = file.getSize();
-        if (size > MAX_FILE_SIZE) throw new CustomException(ErrorCode.SIZE_IS_INVALID);
+        if (size > MAX_FILE_SIZE) throw new CustomException(ErrorCode.IMAGE_SIZE_EXCEEDED);
 
         String contentType = file.getContentType();
         if (contentType == null || contentType.isBlank() || !contentType.startsWith(IMAGE_MIME_TYPE)) {

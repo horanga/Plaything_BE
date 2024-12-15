@@ -5,7 +5,9 @@ import static com.querydsl.core.types.PathMetadataFactory.*;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
+
 import javax.annotation.processing.Generated;
+
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
 
@@ -28,7 +30,7 @@ public class QChat extends EntityPathBase<Chat> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final StringPath message = createString("message");
+    public final StringPath message = createString("chat");
 
     public final StringPath receiver = createString("receiver");
 

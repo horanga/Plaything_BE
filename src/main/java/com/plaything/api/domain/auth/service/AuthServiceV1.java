@@ -82,7 +82,6 @@ public class AuthServiceV1 {
         Optional<User> user = userRepository.findByLoginId(request.name());
 
         if (user.isPresent()) {
-            log.error("USER_ALREADY_EXISTS: {}", request.name());
             throw new CustomException(ErrorCode.USER_ALREADY_EXISTS);
         }
 

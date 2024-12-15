@@ -5,8 +5,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
 @Schema(description = "Chatting List")
-public record ChatListResponse(
+public record ChatList(
         @Schema(description = "return Message : []")
-        List<MessageResponse> message
+        List<ChatResponse> message
 ) {
 }
