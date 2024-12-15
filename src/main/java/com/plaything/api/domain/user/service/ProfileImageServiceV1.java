@@ -25,7 +25,6 @@ public class ProfileImageServiceV1 {
 
         IntStream.range(0, images.size())
                 .mapToObj(i -> ProfileImage.builder()
-                        .url(images.get(i).url())
                         .fileName(images.get(i).fileName())
                         .profile(profile)
                         .isMainPhoto(i == indexOfMainImage)
@@ -38,10 +37,6 @@ public class ProfileImageServiceV1 {
                         throw new CustomException(ErrorCode.IMAGE_SAVED_FAILED);
                     }
                 });
-    }
-
-    public ProfileImage getMainPhoto(String nickName) {
-        return profileImageRepository.findByProfile_NickNameAndIsMainPhoto(nickName, true);
     }
 
     public void checkCountOfImages(List<MultipartFile> files, Long profileId) {
