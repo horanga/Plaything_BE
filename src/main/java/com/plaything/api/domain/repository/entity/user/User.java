@@ -30,11 +30,11 @@ public class User extends BaseEntity {
     @Column
     private boolean isDeleted;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "User_credentials_id", referencedColumnName = "id")
     private UserCredentials credentials;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id", referencedColumnName = "id")
     private Profile profile;
 
