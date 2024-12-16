@@ -30,85 +30,92 @@ public class JWTProvider {
     public void setSecretKey(String secretKey) {
         JWTProvider.secretKey = secretKey;
     }
+
     @Value("${token.refresh_secret_key}")
     public void setRefreshSecretKey(String refreshSecretKey) {
         JWTProvider.refreshSecretKey = refreshSecretKey;
     }
+
     @Value("${token.token-time}")
     public void setTokenTimeForMinutes(long tokenTimeForMinutes) {
         JWTProvider.tokenTimeForMinutes = tokenTimeForMinutes;
     }
+
     @Value("${token.refresh-token-time}")
     public void setRefreshTokenTimeForMinutes(long refreshTokenTimeForMinutes) {
         JWTProvider.refreshTokenTimeForMinutes = refreshTokenTimeForMinutes;
     }
 
-    public static String createToken(String name){
+    public static String createToken(String name) {
         return JWT.create()
                 .withSubject(name)
                 .withIssuedAt(new Date())
-                .withExpiresAt(new Date(System.currentTimeMillis()+tokenTimeForMinutes* Constants.ON_MINUTE_TO_MILLIS))
+                .withExpiresAt(new Date(System.currentTimeMillis() + tokenTimeForMinutes * Constants.ON_MINUTE_TO_MILLIS))
                 .sign(Algorithm.HMAC256(secretKey));
 
     }
 
-    public static String createRefreshToken(String name){
+    public static String createRefreshToken(String name) {
 
         return JWT.create()
                 .withSubject(name)
                 .withIssuedAt(new Date())
-                .withExpiresAt(new Date(System.currentTimeMillis()+refreshTokenTimeForMinutes* Constants.ON_MINUTE_TO_MILLIS))
+                .withExpiresAt(new Date(System.currentTimeMillis() + refreshTokenTimeForMinutes * Constants.ON_MINUTE_TO_MILLIS))
                 .sign(Algorithm.HMAC256(refreshSecretKey));
     }
 
-    public static DecodedJWT checkTokenForRefresh(String token){
+    public static DecodedJWT checkTokenForRefresh(String token) {
 
         //토큰 값이 만료돼야만 정상 작동하는 API
-            try {
-                DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC256(secretKey)).build().verify(token);
-                log.error("token must be expired: {}", decodedJWT.getSubject());
-                throw new CustomException(ErrorCode.ACCESS_TOKEN_IS_NOT_EXPIRED);
-            } catch (AlgorithmMismatchException | SignatureVerificationException | InvalidClaimException e){
-                throw new CustomException(ErrorCode.TOKEN_IS_INVALID);
-            } catch (TokenExpiredException e){
-                return JWT.decode(token);
-            }
+        try {
+            DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC256(secretKey)).build().verify(token);
+            log.error("token must be expired: {}", decodedJWT.getSubject());
+            throw new CustomException(ErrorCode.ACCESS_TOKEN_IS_NOT_EXPIRED);
+        } catch (AlgorithmMismatchException | SignatureVerificationException | InvalidClaimException e) {
+            throw new CustomException(ErrorCode.TOKEN_IS_INVALID);
+        } catch (TokenExpiredException e) {
+            return JWT.decode(token);
+        }
     }
 
-    public static DecodedJWT decodeAccessToke(String token){
+    public static DecodedJWT decodeAccessToke(String token) {
         return decodeTokenAfterVerify(token, secretKey);
     }
 
-    public static DecodedJWT decodeRefreshToke(String token){
+    public static DecodedJWT decodeRefreshToke(String token) {
         return decodeTokenAfterVerify(token, refreshSecretKey);
     }
 
-    private static DecodedJWT decodeTokenAfterVerify(String token, String key){
+    private static DecodedJWT decodeTokenAfterVerify(String token, String key) {
 
         //정상적으로 verify
-        try{
+        try {
             return JWT.require(Algorithm.HMAC256(key)).build().verify(token);
-          } catch (AlgorithmMismatchException | SignatureVerificationException | InvalidClaimException e){
-              throw new CustomException(ErrorCode.TOKEN_IS_INVALID);
-          } catch (TokenExpiredException e){
+        } catch (AlgorithmMismatchException | SignatureVerificationException | InvalidClaimException e) {
+            throw new CustomException(ErrorCode.TOKEN_IS_INVALID);
+        } catch (TokenExpiredException e) {
             throw new CustomException(ErrorCode.TOKEN_IS_EXPIRED);
-          }
+        }
 
     }
 
-    public static DecodedJWT decodedJWT(String token){
+    public static DecodedJWT decodedJWT(String token) {
         return JWT.decode(token);
     }
 
-    public static String extractToken(String header){
-        if(StringUtils.hasText(header) && header.startsWith("Bearer ")){
+    public static String extractToken(String header) {
+        if (header == null) {
+            throw new CustomException(ErrorCode.TOKEN_IS_INVALID);
+        }
+
+        if (StringUtils.hasText(header) && header.startsWith("Bearer ")) {
             return header.substring(7);
-        } else{
+        } else {
             throw new IllegalArgumentException("Invalid Auth Header");
         }
     }
 
-    public static String getUserFromToken(String token){
+    public static String getUserFromToken(String token) {
         DecodedJWT jwt = decodedJWT(token);
         return jwt.getSubject();
     }

@@ -29,6 +29,7 @@ public enum ErrorCode implements CodeInterFace {
     IMAGE_COUNT_EXCEEDED("프로필 사진은 최대 3개까지만 등록 가능합니다", HttpStatus.BAD_REQUEST),
     IMAGE_SAVED_FAILED("IMAGE_SAVED_FAILED", HttpStatus.INTERNAL_SERVER_ERROR),
     IMAGE_REQUIRED("프로필 사진을 필수로 등록해야 합니다", HttpStatus.BAD_REQUEST),
+    NOT_EXIST_MAIN_PHOTO("요청자의 메인 프로필 사진이 없어 매칭이 불가능합니다", HttpStatus.UNPROCESSABLE_ENTITY),
 
     //프로필 조회 or 등록
     NOT_EXIST_PROFILE("프로필이 존재하지 않는 회원입니다", HttpStatus.NOT_FOUND),
@@ -55,18 +56,18 @@ public enum ErrorCode implements CodeInterFace {
 
     //포인트 키 사용
     NOT_EXIST_AVAILABLE_POINT_KEY("사용가능한 포인트 키가 존재하지 않습니다", HttpStatus.NOT_FOUND),
-    
+
     //로그
     LOG_SAVED_FAILED("LOG SAVED FAILED", HttpStatus.INTERNAL_SERVER_ERROR),
 
     //알림
-    NOTIFICATION_SAVED_FAILED("NOTIFICATION SAVED FAILED", HttpStatus.INTERNAL_SERVER_ERROR),
+    NOTIFICATION_SAVED_FAILED("알림 전송에 실패했습니다", HttpStatus.INTERNAL_SERVER_ERROR),
 
     //메시지
     MESSAGE_CREATION_FAILED("MESSAGE CREATION FAILED", HttpStatus.INTERNAL_SERVER_ERROR),
 
     //거래
-    TRANSACTION_ALREADY_PROCESSED("TRANSACTION ALREADY PROCESSED", HttpStatus.CONFLICT),
+    TRANSACTION_ALREADY_PROCESSED("이미 처리된 요청입니다", HttpStatus.CONFLICT),
 
 
     //채팅방
