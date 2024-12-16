@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(indexes = {
-        @Index(name = "idx_senderNickname", columnList = "senderNickname"),
-        @Index(name = "idx_receiverNickname", columnList = "receiverNickname")
+        @Index(name = "idx_senderLoginId", columnList = "senderLoginId"),
+        @Index(name = "idx_receiverLoginId", columnList = "receiverLoginId")
 })
 @Entity
 public class Matching extends BaseEntity {
@@ -23,10 +23,10 @@ public class Matching extends BaseEntity {
     private long id;
 
     @Column(nullable = false)
-    private String senderNickname;
+    private String senderLoginId;
 
     @Column(nullable = false)
-    private String receiverNickname;
+    private String receiverLoginId;
 
     @Column
     private boolean isMatched;

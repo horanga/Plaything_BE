@@ -23,13 +23,12 @@ public record ChatResponse(
         int sequence
 ) {
 
-    public static ChatResponse toResponse(Chat chat, String nickName) {
+    public static ChatResponse toResponse(Chat chat, String loginId) {
 
-
-        if (nickName.equals(chat.getSenderNickname())) {
+        if (loginId.equals(chat.getSenderLoginId())) {
             return new ChatResponse(
                     chat.getId(),
-                    chat.getSenderNickname(),
+                    chat.getSenderLoginId(),
                     chat.getMessage(),
                     chat.getCreatedAt(),
                     chat.getSequence());
@@ -37,7 +36,7 @@ public record ChatResponse(
 
         return new ChatResponse(
                 chat.getId(),
-                chat.getSenderNickname(),
+                chat.getSenderLoginId(),
                 chat.getMessage(),
                 chat.getCreatedAt(),
                 chat.getSequence());

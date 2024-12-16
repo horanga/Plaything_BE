@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @RequiredArgsConstructor
 @Service
@@ -49,11 +50,11 @@ public class ChatFacadeV1 {
         User user = userRepository.findByLoginId(requesterLoginId)
                 .orElseThrow(() ->
                         new CustomException(ErrorCode.NOT_EXIST_USER));
-        String requestNickname = user.getNickname();
-        List<ChatRoom> chatRooms = chatRoomServiceV1.findChatRooms(requestNickname, lastChatRoomId);
-        Map<String, Profile> profileMap = getProfileMap(chatRooms, requestNickname);
 
-        return getChatRoomResponse(chatRooms, profileMap, requestNickname);
+        List<ChatRoom> chatRooms = chatRoomServiceV1.findChatRooms(requesterLoginId, lastChatRoomId);
+        Map<String, Profile> profileMap = getProfileMap(chatRooms, requesterLoginId);
+
+        return getChatRoomResponse(chatRooms, profileMap, requesterLoginId);
     }
 
     public void leaveChatRoom(Long id, String requesterLoginId) {
@@ -68,38 +69,14 @@ public class ChatFacadeV1 {
         User user = userRepository.findByLoginId(requesterLoginId)
                 .orElseThrow(() ->
                         new CustomException(ErrorCode.NOT_EXIST_USER));
-        String requestNickname = user.getNickname();
-        chatRoomServiceV1.checkChatRomm(chatRoomId, requestNickname);
-        return chatServiceV1.chatList(chatRoomId, requestNickname, lastChatId, LocalDate.now());
+        chatRoomServiceV1.checkChatRoom(chatRoomId, user.getLoginId());
+        return chatServiceV1.chatList(chatRoomId, user.getNickname(), lastChatId, LocalDate.now());
     }
 
     public ChatWithMissingChat saveMessage(ChatRequest chatRequest, LocalDateTime now) {
         filteringService.filterWords(chatRequest.chat());
-        chatRateLimiter.checkRate(chatRequest.senderNickname());
+        chatRateLimiter.checkRate(chatRequest.senderLoginId());
         return chatServiceV1.saveChatMessage(chatRequest, now);
-    }
-
-    private List<ChatRoomResponse> getChatRoomResponse(List<ChatRoom> chatRooms, Map<String, Profile> profileMap, String requestNickName) {
-
-        return chatRooms.stream().map(i -> {
-            String name;
-            if (i.getSenderNickname().equals(requestNickName)) {
-                name = i.getReceiverNickname();
-            } else {
-                name = i.getSenderNickname();
-            }
-            Profile profile = profileMap.get(name);
-            return new ChatRoomResponse(
-                    i.getId(),
-                    i.getLastChat(),
-                    i.getLastChatAt(),
-                    i.getLastChatSender(),
-                    ChatProfile.toResponse(profile, urlGenerator.getImageUrl(profile.getMainPhotoFileName())));
-        }).toList();
-    }
-
-    public ChatRoom findByUsers(String senderNickName, String receiverNickname) {
-        return chatRoomServiceV1.findByUsers(senderNickName, receiverNickname);
     }
 
 
@@ -110,19 +87,37 @@ public class ChatFacadeV1 {
     }
 
     private Map<String, Profile> getProfileMap(List<ChatRoom> chatRooms, String requestNickname) {
-        List<String> partnerNames
-                = chatRooms.stream().map(i -> getPartnerNickname(i, requestNickname)).toList();
-        List<Profile> profileList = profileRepository.findByNickNames(partnerNames);
-        return profileList.stream()
+        List<String> partnerLoginId
+                = chatRooms.stream().map(i -> getPartnerLoginId(i, requestNickname)).toList();
+        List<Profile> profileList = profileRepository.findByLoginId(partnerLoginId);
+
+        return IntStream.range(0, partnerLoginId.size())
+                .boxed()
                 .collect(Collectors.toMap(
-                        Profile::getNickName,
-                        profile -> profile
+                        partnerLoginId::get,
+                        profileList::get
                 ));
     }
 
-    private String getPartnerNickname(ChatRoom chatRoom, String requesterNickname) {
-        return chatRoom.getSenderNickname().equals(requesterNickname) ?
-                chatRoom.getReceiverNickname()
-                : chatRoom.getSenderNickname();
+    private List<ChatRoomResponse> getChatRoomResponse(List<ChatRoom> chatRooms, Map<String, Profile> profileMap, String requestLoginId) {
+
+        return chatRooms.stream()
+                .map(chatRoom -> new ChatRoomResponse(
+                        chatRoom.getId(),
+                        chatRoom.getLastChat(),
+                        chatRoom.getLastChatAt(),
+                        chatRoom.getLastChatSender(),
+                        ChatProfile.toResponse(
+                                profileMap.get(getPartnerLoginId(chatRoom, requestLoginId)),
+                                urlGenerator.getImageUrl(profileMap.get(getPartnerLoginId(chatRoom, requestLoginId)).getMainPhotoFileName())
+                        )
+                ))
+                .toList();
+    }
+
+    private String getPartnerLoginId(ChatRoom chatRoom, String requesterNickname) {
+        return chatRoom.getSenderLoginId().equals(requesterNickname) ?
+                chatRoom.getReceiverLoginId()
+                : chatRoom.getSenderLoginId();
     }
 }

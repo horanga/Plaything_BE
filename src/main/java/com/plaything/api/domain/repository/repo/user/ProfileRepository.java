@@ -11,11 +11,12 @@ public interface ProfileRepository extends JpaRepository<Profile, Long> {
 
     @Query("""
                SELECT DISTINCT p FROM Profile p
-                                             LEFT JOIN FETCH p.profileImages pi
-                                             WHERE p.nickName IN :nicknames
+                                             INNER JOIN p.profileImages pi
+                                             INNER JOIN fetch p.user u
+                                             WHERE u.loginId IN :loginids
                                              AND pi.isMainPhoto = true
             """)
-    List<Profile> findByNickNames(@Param("nicknames") List<String> nicknames);
+    List<Profile> findByLoginId(@Param("loginids") List<String> loginids);
 
     Profile findByNickName(String name);
 }

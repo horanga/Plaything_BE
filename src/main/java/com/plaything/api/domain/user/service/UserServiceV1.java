@@ -39,9 +39,7 @@ public class UserServiceV1 {
     public List<UserMatching> searchPartner(String loginId, long lastId) {
         User userByName = findByLoginId(loginId);
         //TODO 프로필 거절, 사진 거절
-
         Profile profile = userByName.getProfile();
-
         validateRequest(profile);
 
         if (profile.isSwitch() || profile.isETC()) {
@@ -52,7 +50,6 @@ public class UserServiceV1 {
             return getUserMatchingInfo(profiles);
 
         }
-
         PersonalityTraitConstant partnerTrait = MatchingRelationship.getPartner(profile);
         MatchRequest matchRequest =
                 MatchRequest.from(
@@ -97,13 +94,10 @@ public class UserServiceV1 {
         }
     }
 
-    public User findByProfileNickname(String nickName) {
-        return userRepository.findByProfile_nickName(nickName);
-    }
-
     private List<UserMatching> getUserMatchingInfo(List<Profile> profiles) {
         return profiles.stream()
                 .map(p -> new UserMatching(
+                        p.getLoginId(),
                         p.getPrimaryRole(),
                         p.getNickName(),
                         p.getBirthDate(),

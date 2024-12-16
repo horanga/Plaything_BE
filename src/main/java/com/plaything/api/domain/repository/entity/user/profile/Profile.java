@@ -3,6 +3,7 @@ package com.plaything.api.domain.repository.entity.user.profile;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorCode;
+import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.user.constants.Gender;
 import com.plaything.api.domain.user.constants.PersonalityTraitConstant;
 import com.plaything.api.domain.user.constants.PrimaryRole;
@@ -56,6 +57,9 @@ public class Profile {
     @Enumerated(EnumType.STRING)
     private ProfileStatus profileStatus;
 
+    @OneToOne(mappedBy = "profile")
+    private User user;
+
     @Column
     private boolean isDeleted;
 
@@ -99,6 +103,10 @@ public class Profile {
         this.profileImages.addAll(profileImages);
     }
 
+    public String getLoginId() {
+        return this.user.getLoginId();
+    }
+
     public PersonalityTraitConstant getPrimaryTrait() {
         return this.personalityTrait.stream().filter(PersonalityTrait::isPrimaryTrait)
                 .map(PersonalityTrait::getTrait)
@@ -140,7 +148,10 @@ public class Profile {
     }
 
     public String getMainPhotoFileName() {
-        ProfileImage profileImage = this.profileImages.stream().filter(ProfileImage::isMainPhoto).findFirst().get();
+        ProfileImage profileImage = this.profileImages.stream()
+                .filter(ProfileImage::isMainPhoto)
+                .findFirst()
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_MAIN_PHOTO));
 
         return profileImage.getFileName();
     }

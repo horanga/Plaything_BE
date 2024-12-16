@@ -15,8 +15,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(indexes = {
-        @Index(name = "idx_receiver_msg", columnList = "receiverNickname,lastChatAt"),
-        @Index(name = "idx_sender_msg", columnList = "senderNickname,lastChatAt")
+        @Index(name = "idx_receiver_msg", columnList = "receiverLoginId,lastChatAt"),
+        @Index(name = "idx_sender_msg", columnList = "senderLoginId,lastChatAt")
 })
 @Entity
 public class ChatRoom {
@@ -26,10 +26,10 @@ public class ChatRoom {
     private Long id;
 
     @Column
-    private String senderNickname;
+    private String senderLoginId;
 
     @Column
-    private String receiverNickname;
+    private String receiverLoginId;
 
     @Column
     private String exitedUserNickname;
@@ -59,16 +59,16 @@ public class ChatRoom {
     private Long version;
 
     public boolean validateRequester(String name) {
-        return senderNickname.equals(name) || receiverNickname.equals(name);
+        return senderLoginId.equals(name) || receiverLoginId.equals(name);
     }
 
-    public void hasPartnerLeave() {
+    public void hasPartnerLeftRoom() {
         if (this.exitedUserNickname != null) {
             throw new CustomException(ErrorCode.PARTNER_ALREADY_LEAVE);
         }
     }
 
-    public void isOver() {
+    public void isChatRoomClosed() {
         if (this.isClosed) {
             throw new CustomException(ErrorCode.CHAT_ROOM_IS_OVER);
         }
@@ -92,8 +92,8 @@ public class ChatRoom {
         }
     }
 
-    public void getMessages(String nickName) {
-        if (this.hasNewChat && !this.lastChatSender.equals(nickName)) {
+    public void checkAndClearNewMessageStatus(String loginId) {
+        if (this.hasNewChat && !this.lastChatSender.equals(loginId)) {
             this.hasNewChat = false;
         }
         this.lastChatCheckedAt = LocalDateTime.now();

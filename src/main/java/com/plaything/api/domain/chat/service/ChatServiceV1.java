@@ -38,12 +38,11 @@ public class ChatServiceV1 {
 
     private final ChatRoomRepository chatRoomRepository;
 
-
-    public ChatList chatList(Long chatRoomId, String requestNickName, Long lastId, LocalDate now) {
+    public ChatList chatList(Long chatRoomId, String requesterNickName, Long lastId, LocalDate now) {
 
         List<Chat> chats = chatQueryRepository.findChat(chatRoomId, lastId, now);
         List<ChatResponse> res = chats.stream()
-                .map(i -> ChatResponse.toResponse(i, requestNickName))
+                .map(i -> ChatResponse.toResponse(i, requesterNickName))
                 .toList();
         return new ChatList(res);
     }
@@ -52,15 +51,17 @@ public class ChatServiceV1 {
     @Retryable(retryFor = OptimisticLockException.class, backoff = @Backoff(delay = 500), maxAttempts = 2)
     @Transactional(transactionManager = "createChatTransactionManger", noRollbackFor = Exception.class)
     public ChatWithMissingChat saveChatMessage(ChatRequest msg, LocalDateTime now) {
-        Optional<ChatRoom> chatRoomByUsers = chatRoomRepository.findChatRoomByUsers(msg.senderNickname(), msg.receiverNickname());
+        Optional<ChatRoom> chatRoom = chatRoomRepository.findChatRoomByUsers(msg.senderLoginId(), msg.receiverLoginId());
+        ChatRoom room = chatRoom
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_MATCHING));
 
-        ChatRoom room = chatRoomByUsers.orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_MATCHING));
         int newSequence = room.getLastSequence() + 1;
-        Chat chat = chat(msg, chatRoomByUsers.get(), now, newSequence);
+        Chat chat = chat(msg, chatRoom.get(), now, newSequence);
         chatRepository.save(chat);
-        room.updateLastMessage(msg.senderNickname(), msg.chat(), LocalDateTime.now(), newSequence);
 
+        room.updateLastMessage(msg.senderLoginId(), msg.chat(), LocalDateTime.now(), newSequence);
         List<ChatWithSequence> missingList = getMissingChats(msg, room);
+
         return new ChatWithMissingChat(ChatWithSequence.from(msg, newSequence, now), missingList);
     }
 
@@ -69,7 +70,7 @@ public class ChatServiceV1 {
 
         if (msg.lastChatSequence() < room.getLastSequence()) {
             List<Integer> missingSequences = IntStream.range(msg.lastChatSequence() + 1, room.getLastSequence())
-                    .mapToObj(Integer::valueOf)
+                    .boxed()
                     .toList();
 
             missingChat.addAll(chatRepository.findMissingChat(room.getId(), missingSequences));
@@ -80,20 +81,18 @@ public class ChatServiceV1 {
                     msg.lastChatSequence(),
                     room.getLastSequence(),
                     room.getId(),
-                    msg.senderNickname()
+                    msg.senderLoginId()
             );
 
         }
-
-        List<ChatWithSequence> missingList = missingChat.stream().map(ChatWithSequence::toResponse).toList();
-        return missingList;
+        return missingChat.stream().map(ChatWithSequence::toResponse).toList();
     }
 
 
     private Chat chat(ChatRequest msg, ChatRoom chatRoom, LocalDateTime now, int sequence) {
         return Chat.builder()
-                .senderNickname(msg.senderNickname())
-                .receiverNickname(msg.receiverNickname())
+                .senderLoginId(msg.senderLoginId())
+                .receiverLoginId(msg.receiverLoginId())
                 .message(msg.chat())
                 .chatRoom(chatRoom)
                 .createdAt(now)

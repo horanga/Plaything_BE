@@ -4,8 +4,6 @@ import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorCode;
 import com.plaything.api.domain.matching.model.response.MatchingResponse;
 import com.plaything.api.domain.matching.service.MatchingServiceV1;
-import com.plaything.api.domain.repository.entity.user.profile.Profile;
-import com.plaything.api.domain.user.service.ProfileFacadeV1;
 import com.plaything.api.domain.user.service.UserServiceV1;
 import com.plaything.api.security.JWTProvider;
 import lombok.RequiredArgsConstructor;
@@ -22,37 +20,33 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class SessionValidator {
 
-    private final Map<String, String[]> sessionUserMap = new ConcurrentHashMap<>();
+    private final Map<String, String> sessionUserMap = new ConcurrentHashMap<>();
     private final Map<String, List<String>> matchingMap = new ConcurrentHashMap<>();
-    private final ProfileFacadeV1 profileFacadeV1;
     private final MatchingServiceV1 matchingServiceV1;
     private final UserServiceV1 userServiceV1;
 
-    public String validateSend(String authHeader, String sessionId, String destination) {
+    public void validateSend(String authHeader, String sessionId, String destination) {
 
         String loginIdByHeader = getLoginId(authHeader);
         if (!sessionUserMap.containsKey(sessionId)) {
             throw new CustomException(ErrorCode.NOT_CONNECTED_STOMP);
         }
-        String loginId = sessionUserMap.get(sessionId)[1];//로그인 id
+        String loginId = sessionUserMap.get(sessionId);
 
         if (!loginIdByHeader.equals(loginId)) {
             throw new CustomException(ErrorCode.NOT_AUTHORIZED_USER);
         }
 
-        String nickName = sessionUserMap.get(sessionId)[0];//닉네임;
-
-        if (!matchingMap.containsKey(nickName)) {
-            List<MatchingResponse> matchingResponse = matchingServiceV1.getMatchingResponse(nickName);
-            List<String> list = getMatchingPartner(nickName, matchingResponse);
-            matchingMap.put(nickName, list);
+        if (!matchingMap.containsKey(loginId)) {
+            List<MatchingResponse> matchingResponse = matchingServiceV1.getMatchingResponse(loginId);
+            List<String> matchingPartner = getMatchingPartner(loginId, matchingResponse);
+            matchingMap.put(loginId, matchingPartner);
         }
 
-        if (!isMatchingPartner(nickName, destination)) {
+        if (!isMatchingPartner(loginId, destination)) {
             throw new CustomException(ErrorCode.NOT_MATCHING_PARTNER);
         }
 
-        return nickName;
     }
 
     public void validateConnect(String authHeader, String sessionId) {
@@ -61,20 +55,18 @@ public class SessionValidator {
         }
 
         String loginId = getLoginId(authHeader);
-        Profile profile = profileFacadeV1.getProfileByLoginIdNotDTO(loginId);
-        String[] userInfo = new String[]{profile.getNickName(), loginId}; //[0] 닉네임, [1] 로그인 id
-        sessionUserMap.put(sessionId, userInfo);
+        sessionUserMap.put(sessionId, loginId);
     }
 
     public void processDisconnect(String sessionId) {
 
         // 연결 종료 시 정보 삭제
         if (sessionUserMap.containsKey(sessionId)) {
-            String nickName = sessionUserMap.get(sessionId)[0];//닉네임;
+            String loginId = sessionUserMap.get(sessionId);//닉네임;
             sessionUserMap.remove(sessionId);
 
-            if (matchingMap.containsKey(nickName)) {
-                matchingMap.remove(nickName);
+            if (matchingMap.containsKey(loginId)) {
+                matchingMap.remove(loginId);
             }
         }
     }
@@ -84,20 +76,22 @@ public class SessionValidator {
         if (!sessionUserMap.containsKey(sessionId)) {
             throw new CustomException(ErrorCode.NOT_CONNECTED_STOMP);
         }
-        String user = sessionUserMap.get(sessionId)[0];
-        String requestedUser = extractChannelFromDestination(destination);
+        String loginId = sessionUserMap.get(sessionId);
+        String requestedUserLoginId = extractChannelFromDestination(destination);
 
-        if (!user.equals(requestedUser)) {
+        //자기 자신의 채널만 구독 가능
+        if (!loginId.equals(requestedUserLoginId)) {
             throw new CustomException(ErrorCode.NOT_AUTHORIZED_SUBSCRIBE);
         }
     }
 
-    private boolean isMatchingPartner(String nickname, String destination) {
-        List<String> strings = matchingMap.get(nickname);
-        return strings.stream().anyMatch(i -> i.equals(extractReceiverFromDestination(destination)));
+    private boolean isMatchingPartner(String loginId, String destination) {
+        List<String> matchingList = matchingMap.get(loginId);
+        return matchingList.stream()
+                .anyMatch(partner -> partner.equals(extractLoginIdFromDestination(destination)));
     }
 
-    private String extractReceiverFromDestination(String destination) {
+    private String extractLoginIdFromDestination(String destination) {
         String[] parts = destination.split("/");
         if (parts[1].equals("pub")) {
             return parts[4];
@@ -105,7 +99,6 @@ public class SessionValidator {
 
         throw new CustomException(ErrorCode.NOT_EXIST_USER);
     }
-
 
     private String extractChannelFromDestination(String destination) {
         String[] parts = destination.split("/");
@@ -116,7 +109,7 @@ public class SessionValidator {
         throw new CustomException(ErrorCode.NOT_AUTHORIZED_SUBSCRIBE);
     }
 
-    private List<String> getMatchingPartner(String nickName, List<MatchingResponse> matchingResponses) {
+    private List<String> getMatchingPartner(String loginId, List<MatchingResponse> matchingResponses) {
 
         if (matchingResponses.isEmpty()) {
             throw new CustomException(ErrorCode.NOT_EXIST_MATCHING_PARTNER);
@@ -124,11 +117,11 @@ public class SessionValidator {
 
         MatchingResponse matchingResponse = matchingResponses.get(0);
 
-        if (matchingResponse.senderNickname().equals(nickName)) {
-            return matchingResponses.stream().map(MatchingResponse::receiverNickname).toList();
+        if (matchingResponse.senderLoginId().equals(loginId)) {
+            return matchingResponses.stream().map(MatchingResponse::receiverLoginId).toList();
         }
 
-        return matchingResponses.stream().map(MatchingResponse::senderNickname).toList();
+        return matchingResponses.stream().map(MatchingResponse::senderLoginId).toList();
     }
 
     private String getLoginId(String authHeader) {

@@ -17,22 +17,22 @@ public class ChatRoomQueryRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    public List<ChatRoom> findChatRooms(String requestNickname, Long lastChatRoomId) {
+    public List<ChatRoom> findChatRooms(String requestLoginId, Long lastChatRoomId) {
         QProfile senderProfile = new QProfile("senderProfile");
         QProfile receiverProfile = new QProfile("receiverProfile");
 
-        BooleanBuilder whereCondition = getBooleanBuilder(requestNickname, lastChatRoomId);
+        BooleanBuilder whereCondition = getBooleanBuilder(requestLoginId, lastChatRoomId);
 
         return jpaQueryFactory.selectFrom(chatRoom)
-                .innerJoin(senderProfile).on(senderProfile.nickName.eq(chatRoom.senderNickname))
-                .innerJoin(receiverProfile).on(receiverProfile.nickName.eq(chatRoom.receiverNickname))
+                .innerJoin(senderProfile).on(senderProfile.user.loginId.eq(chatRoom.senderLoginId))
+                .innerJoin(receiverProfile).on(receiverProfile.user.loginId.eq(chatRoom.receiverLoginId))
                 .where(whereCondition)
                 .where(
-                        chatRoom.receiverNickname.eq(requestNickname)
+                        chatRoom.receiverLoginId.eq(requestLoginId)
                                 .and(senderProfile.isBaned.isFalse())
                                 .and(senderProfile.isDeleted.isFalse())
                                 .or(
-                                        chatRoom.senderNickname.eq(requestNickname)
+                                        chatRoom.senderLoginId.eq(requestLoginId)
                                                 .and(receiverProfile.isBaned.isFalse())
                                                 .and(receiverProfile.isDeleted.isFalse())
                                 )
@@ -48,8 +48,8 @@ public class ChatRoomQueryRepository {
                 .where(
                         chatRoom.hasNewChat.isTrue()
                                 .and(
-                                        chatRoom.receiverNickname.eq(nickName)
-                                                .or(chatRoom.senderNickname.eq(nickName))
+                                        chatRoom.receiverLoginId.eq(nickName)
+                                                .or(chatRoom.senderLoginId.eq(nickName))
                                 ).and(chatRoom.lastChatSender.ne(nickName))
                 )
                 .fetchOne() != null;

@@ -20,15 +20,9 @@ public class WssControllerV1 {
     private final ChatFacadeV1 chatFacadeV1;
     private final SimpMessagingTemplate messagingTemplate;
 
-    @MessageMapping("/chat/chat/{to}")
-    public ChatWithMissingChat receiveMessage(@DestinationVariable String to, ChatRequest msg) {
+    @MessageMapping("/chat/message/{to}")
+    public ChatWithMissingChat sendMessage(@DestinationVariable String to, ChatRequest msg) {
         ChatWithMissingChat chatWithMissingChat = chatFacadeV1.saveMessage(msg, LocalDateTime.now());
-        log.info("sender={}, reciever={}, chat={}, sequence={}, missing={}",
-                chatWithMissingChat.chat().senderNickname(),
-                chatWithMissingChat.chat().receiverNickname(),
-                chatWithMissingChat.chat().chat(),
-                chatWithMissingChat.chat().sequence(),
-                chatWithMissingChat.missingChat().size());
         messagingTemplate.convertAndSendToUser(to, "/chat", chatWithMissingChat.chat());
         return chatWithMissingChat;
     }
