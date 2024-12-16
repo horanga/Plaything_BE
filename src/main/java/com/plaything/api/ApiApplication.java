@@ -49,14 +49,14 @@ public class ApiApplication {
 
                             if (event.getStateTransition().getFromState() == CircuitBreaker.State.CLOSED &&
                                     event.getStateTransition().getToState() == CircuitBreaker.State.OPEN) {
-                                discordAlarm.sendAlarm(
+                                discordAlarm.sendRedisAlarm(
                                         CIRCUIT_OPEN,
                                         OPEN_TITLE,
                                         OPEN_BODY + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
                             }
                             if (event.getStateTransition().getFromState() == CircuitBreaker.State.HALF_OPEN
                                     && event.getStateTransition().getToState() == CircuitBreaker.State.CLOSED) {
-                                discordAlarm.sendAlarm(
+                                discordAlarm.sendRedisAlarm(
                                         CIRCUIT_CLOSED,
                                         CLOSED_TITLE,
                                         CLOSED_BODY + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
