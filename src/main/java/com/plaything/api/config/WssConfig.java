@@ -48,8 +48,6 @@ public class WssConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws-stomp")
                 .setAllowedOrigins("http://localhost:3000",
-                        "https://fe-chat.vercel.app",
-                        "https://fe-chat-jeongs-projects-496987bc.vercel.app",
                         "https://jiangxy.github.io");
     }
 
