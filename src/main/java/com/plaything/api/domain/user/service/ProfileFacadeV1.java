@@ -49,7 +49,7 @@ public class ProfileFacadeV1 {
             validateTraits(registration);
         }
         try {
-            Profile profile = makesProfile(registration);
+            Profile profile = makesProfile(registration, user);
             user.setProfile(profile);
             profileRepository.save(profile);
             profileMonitoringServiceV1.saveProfileRecord(profile, user);
@@ -136,10 +136,11 @@ public class ProfileFacadeV1 {
     }
 
 
-    private Profile makesProfile(ProfileRegistration registration) {
+    private Profile makesProfile(ProfileRegistration registration, User user) {
 
         Profile profile = Profile.builder()
                 .isPrivate(false)
+                .user(user)
                 .nickName(registration.nickName())
                 .introduction(registration.introduction())
                 .gender(registration.gender())

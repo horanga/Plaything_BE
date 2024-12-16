@@ -21,10 +21,10 @@ public class Chat {
     private Long id;
 
     @Column(nullable = false)
-    private String senderNickname;
+    private String senderLoginId;
 
     @Column(nullable = false)
-    private String receiverNickname;
+    private String receiverLoginId;
 
     @Column(nullable = false)
     private String message;

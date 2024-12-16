@@ -30,7 +30,6 @@ public class MatchingServiceV1 {
     private final NotificationServiceV1 notificationServiceV1;
     private final ChatRoomServiceV1 chatRoomServiceV1;
 
-
     public List<UserMatching> match(String user, long lastId) {
         return userServiceV1.searchPartner(user, lastId);
     }
@@ -38,7 +37,7 @@ public class MatchingServiceV1 {
     @Transactional(rollbackFor = Exception.class)
     public void creatMatching(User requester, User partner, String transactionId) {
         pointKeyServiceV1.usePointKey(requester, partner, transactionId);
-        createMatchingLog(requester.getNickname(), partner.getProfile().getNickName());
+        createMatchingLog(requester.getLoginId(), partner.getLoginId());
         try {
             notificationServiceV1.saveNotification(
                     MATCHING_REQUEST,
@@ -52,21 +51,24 @@ public class MatchingServiceV1 {
     @Transactional(rollbackFor = Exception.class)
     public void acceptMatching(User matchingReceiver, User matchingSender, String transactionId) {
         pointKeyServiceV1.usePointKey(matchingReceiver, matchingSender, transactionId);
-        Matching matching = matchingRepository.findBySenderNicknameAndReceiverNickname(
-                        matchingSender.getNickname(), matchingReceiver.getNickname())
+        Matching matching = matchingRepository.findBySenderLoginIdAndReceiverLoginId(
+                        matchingSender.getLoginId(), matchingReceiver.getLoginId())
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_MATCHING));
         matching.acceptMatching();
-        chatRoomServiceV1.creatChatRoom(matchingSender.getNickname(), matchingReceiver.getNickname());
+        chatRoomServiceV1.creatChatRoom(matchingSender.getLoginId(), matchingReceiver.getLoginId());
     }
 
-    public void createMatchingLog(String senderNickname, String receiverNickname) {
-        Matching matching = Matching.builder().senderNickname(senderNickname).receiverNickname(receiverNickname).build();
+    public void createMatchingLog(String senderLoginId, String receiverLoginId) {
+        Matching matching = Matching.builder()
+                .senderLoginId(senderLoginId)
+                .receiverLoginId(receiverLoginId)
+                .build();
         matchingRepository.save(matching);
     }
 
     @Transactional(readOnly = true)
-    public List<MatchingResponse> getMatchingResponse(String nickname) {
-        return matchingRepository.findSuccessAndNotOveMatching(nickname).stream()
+    public List<MatchingResponse> getMatchingResponse(String loginId) {
+        return matchingRepository.findSuccessAndNotOveMatching(loginId).stream()
                 .map(MatchingResponse::toResponse).toList();
     }
 }

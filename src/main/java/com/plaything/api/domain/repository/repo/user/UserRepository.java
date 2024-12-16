@@ -19,5 +19,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findUserByProfile_PersonalityTrait_trait(PersonalityTraitConstant trait);
 
-    User findByProfile_nickName(String nickName);
 }

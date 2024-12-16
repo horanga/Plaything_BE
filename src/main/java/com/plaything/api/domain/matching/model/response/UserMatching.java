@@ -11,6 +11,10 @@ import java.util.List;
 
 @Schema(description = "User 매칭")
 public record UserMatching(
+
+        @Schema(description = "파트너 로그인 id")
+        String loginId,
+
         @Schema(description = "대표 성향")
         PrimaryRole primaryRole,
 

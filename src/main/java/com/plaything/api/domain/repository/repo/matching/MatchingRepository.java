@@ -11,11 +11,12 @@ import java.util.Optional;
 public interface MatchingRepository extends JpaRepository<Matching, Long> {
     @Query("""
             SELECT m FROM Matching m 
-            WHERE (m.senderNickname =:nickname OR m.receiverNickname =:nickname)
+            WHERE (m.senderLoginId =:loginId OR m.receiverLoginId =:loginId)
             AND (m.isMatched = true AND m.isOvered = false)
             """)
-    List<Matching> findSuccessAndNotOveMatching(@Param("nickname") String nickname);
+    List<Matching> findSuccessAndNotOveMatching(@Param("loginId") String loginId);
 
-    Optional<Matching> findBySenderNicknameAndReceiverNickname(String nickname, String receiverNickname);
+
+    Optional<Matching> findBySenderLoginIdAndReceiverLoginId(String senderLoginId, String receiverLoginId);
 
 }

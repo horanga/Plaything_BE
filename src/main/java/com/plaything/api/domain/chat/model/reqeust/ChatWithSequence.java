@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 public record ChatWithSequence(
 
         @Schema(description = "요청자 닉네임")
-        String senderNickname,
+        String senderLoginId,
 
         @Schema(description = "수신자 닉네임")
         String receiverNickname,
@@ -26,8 +26,8 @@ public record ChatWithSequence(
 
     public static ChatWithSequence from(ChatRequest chatRequest, int sequence, LocalDateTime time) {
         return new ChatWithSequence(
-                chatRequest.senderNickname(),
-                chatRequest.receiverNickname(),
+                chatRequest.senderLoginId(),
+                chatRequest.receiverLoginId(),
                 chatRequest.chat(),
                 sequence,
                 time);
@@ -35,8 +35,8 @@ public record ChatWithSequence(
 
     public static ChatWithSequence toResponse(Chat chat) {
         return new ChatWithSequence(
-                chat.getSenderNickname(),
-                chat.getReceiverNickname(),
+                chat.getSenderLoginId(),
+                chat.getReceiverLoginId(),
                 chat.getMessage(),
                 chat.getSequence(),
                 chat.getCreatedAt());
