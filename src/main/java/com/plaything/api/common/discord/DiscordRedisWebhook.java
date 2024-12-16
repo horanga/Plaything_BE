@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Component
-@FeignClient(value = "discord-error-message", url = "${discord.webhook-url}")
-public interface DiscordWebhook {
+@FeignClient(value = "discord-exception-message", url = "${discord.webhook.redis.url}")
+public interface DiscordRedisWebhook {
 
     @PostMapping()
     void sendAlarm(@RequestBody DiscordMessage message);
