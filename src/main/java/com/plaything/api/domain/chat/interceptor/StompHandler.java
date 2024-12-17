@@ -29,7 +29,7 @@ public class StompHandler implements ChannelInterceptor {
         String destination = accessor.getDestination();
 
         if (command != null && command.equals(StompCommand.SEND)) {
-            sessionValidator.validateSend(authHeader, sessionId, destination);
+            sessionValidator.validateSend(authHeader, sessionId, destination, message);
             return message;
         }
 
