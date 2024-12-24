@@ -25,7 +25,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @RequiredArgsConstructor
 @Service
@@ -58,11 +57,7 @@ public class ChatFacadeV1 {
     }
 
     public void leaveChatRoom(Long id, String requesterLoginId) {
-        User user = userRepository.findByLoginId(requesterLoginId)
-                .orElseThrow(() ->
-                        new CustomException(ErrorCode.NOT_EXIST_USER));
-        String requestNickname = user.getNickname();
-        chatRoomServiceV1.leaveRoom(id, requestNickname);
+        chatRoomServiceV1.leaveRoom(id, requesterLoginId);
     }
 
     public ChatList getChatList(String requesterLoginId, Long chatRoomId, Long lastChatId) {
@@ -89,13 +84,14 @@ public class ChatFacadeV1 {
     private Map<String, Profile> getProfileMap(List<ChatRoom> chatRooms, String requestNickname) {
         List<String> partnerLoginId
                 = chatRooms.stream().map(i -> getPartnerLoginId(i, requestNickname)).toList();
+
         List<Profile> profileList = profileRepository.findByLoginId(partnerLoginId);
 
-        return IntStream.range(0, partnerLoginId.size())
-                .boxed()
+
+        return profileList.stream()
                 .collect(Collectors.toMap(
-                        partnerLoginId::get,
-                        profileList::get
+                        p -> p.getUser().getLoginId(),
+                        p -> p
                 ));
     }
 

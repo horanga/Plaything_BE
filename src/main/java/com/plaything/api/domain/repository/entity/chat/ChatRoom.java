@@ -32,7 +32,7 @@ public class ChatRoom {
     private String receiverLoginId;
 
     @Column
-    private String exitedUserNickname;
+    private String exitedUserLoginId;
 
     @Column
     private String lastChat;
@@ -58,12 +58,12 @@ public class ChatRoom {
     @Version
     private Long version;
 
-    public boolean validateRequester(String name) {
-        return senderLoginId.equals(name) || receiverLoginId.equals(name);
+    public boolean validateRequester(String loginId) {
+        return senderLoginId.equals(loginId) || receiverLoginId.equals(loginId);
     }
 
     public void hasPartnerLeftRoom() {
-        if (this.exitedUserNickname != null) {
+        if (this.exitedUserLoginId != null) {
             throw new CustomException(ErrorCode.PARTNER_ALREADY_LEAVE);
         }
     }
@@ -75,8 +75,8 @@ public class ChatRoom {
     }
 
     public void leaveChatRoom(String nickName) {
-        if (this.exitedUserNickname == null) {
-            this.exitedUserNickname = nickName;
+        if (this.exitedUserLoginId == null) {
+            this.exitedUserLoginId = nickName;
         } else {
             isClosed = true;
         }

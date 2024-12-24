@@ -66,7 +66,7 @@ public enum ErrorCode implements CodeInterFace {
     //메시지
     MESSAGE_CREATION_FAILED("MESSAGE CREATION FAILED", HttpStatus.INTERNAL_SERVER_ERROR),
 
-    //거래
+    //요청
     TRANSACTION_ALREADY_PROCESSED("이미 처리된 요청입니다", HttpStatus.CONFLICT),
 
 

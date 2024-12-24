@@ -10,8 +10,8 @@ public record ChatResponse(
         @Schema(description = "메시지 id")
         Long id,
 
-        @Schema(description = "메시지 발송자 닉네임")
-        String senderNickname,
+        @Schema(description = "메시지 발송자 로그인 id")
+        String senderLoginId,
 
         @Schema(description = "메시지 내용")
         String message,
