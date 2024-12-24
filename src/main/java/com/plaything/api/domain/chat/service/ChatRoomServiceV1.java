@@ -44,16 +44,16 @@ public class ChatRoomServiceV1 {
 
 
     @Transactional
-    public void leaveRoom(Long id, String requestNickName) {
+    public void leaveRoom(Long id, String requestLoginId) {
 
         ChatRoom chatRoom = chatRoomRepository.findById(id)
                 .orElseThrow(() ->
                         new CustomException(ErrorCode.NOT_EXIST_CHATROOM));
 
-        if (!chatRoom.validateRequester(requestNickName)) {
+        if (!chatRoom.validateRequester(requestLoginId)) {
             throw new CustomException(ErrorCode.NOT_AUTHORIZED_CHAT_ROOM_USER);
         }
-        chatRoom.leaveChatRoom(requestNickName);
+        chatRoom.leaveChatRoom(requestLoginId);
     }
 
     public void creatChatRoom(String senderLoginId, String receiverLoginId) {

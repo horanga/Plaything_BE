@@ -11,7 +11,7 @@ public interface ProfileRepository extends JpaRepository<Profile, Long> {
 
     @Query("""
                SELECT DISTINCT p FROM Profile p
-                                             INNER JOIN p.profileImages pi
+                                             INNER JOIN fetch p.profileImages pi
                                              INNER JOIN fetch p.user u
                                              WHERE u.loginId IN :loginids
                                              AND pi.isMainPhoto = true

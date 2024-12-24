@@ -37,7 +37,7 @@ public class ProfileFacadeV1 {
 
     @Transactional
     public void registerProfile(ProfileRegistration registration, String name) {
-        User user = userServiceV1.findByLoginId(name);
+        User user = userServiceV1.findByLoginIdForRegistration(name);
 
         //TODO 대표성향을 한개만, 상세 성향은 6개까지만, 선호하는 관계는 모든 선택 가능
         //TODO 중복 안되도록 변경
