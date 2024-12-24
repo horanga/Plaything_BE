@@ -43,23 +43,23 @@ public class ChatRoomQueryRepository {
                 .fetch();
     }
 
-    public boolean findNewChat(String lgoinId) {
+    public boolean findNewChat(String nickName) {
         return jpaQueryFactory.selectFrom(chatRoom)
                 .where(
                         chatRoom.hasNewChat.isTrue()
                                 .and(
-                                        chatRoom.receiverLoginId.eq(lgoinId)
-                                                .or(chatRoom.senderLoginId.eq(lgoinId))
-                                ).and(chatRoom.lastChatSender.ne(lgoinId))
+                                        chatRoom.receiverLoginId.eq(nickName)
+                                                .or(chatRoom.senderLoginId.eq(nickName))
+                                ).and(chatRoom.lastChatSender.ne(nickName))
                 )
                 .fetchOne() != null;
     }
 
-    private BooleanBuilder getBooleanBuilder(String requestLoginId, Long lastChatRoomId) {
+    private BooleanBuilder getBooleanBuilder(String requestNickname, Long lastChatRoomId) {
         BooleanBuilder whereCondition = new BooleanBuilder();
 
-        whereCondition.and(chatRoom.exitedUserLoginId.isNull().or(
-                chatRoom.exitedUserLoginId.ne(requestLoginId)
+        whereCondition.and(chatRoom.exitedUserNickname.isNull().or(
+                chatRoom.exitedUserNickname.ne(requestNickname)
         ));
 
         if (lastChatRoomId != null) {

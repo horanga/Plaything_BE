@@ -3,7 +3,6 @@ package com.plaything.api.domain.chat.interceptor;
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
 import com.plaything.api.domain.auth.service.AuthServiceV1;
-import com.plaything.api.domain.chat.model.reqeust.ChatRequest;
 import com.plaything.api.domain.repository.entity.matching.Matching;
 import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.repo.matching.MatchingRepository;
@@ -72,7 +71,7 @@ class SessionValidatorTest {
         CreateUserRequest request3 = new CreateUserRequest("dusgh12346", "1234", "1");
         authServiceV1.creatUser(request3);
 
-        Matching matching = Matching.builder().receiverLoginId("dusgh1234").senderLoginId("dusgh12345").isMatched(true).isOvered(false).build();
+        Matching matching = Matching.builder().receiverNickname("alex").senderNickname("alex2").isMatched(true).isOvered(false).build();
         matchingRepository.save(matching);
     }
 
@@ -112,7 +111,7 @@ class SessionValidatorTest {
         String token = JWTProvider.createToken(loginId);
         String sessionId = "session";
         assertThatThrownBy(() -> sessionValidator.validateConnect("Bearer " + token, sessionId))
-                .isInstanceOf(CustomException.class).hasMessage("프로필이 존재하지 않는 회원입니다");
+                .isInstanceOf(CustomException.class).hasMessage("존재하지 않는 회원입니다");
     }
 
     @DisplayName("프로필을 차단당한 회원의 jwt 토큰이 들어오면 connect 검증이 실패한다")
@@ -139,7 +138,7 @@ class SessionValidatorTest {
         String loginId = "dusgh1234";
         String token = JWTProvider.createToken(loginId);
         String sessionId = "session";
-        String destination = "/user/dusgh1234/chat";
+        String destination = "/user/alex/chat";
 
         sessionValidator.validateConnect("Bearer " + token, sessionId);
         sessionValidator.validateSubscribe(sessionId, destination);
@@ -197,7 +196,7 @@ class SessionValidatorTest {
 
         sessionValidator.validateConnect("Bearer " + token2, sessionId2);
 
-        String destination = "/user/dusgh1234/chat";
+        String destination = "/user/alex/chat";
 
         sessionValidator.validateSubscribe(sessionId, destination);
 
@@ -221,12 +220,12 @@ class SessionValidatorTest {
 
         sessionValidator.validateConnect("Bearer " + alex2, sessionId2);
 
-        String destination = "/user/dusgh1234/chat";
-        String destination2 = "/pub/chat/chat/dusgh1234";
+        String destination = "/user/alex/chat";
+        String destination2 = "/pub/chat/chat/alex";
 
         sessionValidator.validateSubscribe(sessionId, destination);
 
-        sessionValidator.validateSend("Bearer " + alex2, sessionId2, destination2, new ChatRequest(0, "dusgh1234", "dusgh12345", "하이"));
+        sessionValidator.validateSend("Bearer " + alex2, sessionId2, destination2);
 
     }
 
@@ -250,21 +249,21 @@ class SessionValidatorTest {
 
         sessionValidator.validateConnect("Bearer " + alex2, sessionId2);
 
-        String destination = "/user/dusgh1234/chat";
+        String destination = "/user/alex/chat";
 
         sessionValidator.validateSubscribe(sessionId, destination);
 
         String destination2 = "/pub/chat/chat/alex";
         assertThatThrownBy(() ->
-                sessionValidator.validateSend("Bearer " + alex2, sessionId2, destination2, new ChatRequest(0, "dusgh1234", "dusgh12345", "하이")))
+                sessionValidator.validateSend("Bearer " + alex2, sessionId2, destination2))
                 .isInstanceOf(CustomException.class).hasMessage("매칭 파트너가 없습니다");
 
 
-        Matching matching = Matching.builder().receiverLoginId("dusgh12345").senderLoginId("dusgh12346").isMatched(true).isOvered(false).build();
+        Matching matching = Matching.builder().receiverNickname("alex2").senderNickname("alex3").isMatched(true).isOvered(false).build();
         matchingRepository.save(matching);
 
         assertThatThrownBy(() ->
-                sessionValidator.validateSend("Bearer " + alex2, sessionId2, destination2, new ChatRequest(0, "dusgh1234", "dusgh12345", "하이")))
+                sessionValidator.validateSend("Bearer " + alex2, sessionId2, destination2))
                 .isInstanceOf(CustomException.class).hasMessage("매칭된 파트너가 아닙니다");
     }
 
@@ -285,7 +284,7 @@ class SessionValidatorTest {
 
         profileFacadeV1.registerProfile(profileRegistration2, "dusgh12346");
         String destination = "/pub/chat/chat/alex2";
-        assertThatThrownBy(() -> sessionValidator.validateSend("Bearer " + alex2, sessionId, destination, new ChatRequest(0, "dusgh1234", "dusgh12345", "하이")))
+        assertThatThrownBy(() -> sessionValidator.validateSend("Bearer " + alex2, sessionId, destination))
                 .isInstanceOf(CustomException.class).hasMessage("메시지 발신자가 세션 회원과 일치하지 않습니다");
     }
 
@@ -317,7 +316,7 @@ class SessionValidatorTest {
                 .isInstanceOf(CustomException.class).hasMessage("STOMP에 채팅 연결이 된 회원이 아닙니다");
 
         String destination2 = "/pub/chat/chat/alex2";
-        assertThatThrownBy(() -> sessionValidator.validateSend("Bearer " + alex, sessionId, destination2, new ChatRequest(0, "dusgh1234", "dusgh12345", "하이")))
+        assertThatThrownBy(() -> sessionValidator.validateSend("Bearer " + alex, sessionId, destination2))
                 .isInstanceOf(CustomException.class).hasMessage("STOMP에 채팅 연결이 된 회원이 아닙니다");
     }
 
@@ -329,7 +328,7 @@ class SessionValidatorTest {
         String alex = JWTProvider.createToken(loginId);
         String sessionId = "session";
         String destination = "/pub/chat/chat/alex2";
-        assertThatThrownBy(() -> sessionValidator.validateSend("Bearer " + alex, sessionId, destination, new ChatRequest(0, "dusgh1234", "dusgh12345", "하이")))
+        assertThatThrownBy(() -> sessionValidator.validateSend("Bearer " + alex, sessionId, destination))
                 .isInstanceOf(CustomException.class).hasMessage("STOMP에 채팅 연결이 된 회원이 아닙니다");
     }
 

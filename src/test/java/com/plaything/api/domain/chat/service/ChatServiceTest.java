@@ -1,10 +1,21 @@
 package com.plaything.api.domain.chat.service;
 
+import com.plaything.api.domain.auth.model.request.CreateUserRequest;
+import com.plaything.api.domain.auth.service.AuthServiceV1;
 import com.plaything.api.domain.chat.model.reqeust.ChatRequest;
 import com.plaything.api.domain.chat.model.response.ChatList;
 import com.plaything.api.domain.chat.model.response.ChatRoomResponse;
 import com.plaything.api.domain.chat.model.response.ChatWithMissingChat;
-import com.plaything.api.util.UserGenerator;
+import com.plaything.api.domain.repository.entity.user.profile.Profile;
+import com.plaything.api.domain.repository.entity.user.profile.ProfileImage;
+import com.plaything.api.domain.repository.repo.chat.ChatRepository;
+import com.plaything.api.domain.repository.repo.chat.ChatRoomRepository;
+import com.plaything.api.domain.repository.repo.user.ProfileRepository;
+import com.plaything.api.domain.user.constants.PersonalityTraitConstant;
+import com.plaything.api.domain.user.constants.PrimaryRole;
+import com.plaything.api.domain.user.constants.RelationshipPreferenceConstant;
+import com.plaything.api.domain.user.model.request.ProfileRegistration;
+import com.plaything.api.domain.user.service.ProfileFacadeV1;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,12 +24,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static com.plaything.api.domain.user.constants.Gender.M;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -36,7 +49,19 @@ public class ChatServiceTest {
     private ChatRateLimiter rateLimiter;
 
     @Autowired
-    private UserGenerator userGenerator;
+    private AuthServiceV1 authServiceV1;
+
+    @Autowired
+    private ProfileFacadeV1 profileFacadeV1;
+
+    @Autowired
+    private ProfileRepository profileRepository;
+
+    @Autowired
+    private ChatRoomRepository chatRoomRepository;
+
+    @Autowired
+    private ChatRepository chatRepository;
 
     @AfterEach
     void cleanUp() {
@@ -45,13 +70,32 @@ public class ChatServiceTest {
 
     @BeforeEach
     void setUp() {
-        userGenerator.generate("dusgh1234", "1234", "1", "알렉1");
-        userGenerator.addImages("알렉1", "abc");
+        CreateUserRequest request = new CreateUserRequest("dusgh1234", "1234", "1");
+        authServiceV1.creatUser(request);
 
-        userGenerator.generate("dusgh12345", "1234", "1", "알렉2");
-        userGenerator.addImages("알렉2", "abcd");
+        CreateUserRequest request2 = new CreateUserRequest("dusgh12345", "1234", "1");
+        authServiceV1.creatUser(request2);
 
-        userGenerator.createMatching("dusgh1234", "1234", "dusgh12345", "1234");
+        LocalDate now = LocalDate.now();
+        ProfileRegistration profileRegistration = new ProfileRegistration(
+                "알렉1", "hi", M, PrimaryRole.TOP, List.of(PersonalityTraitConstant.BOSS), PersonalityTraitConstant.BOSS, List.of(RelationshipPreferenceConstant.DATE_DS), now);
+
+        profileFacadeV1.registerProfile(profileRegistration, "dusgh1234");
+
+        Profile profile1 = profileRepository.findByNickName("알렉1");
+        ProfileImage image1 = ProfileImage.builder().profile(profile1).isMainPhoto(true).build();
+        profile1.addProfileImages(List.of(image1));
+
+        ProfileRegistration profileRegistration2 = new ProfileRegistration(
+                "알렉2", "hi", M, PrimaryRole.TOP, List.of(PersonalityTraitConstant.BOSS), PersonalityTraitConstant.BOSS, List.of(RelationshipPreferenceConstant.DATE_DS), now);
+
+        profileFacadeV1.registerProfile(profileRegistration2, "dusgh12345");
+
+        Profile profile2 = profileRepository.findByNickName("알렉2");
+
+        ProfileImage image2 = ProfileImage.builder().profile(profile2).isMainPhoto(true).build();
+        profile2.addProfileImages(List.of(image2));
+
     }
 
 
@@ -62,21 +106,21 @@ public class ChatServiceTest {
         LocalDateTime now = LocalDateTime.now();
 
 
-        sendMessage("dusgh1234", "dusgh12345", "안녕", 1, now);
-        sendMessage("dusgh1234", "dusgh12345", "반가워", 2, now);
+        sendMessage("알렉1", "알렉2", "안녕", 1, now);
+        sendMessage("알렉1", "알렉2", "반가워", 2, now);
         Thread.sleep(300);
-        sendMessage("dusgh1234", "dusgh12345", "뭐해?", 3, now);
+        sendMessage("알렉1", "알렉2", "뭐해?", 3, now);
 
-        sendMessage("dusgh12345", "dusgh1234", "하이", 4, now);
-        sendMessage("dusgh12345", "dusgh1234", "그냥 쉬는중ㅋㅋ", 5, now);
+        sendMessage("알렉2", "알렉1", "하이", 4, now);
+        sendMessage("알렉2", "알렉1", "그냥 쉬는중ㅋㅋ", 5, now);
 
         List<ChatRoomResponse> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
 
         assertThat(chatRooms.get(0).partnerProfile().nickName()).isEqualTo("알렉2");
         assertThat(chatRooms.get(0).partnerProfile().primaryRole()).isEqualTo("MT");
-        assertThat(chatRooms.get(0).partnerProfile().mainPhoto()).isEqualTo("https://d25ulpahxovik9.cloudfront.net/abcd");
+        assertThat(chatRooms.get(0).partnerProfile().mainPhoto()).isEqualTo("abcd");
         assertThat(chatRooms.get(0).lastChat()).isEqualTo("그냥 쉬는중ㅋㅋ");
-        assertThat(chatRooms.get(0).lastChatSender()).isEqualTo("dusgh12345");
+        assertThat(chatRooms.get(0).lastChatSender()).isEqualTo("알렉2");
 
 
         ChatList chatList = chatFacadeV1.getChatList("dusgh1234", chatRooms.get(0).chatRoomId(), null);
@@ -86,8 +130,8 @@ public class ChatServiceTest {
         assertThat(chatList.message()).extracting("sequence")
                 .containsExactly(5, 4, 3, 2, 1);
 
-        assertThat(chatList.message()).extracting("senderLoginId")
-                .containsExactly("dusgh12345", "dusgh12345", "dusgh1234", "dusgh1234", "dusgh1234");
+        assertThat(chatList.message()).extracting("senderNickname")
+                .containsExactly("알렉2", "알렉2", "알렉1", "알렉1", "알렉1");
     }
 
     @DisplayName("채팅 메시지를 페이지네이션 할 수 있다")
@@ -96,26 +140,26 @@ public class ChatServiceTest {
         LocalDateTime now = LocalDateTime.now();
 
         for (int i = 1; i <= 20; i++) {
-            sendMessage("dusgh1234", "dusgh12345", "시작" + i, i, now);
+            sendMessage("알렉1", "알렉2", "시작" + i, i, now);
             Thread.sleep(300);
         }
 
 
-        sendMessage("dusgh1234", "dusgh12345", "안녕", 1, now);
-        sendMessage("dusgh1234", "dusgh12345", "반가워", 2, now);
+        sendMessage("알렉1", "알렉2", "안녕", 1, now);
+        sendMessage("알렉1", "알렉2", "반가워", 2, now);
         Thread.sleep(300);
-        sendMessage("dusgh1234", "dusgh12345", "뭐해?", 3, now);
+        sendMessage("알렉1", "알렉2", "뭐해?", 3, now);
 
-        sendMessage("dusgh12345", "dusgh1234", "하이", 4, now);
-        sendMessage("dusgh12345", "dusgh1234", "그냥 쉬는중ㅋㅋ", 5, now);
+        sendMessage("알렉2", "알렉1", "하이", 4, now);
+        sendMessage("알렉2", "알렉1", "그냥 쉬는중ㅋㅋ", 5, now);
 
         List<ChatRoomResponse> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
 
         assertThat(chatRooms.get(0).partnerProfile().nickName()).isEqualTo("알렉2");
         assertThat(chatRooms.get(0).partnerProfile().primaryRole()).isEqualTo("MT");
-        assertThat(chatRooms.get(0).partnerProfile().mainPhoto()).isEqualTo("https://d25ulpahxovik9.cloudfront.net/abcd");
+        assertThat(chatRooms.get(0).partnerProfile().mainPhoto()).isEqualTo("abcd");
         assertThat(chatRooms.get(0).lastChat()).isEqualTo("그냥 쉬는중ㅋㅋ");
-        assertThat(chatRooms.get(0).lastChatSender()).isEqualTo("dusgh12345");
+        assertThat(chatRooms.get(0).lastChatSender()).isEqualTo("알렉2");
 
 
         ChatList chatList = chatFacadeV1.getChatList("dusgh1234", chatRooms.get(0).chatRoomId(), null);
@@ -126,18 +170,8 @@ public class ChatServiceTest {
         assertThat(chatList.message()).extracting("sequence")
                 .containsExactly(25, 24, 23, 22, 21, 20, 19, 18, 17, 16);
 
-        assertThat(chatList.message()).extracting("senderLoginId")
-                .containsExactly(
-                        "dusgh12345",
-                        "dusgh12345",
-                        "dusgh1234",
-                        "dusgh1234",
-                        "dusgh1234",
-                        "dusgh1234",
-                        "dusgh1234",
-                        "dusgh1234",
-                        "dusgh1234",
-                        "dusgh1234");
+        assertThat(chatList.message()).extracting("senderNickname")
+                .containsExactly("알렉2", "알렉2", "알렉1", "알렉1", "알렉1", "알렉1", "알렉1", "알렉1", "알렉1", "알렉1");
 
 
         ChatList chatList2 = chatFacadeV1.getChatList("dusgh1234", chatRooms.get(0).chatRoomId(), chatList.message().get(9).id());
@@ -149,18 +183,8 @@ public class ChatServiceTest {
         assertThat(chatList2.message()).extracting("sequence")
                 .containsExactly(15, 14, 13, 12, 11, 10, 9, 8, 7, 6);
 
-        assertThat(chatList2.message()).extracting("senderLoginId")
-                .containsExactly(
-                        "dusgh1234",
-                        "dusgh1234",
-                        "dusgh1234",
-                        "dusgh1234",
-                        "dusgh1234",
-                        "dusgh1234",
-                        "dusgh1234",
-                        "dusgh1234",
-                        "dusgh1234",
-                        "dusgh1234");
+        assertThat(chatList2.message()).extracting("senderNickname")
+                .containsExactly("알렉1", "알렉1", "알렉1", "알렉1", "알렉1", "알렉1", "알렉1", "알렉1", "알렉1", "알렉1");
 
 
         ChatList chatList3 = chatFacadeV1.getChatList("dusgh1234", chatRooms.get(0).chatRoomId(), chatList2.message().get(9).id());
@@ -172,13 +196,8 @@ public class ChatServiceTest {
         assertThat(chatList3.message()).extracting("sequence")
                 .containsExactly(5, 4, 3, 2, 1);
 
-        assertThat(chatList3.message()).extracting("senderLoginId")
-                .containsExactly(
-                        "dusgh1234",
-                        "dusgh1234",
-                        "dusgh1234",
-                        "dusgh1234",
-                        "dusgh1234");
+        assertThat(chatList3.message()).extracting("senderNickname")
+                .containsExactly("알렉1", "알렉1", "알렉1", "알렉1", "알렉1");
 
     }
 
@@ -189,13 +208,13 @@ public class ChatServiceTest {
         LocalDateTime date1 = LocalDateTime.now().minusDays(8);
 
         for (int i = 1; i <= 25; i++) {
-            sendMessage("dusgh1234", "dusgh12345", "하이" + i, i, date1);
+            sendMessage("알렉1", "알렉2", "하이" + i, i, date1);
         }
 
         LocalDateTime date2 = LocalDateTime.now().minusDays(7);
 
         for (int i = 26; i <= 30; i++) {
-            sendMessage("dusgh1234", "dusgh12345", "하이" + i, i, date2);
+            sendMessage("알렉1", "알렉2", "하이" + i, i, date2);
 
         }
 
@@ -209,8 +228,8 @@ public class ChatServiceTest {
         assertThat(chatList.message()).extracting("sequence")
                 .containsExactly(30, 29, 28, 27, 26);
 
-        assertThat(chatList.message()).extracting("senderLoginId")
-                .containsExactly("dusgh1234", "dusgh1234", "dusgh1234", "dusgh1234", "dusgh1234");
+        assertThat(chatList.message()).extracting("senderNickname")
+                .containsExactly("알렉1", "알렉1", "알렉1", "알렉1", "알렉1");
 
         assertThat(chatList.message()).extracting("createdAt")
                 .containsExactly(date2, date2, date2, date2, date2);
@@ -222,28 +241,28 @@ public class ChatServiceTest {
         LocalDateTime date1 = LocalDateTime.now();
 
         for (int i = 1; i <= 3; i++) {
-            ChatWithMissingChat chatWithMissingChat = sendMessage("dusgh1234", "dusgh12345", "하이" + i, i, date1);
+            ChatWithMissingChat chatWithMissingChat = sendMessage("알렉1", "알렉2", "하이" + i, i, date1);
 
             assertThat(chatWithMissingChat.missingChat()).isEmpty();
             assertThat(chatWithMissingChat.chat().chat()).isEqualTo("하이" + i);
-            assertThat(chatWithMissingChat.chat().receiverLoginId()).isEqualTo("dusgh12345");
-            assertThat(chatWithMissingChat.chat().senderLoginId()).isEqualTo("dusgh1234");
+            assertThat(chatWithMissingChat.chat().receiverNickname()).isEqualTo("알렉2");
+            assertThat(chatWithMissingChat.chat().senderNickname()).isEqualTo("알렉1");
             assertThat(chatWithMissingChat.chat().createdAt()).isEqualTo(date1);
             assertThat(chatWithMissingChat.chat().sequence()).isEqualTo(i);
         }
 
 
-        ChatWithMissingChat chatWithMissingChat = sendMessage("dusgh12345", "dusgh1234", "하이~", 1, date1);
+        ChatWithMissingChat chatWithMissingChat = sendMessage("알렉2", "알렉1", "하이~", 1, date1);
 
         assertThat(chatWithMissingChat.missingChat()).extracting("chat").containsExactly("하이2", "하이3");
-        assertThat(chatWithMissingChat.missingChat()).extracting("senderLoginId").containsExactly("dusgh1234", "dusgh1234");
-        assertThat(chatWithMissingChat.missingChat()).extracting("receiverLoginId").containsExactly("dusgh12345", "dusgh12345");
+        assertThat(chatWithMissingChat.missingChat()).extracting("senderNickname").containsExactly("알렉1", "알렉1");
+        assertThat(chatWithMissingChat.missingChat()).extracting("receiverNickname").containsExactly("알렉2", "알렉2");
         assertThat(chatWithMissingChat.missingChat()).extracting("createdAt").containsExactly(date1, date1);
         assertThat(chatWithMissingChat.missingChat()).extracting("sequence").containsExactly(2, 3);
 
         assertThat(chatWithMissingChat.chat().chat()).isEqualTo("하이~");
-        assertThat(chatWithMissingChat.chat().receiverLoginId()).isEqualTo("dusgh1234");
-        assertThat(chatWithMissingChat.chat().senderLoginId()).isEqualTo("dusgh12345");
+        assertThat(chatWithMissingChat.chat().receiverNickname()).isEqualTo("알렉1");
+        assertThat(chatWithMissingChat.chat().senderNickname()).isEqualTo("알렉2");
         assertThat(chatWithMissingChat.chat().createdAt()).isEqualTo(date1);
         assertThat(chatWithMissingChat.chat().sequence()).isEqualTo(4);
 
@@ -262,7 +281,7 @@ public class ChatServiceTest {
             final int index = i;
             executorService.submit(() -> {
                 try {
-                    sendMessage("dusgh1234", "dusgh12345", "하이" + index, index, date1);
+                    sendMessage("알렉1", "알렉2", "하이" + index, index, date1);
                 } finally {
                     countDownLatch.countDown(); // 작업 완료 시 카운트 감소
                 }
@@ -286,24 +305,13 @@ public class ChatServiceTest {
         assertThat(chatList.message()).extracting("sequence")
                 .containsExactly(10, 9, 8, 7, 6, 5, 4, 3, 2, 1);
 
-        assertThat(chatList.message()).extracting("senderLoginId")
-                .containsExactly(
-                        "dusgh1234",
-                        "dusgh1234",
-                        "dusgh1234",
-                        "dusgh1234",
-                        "dusgh1234",
-                        "dusgh1234",
-                        "dusgh1234",
-                        "dusgh1234",
-                        "dusgh1234",
-                        "dusgh1234"
-                );
+        assertThat(chatList.message()).extracting("senderNickname")
+                .containsExactly("알렉1", "알렉1", "알렉1", "알렉1", "알렉1", "알렉1", "알렉1", "알렉1", "알렉1", "알렉1");
     }
 
 
-    private ChatWithMissingChat sendMessage(String senderLoginId, String reciverLoginId, String message, int sequence, LocalDateTime now) {
-        ChatRequest msg = new ChatRequest(sequence, senderLoginId, reciverLoginId, message);
+    private ChatWithMissingChat sendMessage(String sender, String reciver, String message, int sequence, LocalDateTime now) {
+        ChatRequest msg = new ChatRequest(sequence, sender, reciver, message);
         return chatServiceV1.saveChatMessage(msg, now);
     }
 

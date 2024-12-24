@@ -1,6 +1,7 @@
 package com.plaything.api.domain.key.service;
 
 import com.plaything.api.common.exception.CustomException;
+import com.plaything.api.domain.auth.model.request.CreateUserRequest;
 import com.plaything.api.domain.auth.model.request.LoginRequest;
 import com.plaything.api.domain.auth.model.response.LoginResponse;
 import com.plaything.api.domain.auth.service.AuthServiceV1;
@@ -10,7 +11,6 @@ import com.plaything.api.domain.key.model.response.AvailablePointKey;
 import com.plaything.api.domain.key.model.response.PointKeyLog;
 import com.plaything.api.domain.repository.entity.pay.UserRewardActivity;
 import com.plaything.api.domain.repository.repo.pay.UserRewardActivityRepository;
-import com.plaything.api.util.UserGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -53,11 +53,7 @@ class PointKeyFacadeV1Test {
     private PointKeyLogServiceV1 pointKeyLogServiceV1;
 
     @Autowired
-    private RedisTemplate redisTemplate;
-
-    @Autowired
-    private UserGenerator userGenerator;
-
+    protected RedisTemplate redisTemplate;
 
     @BeforeEach
     void setUp() {
@@ -67,9 +63,12 @@ class PointKeyFacadeV1Test {
             redisTemplate.delete(keys);
         }
 
-        userGenerator.generate("dusgh1234", "1234", "1", "alex");
-        userGenerator.generate("dusgh12345", "1234", "1", "alex2");
 
+        CreateUserRequest request = new CreateUserRequest("dusgh1234", "1234", "1");
+        authServiceV1.creatUser(request);
+
+        CreateUserRequest request2 = new CreateUserRequest("dusgh12345", "1234", "1");
+        authServiceV1.creatUser(request2);
     }
 
     @DisplayName("매일 첫 로그인 시 포인트 키를 제공한다.")
@@ -232,7 +231,7 @@ class PointKeyFacadeV1Test {
 
         LoginRequest request2 = new LoginRequest("dusgh1234", "1234");
         assertThatThrownBy(() -> authServiceV1.login(request2, LocalDate.now(), "1"))
-                .isInstanceOf(CustomException.class).hasMessage("이미 처리된 요청입니다");
+                .isInstanceOf(CustomException.class).hasMessage("TRANSACTION ALREADY PROCESSED");
 
     }
 
@@ -244,7 +243,7 @@ class PointKeyFacadeV1Test {
 
         AdRewardRequest request2 = new AdRewardRequest("광고1", 2);
         assertThatThrownBy(() -> pointKeyFacadeV1.createPointKeyForAd("dusgh1234", request2, LocalDateTime.now(), "1"))
-                .isInstanceOf(CustomException.class).hasMessage("이미 처리된 요청입니다");
+                .isInstanceOf(CustomException.class).hasMessage("TRANSACTION ALREADY PROCESSED");
     }
 
 }
