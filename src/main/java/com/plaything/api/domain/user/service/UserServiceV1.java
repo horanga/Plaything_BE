@@ -37,7 +37,7 @@ public class UserServiceV1 {
     private final ImageUrlGenerator imageUrlGenerator;
 
     public List<UserMatching> searchPartner(String loginId, long lastId) {
-        User userByName = findByLoginId(loginId);
+        User userByName = findByLoginIdForRegistration(loginId);
         //TODO 프로필 거절, 사진 거절
         Profile profile = userByName.getProfile();
         validateRequest(profile);
@@ -61,10 +61,25 @@ public class UserServiceV1 {
         return getUserMatchingInfo(profiles);
     }
 
-
-    public User findByLoginId(String loginId) {
+    public User findByLoginIdForRegistration(String loginId) {
         return userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
+    }
+
+
+    @Transactional(readOnly = true)
+    public User findByLoginId(String loginId) {
+        User user = userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
+
+        if (user.isProfileEmpty()) {
+            throw new CustomException(ErrorCode.NOT_EXIST_PROFILE);
+        }
+
+        if (user.isPreviousProfileRejected()) {
+            throw new CustomException(ErrorCode.NOT_AUTHORIZED_PROFILE);
+        }
+        return user;
     }
 
     public User findById(long id) {

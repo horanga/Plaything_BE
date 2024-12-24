@@ -3,44 +3,40 @@ package com.plaything.api.domain.notification.service;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
-import com.plaything.api.domain.repository.entity.user.profile.Profile;
-import com.plaything.api.domain.user.model.response.ProfileImageResponse;
+import com.plaything.api.domain.chat.model.response.ChatProfile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import static com.plaything.api.domain.notification.constant.NotificationMessage.MATCHING_REQUEST_BODY;
-import static com.plaything.api.domain.notification.constant.NotificationMessage.MATCHING_REQUEST_TITLE;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class FcmServiceV1 {
 
-    private final String MATCHING_NOTIFICATION = "님이 매칭 요청을 보냈습니다.";
-
     public void sendMessageTo(
-            Profile requesterProfile,
-            ProfileImageResponse requesterMainPhoto,
+            ChatProfile chatProfile,
+            String title,
+            String message,
             String fcmToken) {
 
-        Message message = makeMessage(requesterProfile, requesterMainPhoto, fcmToken);
+        Message msg = makeMessage(chatProfile, title, message, fcmToken);
 
         try {
-            FirebaseMessaging.getInstance().send(message);
+            FirebaseMessaging.getInstance().send(msg);
         } catch (FirebaseMessagingException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private Message makeMessage(Profile requesterProfile,
-                                ProfileImageResponse requesterMainPhoto,
+    private Message makeMessage(ChatProfile chatProfile,
+                                String title,
+                                String message,
                                 String fckToken) {
 
-        return Message.builder().putData("title", requesterProfile.getNickName() + MATCHING_REQUEST_TITLE)
-                .putData("me", requesterProfile.getNickName())
-                .putData("profileImage", requesterMainPhoto.getUrl())
-                .putData("body", MATCHING_REQUEST_BODY)
+        return Message.builder().putData("title", title)
+                .putData("partner", chatProfile.nickName())
+                .putData("partnerImage", chatProfile.mainPhoto())
+                .putData("body", message)
                 .setToken(fckToken)
                 .build();
     }

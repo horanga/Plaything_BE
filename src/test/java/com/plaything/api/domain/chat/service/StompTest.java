@@ -109,10 +109,10 @@ public class StompTest {
 
         profileFacadeV1.registerProfile(profileRegistration2, "dusgh12345");
 
-        ChatRoom room = ChatRoom.builder().senderNickname("alex").receiverNickname("alex2").build();
+        ChatRoom room = ChatRoom.builder().senderLoginId("alex").receiverLoginId("alex2").build();
         chatRoomRepository.save(room);
 
-        Matching matching = Matching.builder().receiverNickname("alex").senderNickname("alex2").isMatched(true).isOvered(false).build();
+        Matching matching = Matching.builder().receiverLoginId("alex").senderLoginId("alex2").isMatched(true).isOvered(false).build();
         matchingRepository.save(matching);
 
         TestTransaction.flagForCommit();
@@ -205,8 +205,8 @@ public class StompTest {
         // then
         ChatRequest receivedChatRequest = messageFuture.get(10, TimeUnit.SECONDS);
         assertThat(receivedChatRequest.chat()).isEqualTo("test chat");
-        assertThat(receivedChatRequest.senderNickname()).isEqualTo("발신자");
-        assertThat(receivedChatRequest.receiverNickname()).isEqualTo("alex");
+        assertThat(receivedChatRequest.senderLoginId()).isEqualTo("발신자");
+        assertThat(receivedChatRequest.receiverLoginId()).isEqualTo("alex");
 
     }
 

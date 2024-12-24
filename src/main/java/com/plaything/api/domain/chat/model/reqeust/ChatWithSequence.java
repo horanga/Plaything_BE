@@ -8,11 +8,11 @@ import java.time.LocalDateTime;
 @Schema(description = "채팅 전송")
 public record ChatWithSequence(
 
-        @Schema(description = "요청자 닉네임")
+        @Schema(description = "요청자 로그인 id")
         String senderLoginId,
 
-        @Schema(description = "수신자 닉네임")
-        String receiverNickname,
+        @Schema(description = "수신자 로그인 id")
+        String receiverLoginId,
 
         @Schema(description = "메시지 내용")
         String chat,

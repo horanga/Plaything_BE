@@ -8,7 +8,6 @@ import com.plaything.api.domain.repository.entity.user.profile.Profile;
 import com.plaything.api.domain.repository.repo.notification.NotificationRepository;
 import com.plaything.api.domain.user.util.ImageUrlGenerator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -26,7 +25,7 @@ public class NotificationServiceV1 {
             NotificationType type,
             Profile requesterProfile,
             User receiver
-    ) throws IOException, RuntimeException {
+    ) throws IOException {
         Notification notification = Notification.builder()
                 .type(type)
                 .requesterNickName(requesterProfile.getNickName())
