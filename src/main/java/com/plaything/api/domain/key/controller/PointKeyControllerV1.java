@@ -6,7 +6,6 @@ import com.plaything.api.domain.key.model.response.PointKeyLog;
 import com.plaything.api.domain.key.service.PointKeyFacadeV1;
 import com.plaything.api.security.JWTProvider;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -31,7 +30,7 @@ public class PointKeyControllerV1 {
     @SecurityRequirement(name = "Authorization")
     @PostMapping("/create-key")
     public void createPointKey(
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString,
+            @RequestHeader(value = "Authorization", required = false) String authString,
             @RequestHeader("Transaction-ID") String transactionId,
             @Valid @RequestBody AdRewardRequest request
     ) {
@@ -47,7 +46,7 @@ public class PointKeyControllerV1 {
     @SecurityRequirement(name = "Authorization")
     @GetMapping("/get-keylog")
     public List<PointKeyLog> getPointKeyLog(
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString
+            @RequestHeader(value = "Authorization", required = false) String authString
     ) {
         String token = JWTProvider.extractToken(authString);
         String user = JWTProvider.getUserFromToken(token);
@@ -62,7 +61,7 @@ public class PointKeyControllerV1 {
     @SecurityRequirement(name = "Authorization")
     @GetMapping("/get-key")
     public AvailablePointKey getPointKey(
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString
+            @RequestHeader(value = "Authorization", required = false) String authString
     ) {
         String token = JWTProvider.extractToken(authString);
         String user = JWTProvider.getUserFromToken(token);

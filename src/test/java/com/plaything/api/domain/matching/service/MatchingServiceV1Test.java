@@ -114,9 +114,9 @@ class MatchingServiceV1Test {
 
     User user4;
 
-
     @BeforeEach
     void setUp() {
+
 
         CreateUserRequest request = new CreateUserRequest("dusgh1234", "1234", "1");
         authServiceV1.creatUser(request);
@@ -261,8 +261,7 @@ class MatchingServiceV1Test {
 
     public static Stream<Arguments> matchingProviderForOthers() {
 
-        return Stream.of(Arguments.of(SWITCH, List.of(DEGRADER, SADIST), SADIST, SWITCH, "알렉12"),
-                Arguments.of(ETC, List.of(DEGRADER, SADIST), SADIST, ETC, "알렉1356"));
+        return Stream.of(Arguments.of(SWITCH, List.of(DEGRADER, SADIST), SADIST, SWITCH, "알렉12"), Arguments.of(ETC, List.of(DEGRADER, SADIST), SADIST, ETC, "알렉1356"));
     }
 
     @DisplayName("대표성향이 아닌 경우는 매칭에 포함되지 않는다.")
@@ -432,22 +431,22 @@ class MatchingServiceV1Test {
     @Test
     void test10() {
         AdRewardRequest request = new AdRewardRequest("광고1", 2);
-        registerProfile("dusgh1234", "연호1", "잘부탁", TOP, List.of(SADIST, DEGRADER), SADIST, List.of(MARRIAGE_DS));
-
-
-        pointKeyFacadeV1.createPointKeyForAd("dusgh1234", request, LocalDateTime.now(), "adafddb");
+        pointKeyFacadeV1.createPointKeyForAd("dusgh1234", request, LocalDateTime.now(), "1");
         AvailablePointKey availablePointKey1 = pointKeyFacadeV1.getAvailablePointKey("dusgh1234");
         assertThat(availablePointKey1.availablePointKey()).isEqualTo(2L);
+
+        ProfileRegistration profileRegistration = new ProfileRegistration("연호1", "안녕", M, TOP, List.of(HUNTER), HUNTER, List.of(RelationshipPreferenceConstant.MARRIAGE_DS), LocalDate.now());
+        profileFacadeV1.registerProfile(profileRegistration, "dusgh1234");
         User user = userRepository.findByLoginId("dusgh1234").get();
         Profile profile = user.getProfile();
-        List<SavedImage> savedImages = List.of(new SavedImage("a", "abc"));
+        List<SavedImage> savedImages = List.of(new SavedImage("a", "b"));
 
         profileImageServiceV1.saveImages(savedImages, profile, 0L);
 
         ProfileRegistration profileRegistration2 = new ProfileRegistration("연호", "안녕", M, TOP, List.of(HUNTER), HUNTER, List.of(RelationshipPreferenceConstant.MARRIAGE_DS), LocalDate.now());
         profileFacadeV1.registerProfile(profileRegistration2, "dusgh12345");
 
-        MatchingRequest matchingRequest = new MatchingRequest("dusgh12345");
+        MatchingRequest matchingRequest = new MatchingRequest("연호");
 
         em.flush();
         em.clear();
@@ -460,7 +459,7 @@ class MatchingServiceV1Test {
         assertThat(notification.get(0).body()).isEqualTo(MATCHING_REQUEST_BODY);
         assertThat(notification.get(0).type()).isEqualTo(MATCHING_REQUEST);
         assertThat(notification.get(0).requesterNickName()).isEqualTo("연호1");
-        assertThat(notification.get(0).requesterMainPhoto()).isEqualTo("https://d25ulpahxovik9.cloudfront.net/abc");
+        assertThat(notification.get(0).requesterMainPhoto()).isEqualTo("a");
     }
 
 
@@ -468,9 +467,10 @@ class MatchingServiceV1Test {
     @Test
     void test11() {
         AdRewardRequest request = new AdRewardRequest("광고1", 2);
-        registerProfile("dusgh1234", "연호1", "잘부탁", TOP, List.of(SADIST, DEGRADER), SADIST, List.of(MARRIAGE_DS));
-
         pointKeyFacadeV1.createPointKeyForAd("dusgh1234", request, LocalDateTime.now(), "122s");
+
+        ProfileRegistration profileRegistration = new ProfileRegistration("연호1", "안녕", M, TOP, List.of(HUNTER), HUNTER, List.of(RelationshipPreferenceConstant.MARRIAGE_DS), LocalDate.now());
+        profileFacadeV1.registerProfile(profileRegistration, "dusgh1234");
         User user = userRepository.findByLoginId("dusgh1234").get();
         Profile profile = user.getProfile();
         List<SavedImage> savedImages = List.of(new SavedImage("a", "b"));
@@ -478,25 +478,24 @@ class MatchingServiceV1Test {
 
         ProfileRegistration profileRegistration2 = new ProfileRegistration("연호", "안녕", M, TOP, List.of(HUNTER), HUNTER, List.of(RelationshipPreferenceConstant.MARRIAGE_DS), LocalDate.now());
         profileFacadeV1.registerProfile(profileRegistration2, "dusgh12345");
-        MatchingRequest matchingRequest = new MatchingRequest("dusgh12345");
+        MatchingRequest matchingRequest = new MatchingRequest("연호");
 
         em.flush();
         em.clear();
-        matchingFacadeV1.createMatching("dusgh1234", matchingRequest, "123dsdddsd");
-        assertThatThrownBy(() -> matchingFacadeV1.createMatching("dusgh1234", matchingRequest, "123dsdddsd")).isInstanceOf(CustomException.class)
-                .hasMessage("이미 처리된 요청입니다");
+        matchingFacadeV1.createMatching("dusgh1234", matchingRequest, "123dsd");
+        assertThatThrownBy(() -> matchingFacadeV1.createMatching("dusgh1234", matchingRequest, "123")).isInstanceOf(CustomException.class).hasMessage("TRANSACTION ALREADY PROCESSED");
     }
 
     @DisplayName("포인트 키를 사용하면 관련 로그들이 쌓인다.")
     @Test
     void test12() {
         AdRewardRequest request = new AdRewardRequest("광고1", 2);
-        registerProfile("dusgh1234", "연호1", "잘부탁", TOP, List.of(SADIST, DEGRADER), SADIST, List.of(MARRIAGE_DS));
-
         pointKeyFacadeV1.createPointKeyForAd("dusgh1234", request, LocalDateTime.now(), "133");
         AvailablePointKey availablePointKey1 = pointKeyFacadeV1.getAvailablePointKey("dusgh1234");
         assertThat(availablePointKey1.availablePointKey()).isEqualTo(2L);
 
+        ProfileRegistration profileRegistration = new ProfileRegistration("연호1", "안녕", M, TOP, List.of(HUNTER), HUNTER, List.of(RelationshipPreferenceConstant.MARRIAGE_DS), LocalDate.now());
+        profileFacadeV1.registerProfile(profileRegistration, "dusgh1234");
         User user = userRepository.findByLoginId("dusgh1234").get();
         Profile profile = user.getProfile();
         List<SavedImage> savedImages = List.of(new SavedImage("a", "b"));
@@ -506,7 +505,7 @@ class MatchingServiceV1Test {
         ProfileRegistration profileRegistration2 = new ProfileRegistration("연호", "안녕", M, TOP, List.of(HUNTER), HUNTER, List.of(RelationshipPreferenceConstant.MARRIAGE_DS), LocalDate.now());
         profileFacadeV1.registerProfile(profileRegistration2, "dusgh12345");
 
-        MatchingRequest matchingRequest = new MatchingRequest("dusgh12345");
+        MatchingRequest matchingRequest = new MatchingRequest("연호");
 
         em.flush();
         em.clear();
@@ -528,43 +527,45 @@ class MatchingServiceV1Test {
     @Test
     void test13() {
         AdRewardRequest request = new AdRewardRequest("광고1", 2);
-        registerProfile("dusgh1234", "연호1", "잘부탁", TOP, List.of(SADIST, DEGRADER), SADIST, List.of(MARRIAGE_DS));
-
         pointKeyFacadeV1.createPointKeyForAd("dusgh1234", request, LocalDateTime.now(), "13223");
-
-        registerProfile("dusgh12345", "연호2", "잘부탁", TOP, List.of(SADIST, DEGRADER), SADIST, List.of(MARRIAGE_DS));
 
         AdRewardRequest request2 = new AdRewardRequest("광고1", 2);
         pointKeyFacadeV1.createPointKeyForAd("dusgh12345", request2, LocalDateTime.now(), "135");
 
+
+        ProfileRegistration profileRegistration = new ProfileRegistration("연호1", "안녕", M, TOP, List.of(HUNTER), HUNTER, List.of(RelationshipPreferenceConstant.MARRIAGE_DS), LocalDate.now());
+        profileFacadeV1.registerProfile(profileRegistration, "dusgh1234");
         User user = userRepository.findByLoginId("dusgh1234").get();
         Profile profile = user.getProfile();
         List<SavedImage> savedImages = List.of(new SavedImage("a", "b"));
 
         profileImageServiceV1.saveImages(savedImages, profile, 0L);
 
+        ProfileRegistration profileRegistration2 = new ProfileRegistration("연호2", "안녕", M, TOP, List.of(HUNTER), HUNTER, List.of(RelationshipPreferenceConstant.MARRIAGE_DS), LocalDate.now());
+        profileFacadeV1.registerProfile(profileRegistration2, "dusgh12345");
+
         User user2 = userRepository.findByLoginId("dusgh1234").get();
-        Profile profile2 = user2.getProfile();
+        Profile profile2 = user.getProfile();
         List<SavedImage> savedImages2 = List.of(new SavedImage("a", "b"));
 
         profileImageServiceV1.saveImages(savedImages2, profile2, 0L);
 
-        MatchingRequest matchingRequest = new MatchingRequest("dusgh12345");
+        MatchingRequest matchingRequest = new MatchingRequest("연호2");
 
 
         em.flush();
         em.clear();
         matchingFacadeV1.createMatching("dusgh1234", matchingRequest, "78894");
-        MatchingRequest matchingRequest2 = new MatchingRequest("dusgh1234");
+        MatchingRequest matchingRequest2 = new MatchingRequest("연호1");
         matchingFacadeV1.acceptMatching("dusgh12345", matchingRequest2, "132");
 
-        Matching matching = matchingRepository.findBySenderLoginIdAndReceiverLoginId("dusgh1234", "dusgh12345").get();
+        Matching matching = matchingRepository.findBySenderNicknameAndReceiverNickname("연호1", "연호2").get();
 
         assertThat(matching.isMatched()).isTrue();
-        ChatRoom room = chatRoomRepository.findChatRoomByUsers("dusgh1234", "dusgh12345").get();
+        ChatRoom room = chatRoomRepository.findChatRoomByUsers("연호1", "연호2").get();
         assertThat(room.getLastSequence()).isEqualTo(0);
-        assertThat(room.getSenderLoginId()).isEqualTo("dusgh1234");
-        assertThat(room.getReceiverLoginId()).isEqualTo("dusgh12345");
+        assertThat(room.getSenderNickname()).isEqualTo("연호1");
+        assertThat(room.getReceiverNickname()).isEqualTo("연호2");
 
     }
 

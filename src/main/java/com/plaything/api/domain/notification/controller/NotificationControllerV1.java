@@ -4,7 +4,6 @@ import com.plaything.api.domain.notification.model.response.NotificationResponse
 import com.plaything.api.domain.notification.service.NotificationServiceV1;
 import com.plaything.api.security.JWTProvider;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +29,7 @@ public class NotificationControllerV1 {
     @SecurityRequirement(name = "Authorization")
     @GetMapping("/get-notification")
     public List<NotificationResponse> getNotification(
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString
+            @RequestHeader(value = "Authorization", required = false) String authString
     ) {
         String token = JWTProvider.extractToken(authString);
         String user = JWTProvider.getUserFromToken(token);

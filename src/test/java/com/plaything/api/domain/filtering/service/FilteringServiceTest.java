@@ -26,7 +26,7 @@ class FilteringServiceTest {
 
         for (String word : list) {
             assertThatThrownBy(() -> filteringService.filterWords(word))
-                    .isInstanceOf(CustomException.class).hasMessage("금지된 단어가 포함됐습니다");
+                    .isInstanceOf(CustomException.class).hasMessage("금지된 단어가 포함됐습니다.");
         }
     }
 
@@ -61,7 +61,7 @@ class FilteringServiceTest {
 
         for (String word : list) {
             assertThatThrownBy(() -> filteringService.filterWords(word))
-                    .isInstanceOf(CustomException.class).hasMessage("금지된 단어가 포함됐습니다");
+                    .isInstanceOf(CustomException.class).hasMessage("금지된 단어가 포함됐습니다.");
         }
     }
 
@@ -92,7 +92,7 @@ class FilteringServiceTest {
 
         for (String word : list) {
             assertThatThrownBy(() -> filteringService.filterWords(word))
-                    .isInstanceOf(CustomException.class).hasMessage("금지된 단어가 포함됐습니다");
+                    .isInstanceOf(CustomException.class).hasMessage("금지된 단어가 포함됐습니다.");
         }
     }
 
@@ -115,7 +115,7 @@ class FilteringServiceTest {
 
         for (String word : list) {
             assertThatThrownBy(() -> filteringService.filterWords(word))
-                    .isInstanceOf(CustomException.class).hasMessage("금지된 단어가 포함됐습니다");
+                    .isInstanceOf(CustomException.class).hasMessage("금지된 단어가 포함됐습니다.");
         }
     }
 

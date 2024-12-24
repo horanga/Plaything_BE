@@ -6,7 +6,6 @@ import com.plaything.api.domain.user.model.response.ProfileResponse;
 import com.plaything.api.domain.user.service.ProfileFacadeV1;
 import com.plaything.api.security.JWTProvider;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -33,7 +32,7 @@ public class UserControllerV1 {
     @PostMapping("/register-profile")
     public void registerProfile(
             @Valid @RequestBody ProfileRegistration registration,
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString
+            @RequestHeader(value = "Authorization", required = false) String authString
     ) {
         String token = JWTProvider.extractToken(authString);
         String user = JWTProvider.getUserFromToken(token);
@@ -48,7 +47,7 @@ public class UserControllerV1 {
     @PutMapping("/update-profile")
     public void updateProfile(
             @Valid @RequestBody ProfileUpdate update,
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString
+            @RequestHeader(value = "Authorization", required = false) String authString
     ) {
         String token = JWTProvider.extractToken(authString);
         String user = JWTProvider.getUserFromToken(token);
@@ -62,7 +61,7 @@ public class UserControllerV1 {
     @SecurityRequirement(name = "Authorization")
     @GetMapping("/get-profile")
     public ProfileResponse getProfile(
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString
+            @RequestHeader(value = "Authorization", required = false) String authString
     ) {
         String token = JWTProvider.extractToken(authString);
         String user = JWTProvider.getUserFromToken(token);
@@ -76,7 +75,7 @@ public class UserControllerV1 {
     @SecurityRequirement(name = "Authorization")
     @PatchMapping("/set-private")
     public void setProfilePrivate(
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString
+            @RequestHeader(value = "Authorization", required = false) String authString
     ) {
         String token = JWTProvider.extractToken(authString);
         String user = JWTProvider.getUserFromToken(token);
@@ -91,7 +90,7 @@ public class UserControllerV1 {
     @SecurityRequirement(name = "Authorization")
     @PatchMapping("/set-public")
     public void setProfilePublic(
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString
+            @RequestHeader(value = "Authorization", required = false) String authString
     ) {
         String token = JWTProvider.extractToken(authString);
         String user = JWTProvider.getUserFromToken(token);
@@ -107,7 +106,7 @@ public class UserControllerV1 {
     public void uploadImage(
             @RequestPart(value = "indexOfMainImage") Long indexOfMainImage,
             @RequestPart(value = "images") List<MultipartFile> images,
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString
+            @RequestHeader(value = "Authorization", required = false) String authString
     ) {
         String token = JWTProvider.extractToken(authString);
         String user = JWTProvider.getUserFromToken(token);
@@ -116,7 +115,7 @@ public class UserControllerV1 {
 
     @DeleteMapping("{id}")
     public void deleteUser(
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString
+            @RequestHeader(value = "Authorization", required = false) String authString
     ) {
         String token = JWTProvider.extractToken(authString);
         String user = JWTProvider.getUserFromToken(token);

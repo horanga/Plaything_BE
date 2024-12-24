@@ -7,7 +7,6 @@ import com.plaything.api.domain.matching.service.MatchingFacadeV1;
 import com.plaything.api.domain.matching.service.MatchingServiceV1;
 import com.plaything.api.security.JWTProvider;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +38,7 @@ public class MatchingControllerV1 {
     @SecurityRequirement(name = "Authorization")
     @PostMapping("/create-matching")
     public void createMatching(
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString,
+            @RequestHeader(value = "Authorization", required = false) String authString,
             @RequestBody MatchingRequest matchingRequest,
             @RequestHeader("Transaction-ID") String transactionId
     ) {
@@ -63,7 +62,7 @@ public class MatchingControllerV1 {
     @SecurityRequirement(name = "Authorization")
     @PostMapping("/accpet-matching")
     public void acceptMatching(
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString,
+            @RequestHeader(value = "Authorization", required = false) String authString,
             @RequestBody MatchingRequest matchingRequest,
             @RequestHeader("Transaction-ID") String transactionId
     ) {
@@ -82,7 +81,7 @@ public class MatchingControllerV1 {
     @SecurityRequirement(name = "Authorization")
     @GetMapping
     public List<UserMatching> matching(
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString
+            @RequestHeader(value = "Authorization", required = false) String authString
     ) {
         String token = JWTProvider.extractToken(authString);
         String user = JWTProvider.getUserFromToken(token);
