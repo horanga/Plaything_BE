@@ -4,6 +4,7 @@ import com.plaything.api.domain.index.model.response.IndexResponse;
 import com.plaything.api.domain.index.service.IndexServiceV1;
 import com.plaything.api.security.JWTProvider;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +24,7 @@ public class IndexController {
     @SecurityRequirement(name = "Authorization")
     @GetMapping
     public IndexResponse refreshIndex(
-            @RequestHeader(value = "Authorization", required = false) String authString
+            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString
     ) {
 
         //TODO 웹소켓 연결 끊겼을 때로 변경

@@ -5,6 +5,7 @@ import com.plaything.api.domain.chat.model.response.ChatRoomResponse;
 import com.plaything.api.domain.chat.service.ChatFacadeV1;
 import com.plaything.api.security.JWTProvider;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +30,7 @@ public class ChatControllerV1 {
     )
     @GetMapping("/chat-rooms")
     public List<ChatRoomResponse> chatRoom(
-            @RequestHeader(value = "Authorization", required = false) String authString,
+            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString,
             @RequestParam(value = "lastId", required = false) Long lastChatRoomId
 
     ) {
@@ -44,7 +45,7 @@ public class ChatControllerV1 {
                     채팅방에서 이전 채팅 내역 10개를 가져옵니다.
                     lastChatId는 현재 갖고 있는 채팅 메시지 id중 가장 작은 걸 보냅니다.
                     가장 최근 채팅 목록을 가져올 땐 lastChatId를 null로 보냅니다.
-                                        
+                    
                     #예외#
                     (1) 상대방이 나갔을 때 api를 호출하면 '상대방이 나갔다'는 예외
                     (2) 종료된 채팅방은 '이미 종료된 채팅방'라는 예외
@@ -53,7 +54,7 @@ public class ChatControllerV1 {
     )
     @GetMapping("/chat-list/{chatRoomId}")
     public ChatList chatList(
-            @RequestHeader(value = "Authorization", required = false) String authString,
+            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString,
             @PathVariable("chatRoomId") Long chatRoomId,
             @RequestParam(value = "lastChatId", required = false) Long lastChatId
 
@@ -72,7 +73,7 @@ public class ChatControllerV1 {
     )
     @PutMapping("/leave-chatroom/{id}")
     public void leaveChatRoom(
-            @RequestHeader(value = "Authorization", required = false) String authString,
+            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString,
             @PathVariable("id") Long id
 
     ) {
