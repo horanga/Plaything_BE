@@ -13,7 +13,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOriginPatterns("http://localhost:*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowedHeaders("*")
-                .allowCredentials(true) // 자격 증명 허용
-                .maxAge(3600); // preflight 요청 캐시 시간
+                .allowCredentials(true)
+                .maxAge(3600);
     }
 }
