@@ -34,8 +34,6 @@ public class SwaggerConfig {
                 .bearerFormat("JWT")
                 .in(SecurityScheme.In.HEADER)
                 .name("Authorization");
-
-        // Security Requirement 정의
         SecurityRequirement securityRequirement = new SecurityRequirement().addList("Authorization");
 
         return new OpenAPI()
