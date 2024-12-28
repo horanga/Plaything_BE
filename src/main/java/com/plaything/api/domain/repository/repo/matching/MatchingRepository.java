@@ -14,8 +14,14 @@ public interface MatchingRepository extends JpaRepository<Matching, Long> {
             WHERE (m.senderLoginId =:loginId OR m.receiverLoginId =:loginId)
             AND (m.isMatched = true AND m.isOvered = false)
             """)
-    List<Matching> findSuccessAndNotOveMatching(@Param("loginId") String loginId);
+    List<Matching> findSuccessAndNotOverMatching(@Param("loginId") String loginId);
 
+    @Query("""
+            SELECT m FROM Matching m
+            WHERE (m.senderLoginId =:loginId OR m.receiverLoginId =:loginId)
+            AND m.isMatched =false
+            """)
+    List<Matching> findMatchingCandidate(@Param("loginId") String loginId);
 
     Optional<Matching> findBySenderLoginIdAndReceiverLoginId(String senderLoginId, String receiverLoginId);
 
