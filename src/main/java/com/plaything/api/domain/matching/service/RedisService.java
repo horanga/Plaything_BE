@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -13,6 +14,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import static com.plaything.api.common.validator.DuplicateRequestChecker.SIMPLE_CIRCUIT_BREAKER_CONIFG;
@@ -25,12 +28,14 @@ public class RedisService {
 
     private final RedisTemplate<String, String> redisTemplate;
     private final MatchingServiceV1 matchingServiceV1;
+    private final Map<String, int[]> viewCountMap = new ConcurrentHashMap<>();
 
-    @CircuitBreaker(name = SIMPLE_CIRCUIT_BREAKER_CONIFG, fallbackMethod = "searchFallback")
-    public List<UserMatching> searchMatchingPartner(String loginId, int duration, TimeUnit timeUnit) {
+    @CircuitBreaker(name = SIMPLE_CIRCUIT_BREAKER_CONIFG, fallbackMethod = "findMatchingCandidatesFallback")
+    public List<UserMatching> findMatchingCandidates(String loginId, int duration, TimeUnit timeUnit) {
         String candidateKey = loginId + MATCHING_CANDIDATE_REDIS_KEY;
         String matchingKey = loginId + MATCHING_LIST_REDIS_KEY;
         String profileKey = loginId + LAST_PROFILE_ID_REDIS_KEY;
+        String countKey = loginId + COUNT_REDIS_KEY;
 
         List<Object> results = redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
             connection.keyCommands().exists(candidateKey.getBytes());
@@ -38,7 +43,7 @@ public class RedisService {
             connection.listCommands().lRange(candidateKey.getBytes(), 0, -1);
             connection.listCommands().lRange(matchingKey.getBytes(), 0, -1);
             connection.stringCommands().get(profileKey.getBytes());
-
+            connection.stringCommands().get(countKey.getBytes());
             return null;
         });
 
@@ -47,6 +52,7 @@ public class RedisService {
         List<String> candidateList = (List<String>) results.get(2);
         List<String> matchingList = (List<String>) results.get(3);
         String lastProfileId = (String) results.get(4);
+        String count = (String) results.get(5);
 
         return getUserMatchingInfo(loginId,
                 hasMatching,
@@ -54,15 +60,45 @@ public class RedisService {
                 candidateList,
                 matchingList,
                 lastProfileId,
+                count,
                 duration,
                 timeUnit);
     }
 
-    public List<UserMatching> searchFallback(String loginId, int duration, TimeUnit timeUnit, Exception ex) {
+    public List<UserMatching> findMatchingCandidatesFallback(String loginId, int duration, TimeUnit timeUnit, Exception ex) {
         logError(ex);
-        List<String> matchingCandidate = matchingServiceV1.getMatchingCandidate(loginId);
-        List<String> matchingPartner = matchingServiceV1.getMatchingPartner(loginId);
-        return matchingServiceV1.searchPartner(loginId, matchingCandidate, matchingPartner, 0);
+        List<String> candidates = matchingServiceV1.getMatchingCandidate(loginId);
+        List<String> partners = matchingServiceV1.getMatchingPartner(loginId);
+
+        if (!viewCountMap.containsKey(loginId)) {
+            return matchingServiceV1.searchPartner(loginId, candidates, partners, 0);
+        }
+        int[] counts = viewCountMap.get(loginId);
+        List<String> availableCandidate = getAvailableCandidates(candidates, counts[0] / MAX_SKIP_COUNT);
+        return matchingServiceV1.searchPartner(loginId, availableCandidate, partners, counts[1]);
+    }
+
+
+    @CircuitBreaker(name = SIMPLE_CIRCUIT_BREAKER_CONIFG, fallbackMethod = "handleViewCountError")
+    public void updateViewCount(String loginId, Long profileId, int countDuration, int profileIdDuration, TimeUnit timeUnit) {
+        String countKey = loginId + COUNT_REDIS_KEY;
+        String profileKey = loginId + LAST_PROFILE_ID_REDIS_KEY;
+
+        redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
+            connection.stringCommands().incr(countKey.getBytes());
+            connection.keyCommands().expire(countKey.getBytes(), timeUnit.toSeconds(countDuration));
+            connection.stringCommands().setEx(profileKey.getBytes(),
+                    timeUnit.toSeconds(profileIdDuration),
+                    String.valueOf(profileId).getBytes());
+            return null;
+        });
+    }
+
+    public void handleViewCountError(String loginId, Long profileId, int countDuration, int profileIdDuration, TimeUnit timeUnit, Exception ex) {
+        logError(ex);
+        int[] count = viewCountMap.computeIfAbsent(loginId, k -> new int[]{0, 0});
+        count[0]++; //count
+        count[1]++; //profileId
     }
 
     private List<UserMatching> getUserMatchingInfo(
@@ -72,11 +108,13 @@ public class RedisService {
             List<String> candidateList,
             List<String> matchingList,
             String lastProfileId,
+            String count,
             int duration,
             TimeUnit timeUnit) {
 
+
         if (!hasMatching || !hasCandidates) {
-            return findFromDBAndSetCache(
+            return refreshCacheFromDB(
                     hasCandidates,
                     hasMatching,
                     candidateList,
@@ -84,19 +122,28 @@ public class RedisService {
                     lastProfileId,
                     loginId,
                     duration,
-                    timeUnit);
+                    timeUnit,
+                    count);
         }
+
+        List<String> candidates = getAvailableCandidates(candidateList, count == null ? 0 : Integer.parseInt(count) / MAX_SKIP_COUNT);
 
         return matchingServiceV1.searchPartner(
                 loginId,
-                candidateList,
+                candidates,
                 matchingList,
                 lastProfileId != null ? Long.parseLong(lastProfileId) : 0L
         );
     }
 
+    private List<String> getAvailableCandidates(List<String> candidateList, int skipTimes) {
+        if (skipTimes > candidateList.size()) {
+            return Collections.emptyList();
+        }
+        return candidateList.subList(skipTimes, candidateList.size());
+    }
 
-    private List<UserMatching> findFromDBAndSetCache(
+    private List<UserMatching> refreshCacheFromDB(
             boolean candidateExist,
             boolean matchingExist,
             List<String> candidateList,
@@ -104,26 +151,28 @@ public class RedisService {
             String lastProfileId,
             String loginId,
             int duration,
-            TimeUnit timeUnit) {
+            TimeUnit timeUnit, String count) {
 
         if (!candidateExist) {
             candidateList = matchingServiceV1.getMatchingCandidate(loginId);
-            cacheList(loginId + MATCHING_CANDIDATE_REDIS_KEY, candidateList, duration, timeUnit);
+            cacheListWithExpiry(loginId + MATCHING_CANDIDATE_REDIS_KEY, candidateList, duration, timeUnit);
         }
 
         if (!matchingExist) {
             matchingList = matchingServiceV1.getMatchingPartner(loginId);
-            cacheList(loginId + MATCHING_LIST_REDIS_KEY, matchingList, duration, timeUnit);
+            cacheListWithExpiry(loginId + MATCHING_LIST_REDIS_KEY, matchingList, duration, timeUnit);
         }
+
+        List<String> candidates = getAvailableCandidates(candidateList, count == null ? 0 : Integer.parseInt(count) / MAX_SKIP_COUNT);
 
         return matchingServiceV1.searchPartner(
                 loginId,
-                candidateList,
+                candidates,
                 matchingList,
                 lastProfileId != null ? Long.parseLong(lastProfileId) : 0L);
     }
 
-    private void cacheList(String key, List<String> values, int duration, TimeUnit timeUnit) {
+    private void cacheListWithExpiry(String key, List<String> values, int duration, TimeUnit timeUnit) {
         if (values.isEmpty()) {
             redisTemplate.opsForList().rightPushAll(key, List.of(KEYWORD_DUMMY_CACHE));
             redisTemplate.expire(key, duration, timeUnit);
@@ -133,24 +182,16 @@ public class RedisService {
         }
     }
 
-    @CircuitBreaker(name = SIMPLE_CIRCUIT_BREAKER_CONIFG, fallbackMethod = "redisError")
-    public void incrementSkipCount(String key, Long profileId, int countDuration, int profileIdDuration, TimeUnit timeUnit) {
-        String countKey = key + COUNT_REDIS_KEY;
-        redisTemplate.opsForValue().increment(countKey);
-        String profileKey = key + LAST_PROFILE_ID_REDIS_KEY;
-        redisTemplate.expire(countKey, countDuration, timeUnit);
 
-        redisTemplate.opsForValue().set(profileKey, String.valueOf(profileId), profileIdDuration, timeUnit);
+    private void logError(Exception ex) {
+        log.error("Redis check failed, using DB fallback. Exception type: {}, Message: {}",
+                ex.getClass().getName(), ex.getMessage());
     }
 
-    public void redisError(String key, Long profileId, int countDuration, int profileIdDuration, TimeUnit timeUnit, Exception ex) {
-        logError(ex);
-    }
-
-    public long getCount(String loginId) {
-        String key = loginId + COUNT_REDIS_KEY;
-        String value = redisTemplate.opsForValue().get(key);
-        return value != null ? Long.parseLong(value) : 0L;
+    @Scheduled(cron = "0 0 4 * * *")
+    public void cleanupViewCountMap() {
+        viewCountMap.clear();
+        log.info("View count map cleared");
     }
 
 
@@ -191,10 +232,5 @@ public class RedisService {
         // loginId:등록날짜 형태로 저장
         String value = loginId + ":" + now.toString();
         redisTemplate.opsForList().rightPush(redisKey, value);
-    }
-
-    private void logError(Exception ex) {
-        log.error("Redis check failed, using DB fallback. Exception type: {}, Message: {}",
-                ex.getClass().getName(), ex.getMessage());
     }
 }

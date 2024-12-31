@@ -77,6 +77,18 @@ public class UserGenerator {
         profileFacadeV1.registerProfile(profileRegistration, loginId);
     }
 
+    public void generateWithRoles(String loginId, String password, String fckToken, String nickName, PrimaryRole primaryRole, List<PersonalityTraitConstant> personalityTraitConstant) {
+
+        CreateUserRequest request = new CreateUserRequest(loginId, password, fckToken);
+        authServiceV1.creatUser(request);
+
+        LocalDate now = LocalDate.now();
+        ProfileRegistration profileRegistration = new ProfileRegistration(
+                nickName, "hi", M, primaryRole, personalityTraitConstant, personalityTraitConstant.get(0), List.of(RelationshipPreferenceConstant.DATE_DS), now);
+
+        profileFacadeV1.registerProfile(profileRegistration, loginId);
+    }
+
     public void addImages(String nickName, String fileName) {
         Profile byNickName = profileRepository.findByNickName(nickName);
         byNickName.addProfileImages(List.of(ProfileImage.builder().profile(byNickName).fileName(fileName).isMainPhoto(true).build()));
@@ -87,7 +99,7 @@ public class UserGenerator {
         LoginRequest loginRequest = new LoginRequest(loginId, password);
         authServiceV1.login(loginRequest, now, String.valueOf(UUID.randomUUID()));
         MatchingRequest matchingRequest = new MatchingRequest(partnerLoginId);
-        matchingFacadeV1.createMatching(loginId, matchingRequest, String.valueOf(UUID.randomUUID()));
+        matchingFacadeV1.sendMatchingRequest(loginId, matchingRequest, String.valueOf(UUID.randomUUID()));
     }
 
     public void createMatching(String loginId, String password, String loginId2, String password2) {
@@ -98,7 +110,7 @@ public class UserGenerator {
         LoginRequest loginRequest2 = new LoginRequest(loginId2, password2);
         authServiceV1.login(loginRequest2, now, String.valueOf(UUID.randomUUID()));
         MatchingRequest matchingRequest = new MatchingRequest(loginId2);
-        matchingFacadeV1.createMatching(loginId, matchingRequest, String.valueOf(UUID.randomUUID()));
-        matchingFacadeV1.acceptMatching(loginId2, new MatchingRequest(loginId), String.valueOf(UUID.randomUUID()));
+        matchingFacadeV1.sendMatchingRequest(loginId, matchingRequest, String.valueOf(UUID.randomUUID()));
+        matchingFacadeV1.acceptMatchingRequest(loginId2, new MatchingRequest(loginId), String.valueOf(UUID.randomUUID()));
     }
 }

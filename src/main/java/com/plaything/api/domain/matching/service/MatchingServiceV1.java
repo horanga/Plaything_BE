@@ -53,8 +53,7 @@ public class MatchingServiceV1 {
         if (profile.isSwitch() || profile.isETC()) {
             MatchRequestForOthers matchRequest
                     = MatchRequestForOthers.from(profile.getPrimaryRole(), lastId, profile.getNickName());
-            List<Profile> profiles = profileQueryRepository.searchUser(matchRequest, matchingCandidates, matchingList);
-
+            List<Profile> profiles = profileQueryRepository.searchUserForOthers(matchRequest, matchingCandidates, matchingList);
             return getUserMatchingInfo(profiles);
 
         }

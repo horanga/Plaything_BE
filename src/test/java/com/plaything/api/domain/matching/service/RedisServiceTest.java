@@ -58,7 +58,7 @@ class RedisServiceTest {
 
         userGenerator.requestMatching("fnel1", "1234", "fnel2");
 
-        List<UserMatching> matchingCandidate2 = matchingFacadeV1.searchMatchingPartner("fnel1", CACHE_DURATION_DAY, CACHE_DURATION_UNIT_DAYS);
+        List<UserMatching> matchingCandidate2 = matchingFacadeV1.findMatchingCandidates("fnel1", CACHE_DURATION_DAY, CACHE_DURATION_UNIT_DAYS);
         assertThat(matchingCandidate2).extracting("loginId").containsExactly("fnel3", "fnel4");
 
         Boolean hasKey = redisTemplate.hasKey("fnel1" + MATCHING_CANDIDATE_REDIS_KEY);
@@ -78,7 +78,7 @@ class RedisServiceTest {
     void test2() {
 
         userGenerator.createMatching("fnel1", "1234", "fnel2", "1234");
-        List<UserMatching> list = matchingFacadeV1.searchMatchingPartner("fnel1", CACHE_DURATION_DAY, CACHE_DURATION_UNIT_DAYS);
+        List<UserMatching> list = matchingFacadeV1.findMatchingCandidates("fnel1", CACHE_DURATION_DAY, CACHE_DURATION_UNIT_DAYS);
         assertThat(list).extracting("loginId").containsExactly("fnel3", "fnel4");
 
         Boolean hasKey = redisTemplate.hasKey("fnel1" + MATCHING_CANDIDATE_REDIS_KEY);
@@ -101,7 +101,7 @@ class RedisServiceTest {
         assertThat(hasKey1).isFalse();
         assertThat(hasKey2).isFalse();
 
-        matchingFacadeV1.searchMatchingPartner("fnel1", CACHE_DURATION_DAY, CACHE_DURATION_UNIT_DAYS);
+        matchingFacadeV1.findMatchingCandidates("fnel1", CACHE_DURATION_DAY, CACHE_DURATION_UNIT_DAYS);
         Boolean hasKey3 = redisTemplate.hasKey("fnel1" + MATCHING_CANDIDATE_REDIS_KEY);
         Boolean hasKey4 = redisTemplate.hasKey("fnel1" + MATCHING_LIST_REDIS_KEY);
         assertThat(hasKey3).isTrue();
@@ -122,7 +122,7 @@ class RedisServiceTest {
         userGenerator.requestMatching("fnel1", "1234", "fnel3");
 
 
-        List<UserMatching> matchingCandidate2 = matchingFacadeV1.searchMatchingPartner("fnel1", CACHE_DURATION_DAY, TimeUnit.SECONDS);
+        List<UserMatching> matchingCandidate2 = matchingFacadeV1.findMatchingCandidates("fnel1", CACHE_DURATION_DAY, TimeUnit.SECONDS);
         assertThat(matchingCandidate2).extracting("loginId").containsExactly("fnel4");
 
         Boolean hasKey = redisTemplate.hasKey("fnel1" + MATCHING_CANDIDATE_REDIS_KEY);
@@ -154,7 +154,7 @@ class RedisServiceTest {
         userGenerator.createMatching("fnel1", "1234", "fnel5", "1234");
 
 
-        List<UserMatching> matchingCandidate2 = matchingFacadeV1.searchMatchingPartner("fnel1", CACHE_DURATION_DAY, CACHE_DURATION_UNIT_DAYS);
+        List<UserMatching> matchingCandidate2 = matchingFacadeV1.findMatchingCandidates("fnel1", CACHE_DURATION_DAY, CACHE_DURATION_UNIT_DAYS);
         assertThat(matchingCandidate2).extracting("loginId").containsExactly("fnel6", "fnel7", "fnel8");
 
         List<String> cachedList = redisTemplate.opsForList().range("fnel1" + MATCHING_CANDIDATE_REDIS_KEY, 0, -1);
@@ -174,10 +174,10 @@ class RedisServiceTest {
         Boolean hasKey2 = redisTemplate.hasKey("fnel1" + MATCHING_LIST_REDIS_KEY);
         assertThat(hasKey2).isFalse();
 
-        List<UserMatching> matchingCandidate2 = matchingFacadeV1.searchMatchingPartner("fnel1", CACHE_DURATION_DAY, CACHE_DURATION_UNIT_DAYS);
+        List<UserMatching> matchingCandidate2 = matchingFacadeV1.findMatchingCandidates("fnel1", CACHE_DURATION_DAY, CACHE_DURATION_UNIT_DAYS);
         assertThat(matchingCandidate2).extracting("loginId").containsExactly("fnel2", "fnel3", "fnel4");
 
-        List<UserMatching> matchingCandidate3 = matchingFacadeV1.searchMatchingPartner("fnel1", CACHE_DURATION_DAY, CACHE_DURATION_UNIT_DAYS);
+        List<UserMatching> matchingCandidate3 = matchingFacadeV1.findMatchingCandidates("fnel1", CACHE_DURATION_DAY, CACHE_DURATION_UNIT_DAYS);
 
         List<String> cachedList = redisTemplate.opsForList().range("fnel1" + MATCHING_CANDIDATE_REDIS_KEY, 0, -1);
         assertThat(cachedList).containsExactly(KEYWORD_DUMMY_CACHE);
@@ -186,6 +186,45 @@ class RedisServiceTest {
         assertThat(cachedList2).containsExactly(KEYWORD_DUMMY_CACHE);
     }
 
-    //TODO LastId 이후로 매칭 조회+Count관련 로직
 
+    @DisplayName("매칭 가능 프로필을 스킵할 때마다 count와 lastProfileId가 레디스에 저장된다.")
+    @Test
+    void test7() {
+        matchingFacadeV1.updateLastViewedProfile("fnel1", 1L, EXPIRATION_DATE_SKIP_COUNT, EXPIRATION_DATE_PROFILE_ID, CACHE_DURATION_UNIT_HOUR);
+
+        String count = redisTemplate.opsForValue().get("fnel1" + COUNT_REDIS_KEY);
+        String profile = redisTemplate.opsForValue().get("fnel1" + LAST_PROFILE_ID_REDIS_KEY);
+
+        assertThat(Integer.parseInt(count)).isEqualTo(1);
+        assertThat(Integer.parseInt(profile)).isEqualTo(1);
+
+        matchingFacadeV1.updateLastViewedProfile("fnel1", 2L, EXPIRATION_DATE_SKIP_COUNT, EXPIRATION_DATE_PROFILE_ID, CACHE_DURATION_UNIT_HOUR);
+        matchingFacadeV1.updateLastViewedProfile("fnel1", 3L, EXPIRATION_DATE_SKIP_COUNT, EXPIRATION_DATE_PROFILE_ID, CACHE_DURATION_UNIT_HOUR);
+
+
+        String count2 = redisTemplate.opsForValue().get("fnel1" + COUNT_REDIS_KEY);
+        String profile2 = redisTemplate.opsForValue().get("fnel1" + LAST_PROFILE_ID_REDIS_KEY);
+
+        assertThat(Integer.parseInt(count2)).isEqualTo(3);
+        assertThat(Integer.parseInt(profile2)).isEqualTo(3);
+    }
+
+    @DisplayName("매칭 가능 프로필을 스킵할 시 저장되는 캐시는 지정된 시간만큼만 저장된다.")
+    @Test
+    void test8() throws InterruptedException {
+        matchingFacadeV1.updateLastViewedProfile("fnel1", 1L, 2, 2, TimeUnit.SECONDS);
+
+        String count = redisTemplate.opsForValue().get("fnel1" + COUNT_REDIS_KEY);
+        String profile = redisTemplate.opsForValue().get("fnel1" + LAST_PROFILE_ID_REDIS_KEY);
+
+        assertThat(Integer.parseInt(count)).isEqualTo(1);
+        assertThat(Integer.parseInt(profile)).isEqualTo(1);
+
+        Thread.sleep(3000);
+
+        String count2 = redisTemplate.opsForValue().get("fnel1" + COUNT_REDIS_KEY);
+        String profile2 = redisTemplate.opsForValue().get("fnel1" + LAST_PROFILE_ID_REDIS_KEY);
+        assertThat(count2).isNull();
+        assertThat(profile2).isNull();
+    }
 }
