@@ -12,11 +12,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.plaything.api.domain.matching.constants.MatchingConstants.CACHE_DURATION_DAY;
-import static com.plaything.api.domain.matching.constants.MatchingConstants.CACHE_DURATION_UNIT_DAYS;
+import static com.plaything.api.domain.matching.constants.MatchingConstants.*;
 
 @Tag(name = "Matching API", description = "V1 Matching API")
 @RestController
@@ -57,7 +55,7 @@ public class MatchingControllerV1 {
     ) {
         String token = JWTProvider.extractToken(authString);
         String user = JWTProvider.getUserFromToken(token);
-        matchingFacadeV1.createMatching(user, matchingRequest, transactionId);
+        matchingFacadeV1.sendMatchingRequest(user, matchingRequest, transactionId);
     }
 
     @Operation(
@@ -95,7 +93,7 @@ public class MatchingControllerV1 {
     ) {
         String token = JWTProvider.extractToken(authString);
         String user = JWTProvider.getUserFromToken(token);
-        matchingFacadeV1.acceptMatching(user, matchingRequest, transactionId);
+        matchingFacadeV1.acceptMatchingRequest(user, matchingRequest, transactionId);
     }
 
     @Operation(
@@ -118,7 +116,7 @@ public class MatchingControllerV1 {
     ) {
         String token = JWTProvider.extractToken(authString);
         String user = JWTProvider.getUserFromToken(token);
-        return matchingFacadeV1.searchMatchingPartner(user, CACHE_DURATION_DAY, CACHE_DURATION_UNIT_DAYS);
+        return matchingFacadeV1.findMatchingCandidates(user, CACHE_DURATION_DAY, CACHE_DURATION_UNIT_DAYS);
     }
 
     @Operation(
@@ -141,7 +139,12 @@ public class MatchingControllerV1 {
     ) {
         String token = JWTProvider.extractToken(authString);
         String user = JWTProvider.getUserFromToken(token);
-        matchingFacadeV1.countLastProfileId(user, lastProfileId, LocalDateTime.now());
+        matchingFacadeV1.updateLastViewedProfile(
+                user,
+                lastProfileId,
+                EXPIRATION_DATE_SKIP_COUNT,
+                EXPIRATION_DATE_PROFILE_ID,
+                CACHE_DURATION_UNIT_DAYS);
     }
 
     //TODO 블랙리스트 기능 넣기
