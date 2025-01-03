@@ -28,8 +28,7 @@ public class ProfileQueryRepository {
 
         BooleanBuilder booleanBuilder = getBooleanBuilder(candidateIds, matchingList);
 
-
-        return jpaQueryFactory
+        List<Profile> list = jpaQueryFactory
                 .selectFrom(profile)
                 .innerJoin(profile.personalityTrait, personalityTrait)
                 .innerJoin(profile.relationshipPreference, relationshipPreference1)
@@ -39,17 +38,27 @@ public class ProfileQueryRepository {
                         .and(personalityTrait.isPrimaryTrait.isTrue()).and(profile.isPrivate.isFalse())
                         .and(profile.primaryRole.eq(request.primaryRole().getOpposite()))
                         .and(profile.isBaned.isFalse().and(profile.nickName.ne(request.userName())))
+                        .and(profile.id.gt(request.lastId()))
                         .and(booleanBuilder)
                 )
 
                 .limit(LIMIT_OF_PARTNER)
                 .fetch();
+
+        //재귀함수 무한 반복을 막기 위한 조건 설정 lastId>0
+        if (list.isEmpty() && request.lastId() > 0) {
+            MatchRequest newRequest = new MatchRequest(request.primaryRole(), request.personalityTraitConstant(), 0, request.userName());
+            return searchUser(newRequest, candidateIds, matchingList);
+
+        }
+
+        return list;
     }
 
-    public List<Profile> searchUser(MatchRequestForOthers request, List<String> loginIds, List<String> matchingList) {
-        BooleanBuilder booleanBuilder = getBooleanBuilder(loginIds, matchingList);
+    public List<Profile> searchUserForOthers(MatchRequestForOthers request, List<String> candidateIds, List<String> matchingList) {
+        BooleanBuilder booleanBuilder = getBooleanBuilder(candidateIds, matchingList);
 
-        return jpaQueryFactory
+        List<Profile> list = jpaQueryFactory
                 .selectFrom(profile)
                 .innerJoin(profile.personalityTrait, personalityTrait)
                 .innerJoin(profile.relationshipPreference, relationshipPreference1)
@@ -58,11 +67,18 @@ public class ProfileQueryRepository {
                 .where(profile.primaryRole.eq(request.primaryRole())
                         .and(profile.isBaned.isFalse().and(profile.nickName.ne(request.userName()))
                                 .and(profile.isPrivate.isFalse()))
+                        .and(profile.id.gt(request.lastId()))
                         .and(booleanBuilder))
                 .limit(LIMIT_OF_PARTNER)
                 .fetch();
-    }
 
+        if (list.isEmpty() && request.lastId() > 0) {
+            MatchRequestForOthers matchRequestForOthers = new MatchRequestForOthers(request.primaryRole(), 0, request.userName());
+            return searchUserForOthers(matchRequestForOthers, candidateIds, matchingList);
+
+        }
+        return list;
+    }
 
     private BooleanBuilder getBooleanBuilder(List<String> loginIds, List<String> matchingList) {
         BooleanBuilder booleanBuilder = new BooleanBuilder();
