@@ -8,11 +8,14 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceConnection;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
+import java.util.List;
 
 @Configuration
 public class RedisConfig {
@@ -30,12 +33,14 @@ public class RedisConfig {
                         .autoReconnect(true)
                         .build())
                 .commandTimeout(Duration.ofSeconds(5))
-                .useSsl()
                 .build();
 
         RedisStandaloneConfiguration serverConfig = new RedisStandaloneConfiguration(host, port);
 
-        return new LettuceConnectionFactory(serverConfig, clientConfig);
+        LettuceConnectionFactory factory = new LettuceConnectionFactory(serverConfig, clientConfig);
+        factory.setPipeliningFlushPolicy(LettuceConnection.PipeliningFlushPolicy.buffered(1000));
+
+        return factory;
     }
 
     @Bean
@@ -46,7 +51,17 @@ public class RedisConfig {
 
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new StringRedisSerializer());
+        redisTemplate.setEnableTransactionSupport(false);
 
         return redisTemplate;
+    }
+
+    @Bean
+    public RedisTemplate<String, List<String>> listRedisTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, List<String>> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(List.class));
+        return template;
     }
 }
