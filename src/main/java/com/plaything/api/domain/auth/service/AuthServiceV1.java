@@ -79,14 +79,14 @@ public class AuthServiceV1 {
     @Transactional
     public CreateUserResponse creatUser(CreateUserRequest request) {
 
-        Optional<User> user = userRepository.findByLoginId(request.name());
+        Optional<User> user = userRepository.findByLoginId(request.loginId());
 
         if (user.isPresent()) {
             throw new CustomException(ErrorCode.USER_ALREADY_EXISTS);
         }
 
         try {
-            User newUser = this.newUser(request.name(), request.fcmToken());
+            User newUser = this.newUser(request.loginId(), request.fcmToken());
             UserCredentials newCredentials = this.newUserCredentials(request.password(), newUser);
             newUser.setCredentials(newCredentials);
 
