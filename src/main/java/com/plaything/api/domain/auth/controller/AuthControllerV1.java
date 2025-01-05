@@ -43,15 +43,5 @@ public class AuthControllerV1 {
     ) {
         return authServiceV1.login(loginRequest, LocalDate.now(), transactionId);
     }
-
-    @Operation(
-            summary = "get user loginId",
-            description = "token을 기반으로 user를 가져옵니다."
-    )
-    @GetMapping("/verify-token/{token}")
-    public String getUserFromToken(
-            @PathVariable("token") String token) {
-        return authServiceV1.getUserFromToken(token);
-    }
 }
 
