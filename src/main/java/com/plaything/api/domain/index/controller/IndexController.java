@@ -19,7 +19,7 @@ public class IndexController {
 
     @Operation(
             summary = "새로운 메시지 여부를 확인",
-            description = "새로운 메시지가 있는지 확인하는 refresh Index API"
+            description = "새로운 메시지가 있는지 확인하는 용도입니다"
     )
     @SecurityRequirement(name = "Authorization")
     @GetMapping
