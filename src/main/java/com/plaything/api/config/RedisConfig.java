@@ -1,6 +1,7 @@
 package com.plaything.api.config;
 
 import io.lettuce.core.ClientOptions;
+import io.lettuce.core.SocketOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,10 +28,16 @@ public class RedisConfig {
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
+
+        SocketOptions socketOptions = SocketOptions.builder()
+                .connectTimeout(Duration.ofSeconds(10))
+                .build();
+
         LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
                 .clientOptions(ClientOptions.builder()
                         .disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS)
                         .autoReconnect(true)
+                        .socketOptions(socketOptions)
                         .build())
                 .commandTimeout(Duration.ofSeconds(5))
                 .useSsl()
