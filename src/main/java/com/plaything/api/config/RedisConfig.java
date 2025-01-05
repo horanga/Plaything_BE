@@ -33,6 +33,7 @@ public class RedisConfig {
                         .autoReconnect(true)
                         .build())
                 .commandTimeout(Duration.ofSeconds(5))
+                .useSsl()
                 .build();
 
         RedisStandaloneConfiguration serverConfig = new RedisStandaloneConfiguration(host, port);
