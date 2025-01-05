@@ -1,21 +1,14 @@
 package com.plaything.api.common.validator;
 
 import com.plaything.api.common.exception.CustomException;
-import com.plaything.api.domain.auth.model.request.CreateUserRequest;
-import com.plaything.api.domain.auth.service.AuthServiceV1;
-import com.plaything.api.domain.image.service.model.SavedImage;
 import com.plaything.api.domain.key.model.request.AdRewardRequest;
 import com.plaything.api.domain.key.model.request.MatchingRequest;
 import com.plaything.api.domain.key.service.PointKeyFacadeV1;
 import com.plaything.api.domain.matching.service.MatchingFacadeV1;
 import com.plaything.api.domain.repository.entity.user.User;
-import com.plaything.api.domain.repository.entity.user.profile.Profile;
 import com.plaything.api.domain.repository.repo.pay.PointKeyRepository;
 import com.plaything.api.domain.repository.repo.user.UserRepository;
-import com.plaything.api.domain.user.constants.RelationshipPreferenceConstant;
-import com.plaything.api.domain.user.model.request.ProfileRegistration;
-import com.plaything.api.domain.user.service.ProfileFacadeV1;
-import com.plaything.api.domain.user.service.ProfileImageServiceV1;
+import com.plaything.api.util.UserGenerator;
 import io.lettuce.core.RedisCommandTimeoutException;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,13 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import static com.plaything.api.domain.user.constants.Gender.M;
-import static com.plaything.api.domain.user.constants.PersonalityTraitConstant.HUNTER;
-import static com.plaything.api.domain.user.constants.PrimaryRole.TOP;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
@@ -59,22 +48,16 @@ class DuplicateRequestCheckerTest {
     private PointKeyFacadeV1 pointKeyFacadeV1;
 
     @Autowired
-    private AuthServiceV1 authServiceV1;
-
-    @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private ProfileFacadeV1 profileFacadeV1;
-
-    @Autowired
-    private ProfileImageServiceV1 profileImageServiceV1;
 
     @Autowired
     private EntityManager em;
 
     @Autowired
     private MatchingFacadeV1 matchingFacadeV1;
+
+    @Autowired
+    private UserGenerator userGenerator;
 
 
     @BeforeEach
@@ -86,11 +69,12 @@ class DuplicateRequestCheckerTest {
             mockRedis.delete(keys);
         }
 
-        CreateUserRequest request = new CreateUserRequest("dusgh1234", "1234", "1");
-        authServiceV1.creatUser(request);
 
-        CreateUserRequest request2 = new CreateUserRequest("dusgh12345", "1234", "1");
-        authServiceV1.creatUser(request2);
+        userGenerator.generate("dusgh1234", "1234", "1", "연호");
+        userGenerator.addImages("연호", "ㅇㅇ");
+
+        userGenerator.generate("dusgh12345", "1234", "1", "연호2");
+        userGenerator.addImages("연호2", "ㅇㅇ");
     }
 
 
@@ -116,7 +100,7 @@ class DuplicateRequestCheckerTest {
         pointKeyFacadeV1.createPointKeyForAd("dusgh1234", adRewardRequest, LocalDateTime.now(), transactionId);
 
         assertThatThrownBy(() -> pointKeyFacadeV1.createPointKeyForAd("dusgh1234", adRewardRequest, LocalDateTime.now(), transactionId))
-                .isInstanceOf(CustomException.class).hasMessage("TRANSACTION ALREADY PROCESSED");
+                .isInstanceOf(CustomException.class).hasMessage("이미 처리된 요청입니다");
 
         verify(pointKeyRepository, times(2)).existsByTransactionId(transactionId);
         verify(duplicateRequestChecker, times(2)).fallback(
@@ -143,7 +127,7 @@ class DuplicateRequestCheckerTest {
 
 
         assertThatThrownBy(() -> pointKeyFacadeV1.createPointKeyForLogin(user, transactionId, LocalDate.now()))
-                .isInstanceOf(CustomException.class).hasMessage("TRANSACTION ALREADY PROCESSED");
+                .isInstanceOf(CustomException.class).hasMessage("이미 처리된 요청입니다");
 
         verify(pointKeyRepository, times(2)).existsByTransactionId(transactionId);
         verify(duplicateRequestChecker, times(2)).fallback(
@@ -165,27 +149,14 @@ class DuplicateRequestCheckerTest {
         AdRewardRequest request = new AdRewardRequest("광고1", 2);
         pointKeyFacadeV1.createPointKeyForAd("dusgh1234", request, LocalDateTime.now(), "1");
 
-        ProfileRegistration profileRegistration = new ProfileRegistration("연호1", "안녕", M, TOP, List.of(HUNTER), HUNTER, List.of(RelationshipPreferenceConstant.MARRIAGE_DS),
-                LocalDate.now());
-        profileFacadeV1.registerProfile(profileRegistration, "dusgh1234");
-        User user = userRepository.findByLoginId("dusgh1234").get();
-        Profile profile = user.getProfile();
-        List<SavedImage> savedImages = List.of(new SavedImage("a", "b"));
-
-        profileImageServiceV1.saveImages(savedImages, profile, 0L);
-
-        ProfileRegistration profileRegistration2 = new ProfileRegistration("연호", "안녕", M, TOP, List.of(HUNTER), HUNTER, List.of(RelationshipPreferenceConstant.MARRIAGE_DS),
-                LocalDate.now());
-        profileFacadeV1.registerProfile(profileRegistration2, "dusgh12345");
-
-        MatchingRequest matchingRequest = new MatchingRequest("연호");
+        MatchingRequest matchingRequest = new MatchingRequest("dusgh12345");
 
         em.flush();
         em.clear();
-        matchingFacadeV1.createMatching("dusgh1234", matchingRequest, transactionId);
+        matchingFacadeV1.sendMatchingRequest("dusgh1234", matchingRequest, transactionId);
 
-        assertThatThrownBy(() -> matchingFacadeV1.createMatching("dusgh1234", matchingRequest, transactionId))
-                .isInstanceOf(CustomException.class).hasMessage("TRANSACTION ALREADY PROCESSED");
+        assertThatThrownBy(() -> matchingFacadeV1.sendMatchingRequest("dusgh1234", matchingRequest, transactionId))
+                .isInstanceOf(CustomException.class).hasMessage("이미 처리된 요청입니다");
 
         verify(pointKeyRepository, times(2)).existsByTransactionId(transactionId);
         verify(duplicateRequestChecker, times(2)).fallback(

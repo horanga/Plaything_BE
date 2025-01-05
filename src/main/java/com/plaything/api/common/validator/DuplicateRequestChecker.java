@@ -1,7 +1,5 @@
 package com.plaything.api.common.validator;
 
-import com.plaything.api.common.exception.CustomException;
-import com.plaything.api.common.exception.ErrorCode;
 import com.plaything.api.domain.repository.repo.pay.PointKeyRepository;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +21,6 @@ public class DuplicateRequestChecker {
 
     @CircuitBreaker(name = SIMPLE_CIRCUIT_BREAKER_CONIFG, fallbackMethod = "fallback")
     public boolean checkDuplicateRequest(String userId, String transactionId) {
-
 
         return Boolean.TRUE.equals(redisTemplate.opsForValue()
                 .setIfAbsent(userId + ":" + transactionId, "success", 10, TimeUnit.SECONDS));

@@ -6,10 +6,10 @@ import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "User를 생성합니다.")
 public record CreateUserRequest(
-        @Schema(description = "유저 이름")
+        @Schema(description = "로그인 id")
         @NotBlank
         @NotNull
-        String name,
+        String loginId,
 
         @Schema(description = "유저 비밀번호")
         @NotBlank
