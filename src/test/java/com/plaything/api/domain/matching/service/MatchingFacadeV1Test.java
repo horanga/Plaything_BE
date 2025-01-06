@@ -1,10 +1,11 @@
 package com.plaything.api.domain.matching.service;
 
 import com.plaything.api.domain.matching.model.response.UserMatching;
+import com.plaything.api.domain.profile.service.ProfileFacadeV1;
 import com.plaything.api.domain.repository.entity.profile.Profile;
 import com.plaything.api.domain.repository.repo.profile.ProfileRepository;
-import com.plaything.api.domain.user.constants.PersonalityTraitConstant;
-import com.plaything.api.domain.user.constants.PrimaryRole;
+import com.plaything.api.domain.profile.constants.PersonalityTraitConstant;
+import com.plaything.api.domain.profile.constants.PrimaryRole;
 import com.plaything.api.util.UserGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,13 +15,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static com.plaything.api.domain.matching.constants.MatchingConstants.LAST_PROFILE_ID_REDIS_KEY;
-import static com.plaything.api.domain.user.constants.PersonalityTraitConstant.DEGRADEE;
-import static com.plaything.api.domain.user.constants.PersonalityTraitConstant.SERVANT;
+import static com.plaything.api.domain.profile.constants.PersonalityTraitConstant.DEGRADEE;
+import static com.plaything.api.domain.profile.constants.PersonalityTraitConstant.SERVANT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
@@ -38,6 +40,9 @@ class MatchingFacadeV1Test {
 
     @Autowired
     private ProfileRepository profileRepository;
+
+    @Autowired
+    private ProfileFacadeV1 profileFacadeV1;
 
     @BeforeEach
     void setUp() {
@@ -91,9 +96,35 @@ class MatchingFacadeV1Test {
         assertThat(list).extracting("loginId").containsExactly("fnel4", "fnel5");
     }
 
-    @DisplayName("존재하는 프로필 이상으로 저장된 profileId가 넘어서면, 프로필 처음부터 조회한다")
+    @DisplayName("프로필 숨기기를 한 경우 매칭 리스트에 포함되지 않는다.")
     @Test
     void test4() {
+        profileFacadeV1.hideProfile("fnel1", "fnel2", LocalDate.now());
+        profileFacadeV1.hideProfile("fnel1", "fnel3", LocalDate.now());
+        userGenerator.generateWithRole("fnel5", "1234", "11", "연호5", PrimaryRole.BOTTOM, SERVANT);
+        userGenerator.addImages("연호5", "abc");
+
+        List<UserMatching> list = matchingFacadeV1.findMatchingCandidates("fnel1", 1, TimeUnit.HOURS);
+        assertThat(list).extracting("loginId").containsExactly( "fnel4", "fnel5");
+    }
+
+    @DisplayName("프로필 숨기기를 한 경우 일주일간만 매칭 리스트에 포함되지 않는다.")
+    @Test
+    void test5() {
+        profileFacadeV1.hideProfile("fnel1", "fnel2", LocalDate.now().minusDays(8));
+        profileFacadeV1.hideProfile("fnel1", "fnel3", LocalDate.now().minusDays(7));
+        userGenerator.generateWithRole("fnel5", "1234", "11", "연호5", PrimaryRole.BOTTOM, SERVANT);
+        userGenerator.addImages("연호5", "abc");
+
+        List<UserMatching> list = matchingFacadeV1.findMatchingCandidates("fnel1", 1, TimeUnit.HOURS);
+        assertThat(list).extracting("loginId").containsExactly("fnel2","fnel4", "fnel5");
+    }
+
+
+
+    @DisplayName("존재하는 프로필 이상으로 저장된 profileId가 넘어서면, 프로필 처음부터 조회한다")
+    @Test
+    void test6() {
         userGenerator.generateWithRole("fnel5", "1234", "11", "연호5", PrimaryRole.BOTTOM, SERVANT);
         userGenerator.addImages("연호5", "abc");
         userGenerator.createMatching("fnel1", "1234", "fnel2", "1234");
@@ -111,7 +142,7 @@ class MatchingFacadeV1Test {
 
     @DisplayName("매칭 프로필은 lastProfileId 이후로 조회된다.")
     @Test
-    void test5() {
+    void test7() {
         userGenerator.generateWithRole("fnel5", "1234", "11", "연호5", PrimaryRole.BOTTOM, SERVANT);
         userGenerator.addImages("연호5", "abc");
         userGenerator.createMatching("fnel1", "1234", "fnel2", "1234");
@@ -136,7 +167,7 @@ class MatchingFacadeV1Test {
 
     @DisplayName("skip count가 50번을 넘어가면 matching candidate중 첫번쨰가 매칭 가능 대상에 포함된다.")
     @Test
-    void test6() {
+    void test8() {
 
         userGenerator.generateWithRole("fnel5", "1234", "11", "연호5", PrimaryRole.BOTTOM, SERVANT);
         userGenerator.addImages("연호5", "abc");
@@ -153,7 +184,7 @@ class MatchingFacadeV1Test {
 
     @DisplayName("실전 통합 테스트")
     @Test
-    void test7() throws InterruptedException {
+    void test9() throws InterruptedException {
 
         userGenerator.generateWithRole("fnel5", "1234", "11", "연호5", PrimaryRole.BOTTOM, SERVANT);
         userGenerator.addImages("연호5", "abc");

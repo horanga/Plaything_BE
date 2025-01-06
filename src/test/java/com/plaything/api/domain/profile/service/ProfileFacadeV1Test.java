@@ -1,16 +1,19 @@
-package com.plaything.api.domain.user.service;
+package com.plaything.api.domain.profile.service;
 
 import com.plaything.api.common.exception.CustomException;
+import com.plaything.api.domain.repository.entity.profile.ProfileHidePreference;
 import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.entity.user.UserCredentials;
 import com.plaything.api.domain.repository.entity.profile.PersonalityTrait;
 import com.plaything.api.domain.repository.entity.profile.Profile;
 import com.plaything.api.domain.repository.entity.profile.RelationshipPreference;
+import com.plaything.api.domain.repository.repo.profile.ProfileHidePreferenceRepository;
 import com.plaything.api.domain.repository.repo.profile.ProfileRepository;
 import com.plaything.api.domain.repository.repo.user.UserRepository;
-import com.plaything.api.domain.user.constants.*;
-import com.plaything.api.domain.user.model.request.ProfileRegistration;
-import com.plaything.api.domain.user.model.response.ProfileResponse;
+import com.plaything.api.domain.profile.constants.*;
+import com.plaything.api.domain.profile.model.request.ProfileRegistration;
+import com.plaything.api.domain.profile.model.response.ProfileResponse;
+import com.plaything.api.util.UserGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,10 +30,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static com.plaything.api.domain.user.constants.Gender.*;
-import static com.plaything.api.domain.user.constants.PersonalityTraitConstant.*;
-import static com.plaything.api.domain.user.constants.PrimaryRole.*;
-import static com.plaything.api.domain.user.constants.ProfileStatus.NEW;
+import static com.plaything.api.domain.profile.constants.Gender.*;
+import static com.plaything.api.domain.profile.constants.PersonalityTraitConstant.*;
+import static com.plaything.api.domain.profile.constants.PrimaryRole.*;
+import static com.plaything.api.domain.profile.constants.ProfileStatus.NEW;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -48,9 +51,14 @@ class ProfileFacadeV1Test {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserGenerator userGenerator;
+
+    @Autowired
+    private ProfileHidePreferenceRepository profileHidePreferenceRepository;
+
     @BeforeEach
     void setUp() {
-
 
         User user = User.builder()
                 .loginId("dusgh123")
@@ -500,6 +508,23 @@ class ProfileFacadeV1Test {
         assertThat(profile.isPrivate()).isTrue();
 
     }
+
+
+    @DisplayName("특정 프로필을 일주일간 차단할 수 있다.")
+    @Test
+    void test15() {
+
+        userGenerator.generate("fnel12", "123", "a", "알렉스");
+        userGenerator.generate("fnel123", "123", "a", "알렉스1");
+
+        profileFacadeV1.hideProfile("fnel12", "fnel123", LocalDate.now().minusDays(8));
+        List<ProfileHidePreference> list = profileHidePreferenceRepository.findBySettingUser_LoginId("fnel12");
+        assertThat(list.get(0).getSettingUser().getLoginId()).isEqualTo("fnel12");
+        assertThat(list.get(0).getTargetUser().getLoginId()).isEqualTo("fnel123");
+        assertThat(list.get(0).getCreateAt()).isEqualTo(LocalDate.now().minusDays(8).toString());
+    }
+
+
 
     private Profile getProfileFromDb(
             String nickname,

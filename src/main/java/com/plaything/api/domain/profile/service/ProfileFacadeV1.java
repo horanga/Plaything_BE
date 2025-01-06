@@ -1,34 +1,41 @@
-package com.plaything.api.domain.user.service;
+package com.plaything.api.domain.profile.service;
 
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorCode;
 import com.plaything.api.domain.admin.sevice.ProfileMonitoringServiceV1;
 import com.plaything.api.domain.image.service.S3ImagesServiceV1;
 import com.plaything.api.domain.image.service.model.SavedImage;
+import com.plaything.api.domain.repository.entity.profile.ProfileHidePreference;
 import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.entity.profile.PersonalityTrait;
 import com.plaything.api.domain.repository.entity.profile.Profile;
 import com.plaything.api.domain.repository.entity.profile.RelationshipPreference;
+import com.plaything.api.domain.repository.repo.profile.ProfileHidePreferenceRepository;
 import com.plaything.api.domain.repository.repo.profile.ProfileRepository;
-import com.plaything.api.domain.user.constants.PrimaryRole;
-import com.plaything.api.domain.user.constants.ProfileStatus;
-import com.plaything.api.domain.user.model.request.ProfileRegistration;
-import com.plaything.api.domain.user.model.request.ProfileUpdate;
-import com.plaything.api.domain.user.model.response.ProfileImageResponse;
-import com.plaything.api.domain.user.model.response.ProfileResponse;
-import com.plaything.api.domain.user.util.ImageUrlGenerator;
+import com.plaything.api.domain.profile.constants.PrimaryRole;
+import com.plaything.api.domain.profile.constants.ProfileStatus;
+import com.plaything.api.domain.profile.model.request.ProfileRegistration;
+import com.plaything.api.domain.profile.model.request.ProfileUpdate;
+import com.plaything.api.domain.profile.model.response.ProfileImageResponse;
+import com.plaything.api.domain.profile.model.response.ProfileResponse;
+import com.plaything.api.domain.profile.util.ImageUrlGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
+
+import static com.plaything.api.domain.matching.constants.MatchingConstants.BLOCK_DURATION;
 
 @RequiredArgsConstructor
 @Service
 public class ProfileFacadeV1 {
 
     private final ProfileRepository profileRepository;
+    private final ProfileHidePreferenceRepository profileHidePreferenceRepository;
     private final S3ImagesServiceV1 s3ImagesServiceV1;
     private final UserServiceV1 userServiceV1;
     private final ProfileImageServiceV1 profileImageServiceV1;
@@ -131,10 +138,54 @@ public class ProfileFacadeV1 {
         }
     }
 
+    public void hideProfile(String setterLoginId, String targetLoginId, LocalDate now ) {
+        User setter = userServiceV1.findByLoginId(setterLoginId);
+        User targetProfile = userServiceV1.findByLoginId(targetLoginId);
+        ProfileHidePreference profileHidePreference = ProfileHidePreference.builder()
+                .targetUser(targetProfile)
+                .settingUser(setter)
+                .createAt(now).build();
+        profileHidePreferenceRepository.save(profileHidePreference);
+    }
+
+    public List<String> getHideList(String loginId){
+
+        //TODO 숨긴 프로필 리스트 나중에 스케쥴링으로 지우기
+
+        List<ProfileHidePreference> list = profileHidePreferenceRepository.findBySettingUser_LoginId(loginId);
+        if(list.isEmpty()){
+            return Collections.emptyList();
+        }
+
+        LocalDate criteria = LocalDate.now().minusDays(BLOCK_DURATION);
+
+        return list.stream().filter(i->i.getCreateAt().isAfter(criteria))
+                        .map(i->i.getTargetUser().getLoginId()).toList();
+    }
+
+    //프로필 조회를 위한 api가 아닌 단순 로직에 필요한 메서드
+    public Profile getProfileByLoginIdNotDTO(String loginId) {
+
+        User user = userServiceV1.findByLoginId(loginId);
+        Profile profile = user.getProfile();
+        if (profile == null) {
+            throw new CustomException(ErrorCode.NOT_EXIST_USER);
+        }
+
+        if (profile.isBaned()) {
+            throw new CustomException(ErrorCode.NOT_AUTHORIZED_PROFILE);
+        }
+        return profile;
+    }
+
+    public void delete(String auth) {
+        userServiceV1.delete(auth);
+
+    }
+
     private void validateTraits(ProfileRegistration registration) {
         registration.personalityTraitConstant().forEach(i -> i.validateRoleCompatibility(registration.primaryRole()));
     }
-
 
     private Profile makesProfile(ProfileRegistration registration, User user) {
 
@@ -168,25 +219,5 @@ public class ProfileFacadeV1 {
         profile.addPersonalityTrait(personalityTraitList);
         profile.addRelationshipPreference(relationshipPreferenceList);
         return profile;
-    }
-
-    //프로필 조회를 위한 api가 아닌 단순 로직에 필요한 메서드
-    public Profile getProfileByLoginIdNotDTO(String loginId) {
-
-        User user = userServiceV1.findByLoginId(loginId);
-        Profile profile = user.getProfile();
-        if (profile == null) {
-            throw new CustomException(ErrorCode.NOT_EXIST_USER);
-        }
-
-        if (profile.isBaned()) {
-            throw new CustomException(ErrorCode.NOT_AUTHORIZED_PROFILE);
-        }
-        return profile;
-    }
-
-    public void delete(String auth) {
-        userServiceV1.delete(auth);
-
     }
 }
