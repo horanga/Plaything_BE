@@ -40,11 +40,20 @@ public class RedisService {
         String countKey = loginId + COUNT_REDIS_KEY;
         String profileHideKey = loginId +HIDE_PROFILE_KEY;
 
-        List<String> candidateList = redisTemplate.opsForList().range(candidateKey, 0, -1);
-        List<String> matchingList = redisTemplate.opsForList().range(matchingKey, 0, -1);
-        List<String> hideList = redisTemplate.opsForList().range(profileHideKey, 0, -1);
-        String lastProfileId = redisTemplate.opsForValue().get(profileKey);
-        String count = redisTemplate.opsForValue().get(countKey);
+        List<Object> results = redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
+            connection.listCommands().lRange(candidateKey.getBytes(), 0, -1);
+            connection.listCommands().lRange(matchingKey.getBytes(), 0, -1);
+            connection.listCommands().lRange(profileHideKey.getBytes(), 0, -1);
+            connection.stringCommands().get(profileKey.getBytes());
+            connection.stringCommands().get(countKey.getBytes());
+            return null;
+        });
+
+        List<String> candidateList = (List<String>) results.get(0);
+        List<String> matchingList = (List<String>) results.get(1);
+        List<String> hideList = (List<String>) results.get(2);
+        String lastProfileId = (String) results.get(3);
+        String count = (String) results.get(4);
 
         return getUserMatchingInfo(loginId,
                 candidateList,
@@ -55,40 +64,6 @@ public class RedisService {
                 duration,
                 timeUnit);
     }
-
-//
-//    @CircuitBreaker(name = SIMPLE_CIRCUIT_BREAKER_CONIFG, fallbackMethod = "findMatchingCandidatesFallback")
-//    public List<UserMatching> findMatchingCandidates(String loginId, int duration, TimeUnit timeUnit) {
-//        String candidateKey = loginId + MATCHING_CANDIDATE_REDIS_KEY;
-//        String matchingKey = loginId + MATCHING_LIST_REDIS_KEY;
-//        String profileKey = loginId + LAST_PROFILE_ID_REDIS_KEY;
-//        String countKey = loginId + COUNT_REDIS_KEY;
-//        String profileHideKey = loginId +HIDE_PROFILE_KEY;
-//
-//        List<Object> results = redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
-//            connection.listCommands().lRange(candidateKey.getBytes(), 0, -1);
-//            connection.listCommands().lRange(matchingKey.getBytes(), 0, -1);
-//            connection.listCommands().lRange(profileHideKey.getBytes(), 0, -1);
-//            connection.stringCommands().get(profileKey.getBytes());
-//            connection.stringCommands().get(countKey.getBytes());
-//            return null;
-//        });
-//
-//        List<String> candidateList = (List<String>) results.get(0);
-//        List<String> matchingList = (List<String>) results.get(1);
-//        List<String> hideList = (List<String>) results.get(2);
-//        String lastProfileId = (String) results.get(3);
-//        String count = (String) results.get(4);
-//
-//        return getUserMatchingInfo(loginId,
-//                candidateList,
-//                matchingList,
-//                hideList,
-//                lastProfileId,
-//                count,
-//                duration,
-//                timeUnit);
-//    }
 
     public List<UserMatching> findMatchingCandidatesFallback(String loginId, int duration, TimeUnit timeUnit, Exception ex) {
         logError(ex);
