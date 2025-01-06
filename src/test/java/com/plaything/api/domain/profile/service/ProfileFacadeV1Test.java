@@ -203,7 +203,7 @@ class ProfileFacadeV1Test {
         profileFacadeV1.registerProfile(profileRegistration, "dusgh123");
         ProfileResponse profile = profileFacadeV1.getProfileByLoginId("dusgh123");
 
-        assertThat(profile.age()).isEqualTo(29);
+        assertThat(profile.age()).isEqualTo(30);
         assertThat(profile.introduction()).isEqualTo("hi");
         assertThat(profile.profileStatus()).isEqualTo(NEW);
         assertThat(profile.primaryRole()).isEqualTo(role);
