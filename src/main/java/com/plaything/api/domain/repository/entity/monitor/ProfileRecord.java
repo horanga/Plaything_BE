@@ -1,7 +1,7 @@
 package com.plaything.api.domain.repository.entity.monitor;
 
 import com.plaything.api.domain.repository.entity.user.User;
-import com.plaything.api.domain.user.constants.ProfileStatus;
+import com.plaything.api.domain.profile.constants.ProfileStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import static com.plaything.api.domain.user.constants.Role.ROLE_USER;
+import static com.plaything.api.domain.profile.constants.Role.ROLE_USER;
 
 @Slf4j
 @RequiredArgsConstructor

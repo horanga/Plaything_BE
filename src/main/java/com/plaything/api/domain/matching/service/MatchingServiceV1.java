@@ -11,16 +11,16 @@ import com.plaything.api.domain.matching.model.response.UserMatching;
 import com.plaything.api.domain.notification.service.NotificationServiceV1;
 import com.plaything.api.domain.repository.entity.matching.Matching;
 import com.plaything.api.domain.repository.entity.user.User;
-import com.plaything.api.domain.repository.entity.user.profile.Profile;
+import com.plaything.api.domain.repository.entity.profile.Profile;
 import com.plaything.api.domain.repository.repo.matching.MatchingRepository;
 import com.plaything.api.domain.repository.repo.query.ProfileQueryRepository;
-import com.plaything.api.domain.user.constants.MatchingRelationship;
-import com.plaything.api.domain.user.constants.PersonalityTraitConstant;
-import com.plaything.api.domain.user.model.response.PersonalityTraitResponse;
-import com.plaything.api.domain.user.model.response.ProfileImageResponse;
-import com.plaything.api.domain.user.model.response.RelationshipPreferenceResponse;
-import com.plaything.api.domain.user.service.UserServiceV1;
-import com.plaything.api.domain.user.util.ImageUrlGenerator;
+import com.plaything.api.domain.profile.constants.MatchingRelationship;
+import com.plaything.api.domain.profile.constants.PersonalityTraitConstant;
+import com.plaything.api.domain.profile.model.response.PersonalityTraitResponse;
+import com.plaything.api.domain.profile.model.response.ProfileImageResponse;
+import com.plaything.api.domain.profile.model.response.RelationshipPreferenceResponse;
+import com.plaything.api.domain.profile.service.UserServiceV1;
+import com.plaything.api.domain.profile.util.ImageUrlGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,7 +44,7 @@ public class MatchingServiceV1 {
     private final MatchingRepository matchingRepository;
     private final ProfileQueryRepository profileQueryRepository;
 
-    public List<UserMatching> searchPartner(String loginId, List<String> matchingCandidates, List<String> matchingList, long lastId) {
+    public List<UserMatching> searchPartner(String loginId, List<String> matchingCandidates, List<String> matchingList, List<String> hideList, long lastId) {
         User userByName = findByLoginIdForRegistration(loginId);
         //TODO 프로필 거절, 사진 거절
         Profile profile = userByName.getProfile();
@@ -53,7 +53,7 @@ public class MatchingServiceV1 {
         if (profile.isSwitch() || profile.isETC()) {
             MatchRequestForOthers matchRequest
                     = MatchRequestForOthers.from(profile.getPrimaryRole(), lastId, profile.getNickName());
-            List<Profile> profiles = profileQueryRepository.searchUserForOthers(matchRequest, matchingCandidates, matchingList);
+            List<Profile> profiles = profileQueryRepository.searchUserForOthers(matchRequest, matchingCandidates, matchingList, hideList);
             return getUserMatchingInfo(profiles);
 
         }
@@ -64,7 +64,7 @@ public class MatchingServiceV1 {
                         partnerTrait,
                         lastId,
                         profile.getNickName());
-        List<Profile> profiles = profileQueryRepository.searchUser(matchRequest, matchingCandidates, matchingList);
+        List<Profile> profiles = profileQueryRepository.searchUser(matchRequest, matchingCandidates, matchingList, hideList);
         return getUserMatchingInfo(profiles);
     }
 

@@ -7,13 +7,13 @@ import com.plaything.api.domain.chat.model.reqeust.ChatRequest;
 import com.plaything.api.domain.repository.entity.matching.Matching;
 import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.repo.matching.MatchingRepository;
-import com.plaything.api.domain.user.constants.PersonalityTraitConstant;
-import com.plaything.api.domain.user.constants.PrimaryRole;
-import com.plaything.api.domain.user.constants.RelationshipPreferenceConstant;
-import com.plaything.api.domain.user.model.request.ProfileRegistration;
-import com.plaything.api.domain.user.model.response.ProfileResponse;
-import com.plaything.api.domain.user.service.ProfileFacadeV1;
-import com.plaything.api.domain.user.service.UserServiceV1;
+import com.plaything.api.domain.profile.constants.PersonalityTraitConstant;
+import com.plaything.api.domain.profile.constants.PrimaryRole;
+import com.plaything.api.domain.profile.constants.RelationshipPreferenceConstant;
+import com.plaything.api.domain.profile.model.request.ProfileRegistration;
+import com.plaything.api.domain.profile.model.response.ProfileResponse;
+import com.plaything.api.domain.profile.service.ProfileFacadeV1;
+import com.plaything.api.domain.profile.service.UserServiceV1;
 import com.plaything.api.security.JWTProvider;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.plaything.api.domain.user.constants.Gender.M;
+import static com.plaything.api.domain.profile.constants.Gender.M;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Transactional

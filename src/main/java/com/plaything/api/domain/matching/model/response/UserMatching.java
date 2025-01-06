@@ -1,9 +1,9 @@
 package com.plaything.api.domain.matching.model.response;
 
-import com.plaything.api.domain.user.constants.PrimaryRole;
-import com.plaything.api.domain.user.model.response.PersonalityTraitResponse;
-import com.plaything.api.domain.user.model.response.ProfileImageResponse;
-import com.plaything.api.domain.user.model.response.RelationshipPreferenceResponse;
+import com.plaything.api.domain.profile.constants.PrimaryRole;
+import com.plaything.api.domain.profile.model.response.PersonalityTraitResponse;
+import com.plaything.api.domain.profile.model.response.ProfileImageResponse;
+import com.plaything.api.domain.profile.model.response.RelationshipPreferenceResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;

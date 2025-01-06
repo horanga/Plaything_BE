@@ -30,7 +30,7 @@ public class QProfileRecord extends EntityPathBase<ProfileRecord> {
 
     public final NumberPath<Long> profileId = createNumber("profileId", Long.class);
 
-    public final EnumPath<com.plaything.api.domain.user.constants.ProfileStatus> profileStatus = createEnum("profileStatus", com.plaything.api.domain.user.constants.ProfileStatus.class);
+    public final EnumPath<com.plaything.api.domain.profile.constants.ProfileStatus> profileStatus = createEnum("profileStatus", com.plaything.api.domain.profile.constants.ProfileStatus.class);
 
     public final com.plaything.api.domain.repository.entity.user.QUser user;
 

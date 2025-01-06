@@ -7,7 +7,7 @@ import com.plaything.api.domain.chat.model.reqeust.ChatRequest;
 import com.plaything.api.domain.matching.model.response.MatchingResponse;
 import com.plaything.api.domain.matching.service.MatchingServiceV1;
 import com.plaything.api.domain.repository.entity.user.User;
-import com.plaything.api.domain.user.service.UserServiceV1;
+import com.plaything.api.domain.profile.service.UserServiceV1;
 import com.plaything.api.security.JWTProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

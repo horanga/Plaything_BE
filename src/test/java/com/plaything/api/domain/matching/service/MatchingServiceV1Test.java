@@ -8,17 +8,17 @@ import com.plaything.api.domain.key.service.PointKeyLogServiceV1;
 import com.plaything.api.domain.matching.model.response.UserMatching;
 import com.plaything.api.domain.notification.service.NotificationServiceV1;
 import com.plaything.api.domain.repository.entity.user.User;
-import com.plaything.api.domain.repository.entity.user.profile.ProfileImage;
+import com.plaything.api.domain.repository.entity.profile.ProfileImage;
 import com.plaything.api.domain.repository.repo.chat.ChatRoomRepository;
 import com.plaything.api.domain.repository.repo.matching.MatchingRepository;
-import com.plaything.api.domain.repository.repo.user.ProfileImageRepository;
+import com.plaything.api.domain.repository.repo.profile.ProfileImageRepository;
 import com.plaything.api.domain.repository.repo.user.UserRepository;
-import com.plaything.api.domain.user.constants.PersonalityTraitConstant;
-import com.plaything.api.domain.user.constants.PrimaryRole;
-import com.plaything.api.domain.user.constants.RelationshipPreferenceConstant;
-import com.plaything.api.domain.user.model.request.ProfileRegistration;
-import com.plaything.api.domain.user.service.ProfileFacadeV1;
-import com.plaything.api.domain.user.service.ProfileImageServiceV1;
+import com.plaything.api.domain.profile.constants.PersonalityTraitConstant;
+import com.plaything.api.domain.profile.constants.PrimaryRole;
+import com.plaything.api.domain.profile.constants.RelationshipPreferenceConstant;
+import com.plaything.api.domain.profile.model.request.ProfileRegistration;
+import com.plaything.api.domain.profile.service.ProfileFacadeV1;
+import com.plaything.api.domain.profile.service.ProfileImageServiceV1;
 import com.plaything.api.util.UserGenerator;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,10 +36,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static com.plaything.api.domain.user.constants.Gender.M;
-import static com.plaything.api.domain.user.constants.PersonalityTraitConstant.*;
-import static com.plaything.api.domain.user.constants.PrimaryRole.*;
-import static com.plaything.api.domain.user.constants.RelationshipPreferenceConstant.MARRIAGE_DS;
+import static com.plaything.api.domain.profile.constants.Gender.M;
+import static com.plaything.api.domain.profile.constants.PersonalityTraitConstant.*;
+import static com.plaything.api.domain.profile.constants.PrimaryRole.*;
+import static com.plaything.api.domain.profile.constants.RelationshipPreferenceConstant.MARRIAGE_DS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
@@ -128,7 +128,7 @@ class MatchingServiceV1Test {
         userGenerator.addImages("알렉3", "a");
         userGenerator.addImages("알렉4", "a");
 
-        List<UserMatching> list = matchingServiceV1.searchPartner("fnel1", Collections.emptyList(), Collections.emptyList(), 0L);
+        List<UserMatching> list = matchingServiceV1.searchPartner("fnel1", Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), 0L);
         assertThat(list).hasSize(3);
         assertThat(list).extracting("primaryRole").containsExactly(BOTTOM, BOTTOM, BOTTOM);
         assertThat(list).extracting("nickName").containsExactly("알렉2", "알렉3", "알렉4");
@@ -140,7 +140,7 @@ class MatchingServiceV1Test {
         assertThat(list.get(2).personalityTraitList()).extracting("personalityTrait").containsExactly(primary2);
         assertThat(list.get(2).personalityTraitList()).extracting("isPrimaryTrait").containsExactly(true);
 
-        List<UserMatching> list2 = matchingServiceV1.searchPartner("fnel2", Collections.emptyList(), Collections.emptyList(), 0L);
+        List<UserMatching> list2 = matchingServiceV1.searchPartner("fnel2", Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), 0L);
 
         assertThat(list2).hasSize(1);
         assertThat(list2).extracting("primaryRole").containsExactly(TOP);
@@ -214,12 +214,12 @@ class MatchingServiceV1Test {
         userGenerator.addImages("알렉3", "a");
         userGenerator.addImages("알렉4", "a");
 
-        List<UserMatching> list1 = matchingServiceV1.searchPartner("fnel1", Collections.emptyList(), Collections.emptyList(), 0l);
+        List<UserMatching> list1 = matchingServiceV1.searchPartner("fnel1", Collections.emptyList(), Collections.emptyList(),Collections.emptyList(), 0l);
         assertThat(list1).extracting("primaryRole").containsExactly(SWITCH);
         assertThat(list1).extracting("nickName").containsExactly("알렉2");
         assertThat(list1.get(0).personalityTraitList()).extracting("personalityTrait").containsExactly(SADIST);
 
-        List<UserMatching> list2 = matchingServiceV1.searchPartner("fnel3", Collections.emptyList(), Collections.emptyList(), 0l);
+        List<UserMatching> list2 = matchingServiceV1.searchPartner("fnel3", Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), 0l);
         assertThat(list2).extracting("primaryRole").containsExactly(ETC);
         assertThat(list2).extracting("nickName").containsExactly("알렉4");
         assertThat(list2.get(0).personalityTraitList()).extracting("personalityTrait").containsExactly(SADIST);
@@ -242,8 +242,8 @@ class MatchingServiceV1Test {
         addImage(user2);
         addImage(user3);
 
-        List<UserMatching> matched1 = matchingServiceV1.searchPartner("fnel123", Collections.emptyList(), Collections.emptyList(), 0L);
-        List<UserMatching> matched2 = matchingServiceV1.searchPartner("fnel1234", Collections.emptyList(), Collections.emptyList(), 0L);
+        List<UserMatching> matched1 = matchingServiceV1.searchPartner("fnel123", Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), 0L);
+        List<UserMatching> matched2 = matchingServiceV1.searchPartner("fnel1234", Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), 0L);
 
         assertThat(matched1).isEmpty();
         assertThat(matched2).isEmpty();

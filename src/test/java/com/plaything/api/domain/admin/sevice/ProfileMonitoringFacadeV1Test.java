@@ -7,12 +7,12 @@ import com.plaything.api.domain.repository.entity.user.UserViolationStats;
 import com.plaything.api.domain.repository.repo.monitor.RejectedProfileRepository;
 import com.plaything.api.domain.repository.repo.monitor.UserViolationStatsRepository;
 import com.plaything.api.domain.repository.repo.user.UserRepository;
-import com.plaything.api.domain.user.constants.PersonalityTraitConstant;
-import com.plaything.api.domain.user.constants.PrimaryRole;
-import com.plaything.api.domain.user.constants.RelationshipPreferenceConstant;
-import com.plaything.api.domain.user.constants.Role;
-import com.plaything.api.domain.user.model.request.ProfileRegistration;
-import com.plaything.api.domain.user.service.ProfileFacadeV1;
+import com.plaything.api.domain.profile.constants.PersonalityTraitConstant;
+import com.plaything.api.domain.profile.constants.PrimaryRole;
+import com.plaything.api.domain.profile.constants.RelationshipPreferenceConstant;
+import com.plaything.api.domain.profile.constants.Role;
+import com.plaything.api.domain.profile.model.request.ProfileRegistration;
+import com.plaything.api.domain.profile.service.ProfileFacadeV1;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,8 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.plaything.api.domain.user.constants.Gender.M;
-import static com.plaything.api.domain.user.constants.ProfileStatus.NEW;
+import static com.plaything.api.domain.profile.constants.Gender.M;
+import static com.plaything.api.domain.profile.constants.ProfileStatus.NEW;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional

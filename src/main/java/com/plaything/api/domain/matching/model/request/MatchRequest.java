@@ -1,7 +1,7 @@
 package com.plaything.api.domain.matching.model.request;
 
-import com.plaything.api.domain.user.constants.PersonalityTraitConstant;
-import com.plaything.api.domain.user.constants.PrimaryRole;
+import com.plaything.api.domain.profile.constants.PersonalityTraitConstant;
+import com.plaything.api.domain.profile.constants.PrimaryRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "이용자 매칭 요청")

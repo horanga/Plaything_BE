@@ -28,7 +28,7 @@ public class QPersonalityTrait extends EntityPathBase<PersonalityTrait> {
 
     public final QProfile profile;
 
-    public final EnumPath<com.plaything.api.domain.user.constants.PersonalityTraitConstant> trait = createEnum("trait", com.plaything.api.domain.user.constants.PersonalityTraitConstant.class);
+    public final EnumPath<com.plaything.api.domain.profile.constants.PersonalityTraitConstant> trait = createEnum("trait", com.plaything.api.domain.profile.constants.PersonalityTraitConstant.class);
 
     public QPersonalityTrait(String variable) {
         this(PersonalityTrait.class, forVariable(variable), INITS);

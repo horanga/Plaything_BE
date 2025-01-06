@@ -2,7 +2,7 @@ package com.plaything.api.domain.index.service;
 
 import com.plaything.api.domain.index.model.response.IndexResponse;
 import com.plaything.api.domain.repository.repo.query.ChatRoomQueryRepository;
-import com.plaything.api.domain.user.service.ProfileFacadeV1;
+import com.plaything.api.domain.profile.service.ProfileFacadeV1;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

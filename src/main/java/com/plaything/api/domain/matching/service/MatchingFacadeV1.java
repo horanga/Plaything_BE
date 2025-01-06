@@ -7,7 +7,7 @@ import com.plaything.api.domain.key.model.request.MatchingRequest;
 import com.plaything.api.domain.key.service.PointKeyServiceV1;
 import com.plaything.api.domain.matching.model.response.UserMatching;
 import com.plaything.api.domain.repository.entity.user.User;
-import com.plaything.api.domain.user.service.UserServiceV1;
+import com.plaything.api.domain.profile.service.UserServiceV1;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

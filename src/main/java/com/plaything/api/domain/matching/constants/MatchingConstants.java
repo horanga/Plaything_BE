@@ -8,9 +8,10 @@ public class MatchingConstants {
     public static final String MATCHING_LIST_REDIS_KEY = "::matchingList";
     public static final String COUNT_REDIS_KEY = "::count";
     public static final String LAST_PROFILE_ID_REDIS_KEY = "::lastProfileId";
+    public static final String HIDE_PROFILE_KEY = ":hideProfile";
 
     public static final int MAX_SKIP_COUNT = 50;
-    public static final int RE_MATCHING_PERIOD = 7;
+    public static final int BLOCK_DURATION = 8;
     public static final int EXPIRATION_DATE_SKIP_COUNT = 20;
     public static final int EXPIRATION_DATE_PROFILE_ID = 20;
 

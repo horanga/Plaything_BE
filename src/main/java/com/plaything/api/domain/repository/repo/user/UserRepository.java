@@ -1,7 +1,7 @@
 package com.plaything.api.domain.repository.repo.user;
 
 import com.plaything.api.domain.repository.entity.user.User;
-import com.plaything.api.domain.user.constants.PersonalityTraitConstant;
+import com.plaything.api.domain.profile.constants.PersonalityTraitConstant;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

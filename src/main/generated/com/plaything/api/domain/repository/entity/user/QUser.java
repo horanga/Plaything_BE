@@ -40,7 +40,7 @@ public class QUser extends EntityPathBase<User> {
 
     public final com.plaything.api.domain.repository.entity.user.profile.QProfile profile;
 
-    public final EnumPath<com.plaything.api.domain.user.constants.Role> role = createEnum("role", com.plaything.api.domain.user.constants.Role.class);
+    public final EnumPath<com.plaything.api.domain.profile.constants.Role> role = createEnum("role", com.plaything.api.domain.profile.constants.Role.class);
 
     public QUser(String variable) {
         this(User.class, forVariable(variable), INITS);

@@ -6,7 +6,7 @@ import com.plaything.api.domain.admin.model.response.ProfileRecordResponse;
 import com.plaything.api.domain.repository.entity.monitor.ProfileRecord;
 import com.plaything.api.domain.repository.entity.monitor.RejectedProfile;
 import com.plaything.api.domain.repository.entity.user.User;
-import com.plaything.api.domain.repository.entity.user.profile.Profile;
+import com.plaything.api.domain.repository.entity.profile.Profile;
 import com.plaything.api.domain.repository.repo.monitor.ProfileRecordRepository;
 import com.plaything.api.domain.repository.repo.monitor.RejectedProfileRepository;
 import lombok.RequiredArgsConstructor;

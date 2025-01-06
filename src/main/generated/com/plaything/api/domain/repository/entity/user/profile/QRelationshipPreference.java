@@ -26,7 +26,7 @@ public class QRelationshipPreference extends EntityPathBase<RelationshipPreferen
 
     public final QProfile profile;
 
-    public final EnumPath<com.plaything.api.domain.user.constants.RelationshipPreferenceConstant> relationshipPreference = createEnum("relationshipPreference", com.plaything.api.domain.user.constants.RelationshipPreferenceConstant.class);
+    public final EnumPath<com.plaything.api.domain.profile.constants.RelationshipPreferenceConstant> relationshipPreference = createEnum("relationshipPreference", com.plaything.api.domain.profile.constants.RelationshipPreferenceConstant.class);
 
     public QRelationshipPreference(String variable) {
         this(RelationshipPreference.class, forVariable(variable), INITS);
