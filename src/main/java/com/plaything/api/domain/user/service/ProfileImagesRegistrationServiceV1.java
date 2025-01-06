@@ -1,8 +1,8 @@
 package com.plaything.api.domain.user.service;
 
 import com.plaything.api.domain.repository.entity.monitor.ProfileImageRegistration;
-import com.plaything.api.domain.repository.entity.user.profile.ProfileImage;
-import com.plaything.api.domain.repository.repo.user.ProfileImagesRegistrationRepository;
+import com.plaything.api.domain.repository.entity.profile.ProfileImage;
+import com.plaything.api.domain.repository.repo.profile.ProfileImagesRegistrationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,6 +1,6 @@
 package com.plaything.api.domain.user.model.response;
 
-import com.plaything.api.domain.repository.entity.user.profile.PersonalityTrait;
+import com.plaything.api.domain.repository.entity.profile.PersonalityTrait;
 import com.plaything.api.domain.user.constants.PersonalityTraitConstant;
 import io.swagger.v3.oas.annotations.media.Schema;
 

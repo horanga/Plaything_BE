@@ -2,7 +2,7 @@ package com.plaything.api.domain.repository.repo.query;
 
 import com.plaything.api.domain.matching.model.request.MatchRequest;
 import com.plaything.api.domain.matching.model.request.MatchRequestForOthers;
-import com.plaything.api.domain.repository.entity.user.profile.Profile;
+import com.plaything.api.domain.repository.entity.profile.Profile;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;

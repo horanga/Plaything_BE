@@ -1,6 +1,6 @@
 package com.plaything.api.domain.repository.entity.monitor;
 
-import com.plaything.api.domain.repository.entity.user.profile.ProfileImage;
+import com.plaything.api.domain.repository.entity.profile.ProfileImage;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

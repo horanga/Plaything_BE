@@ -1,8 +1,8 @@
 package com.plaything.api.domain.matching.service;
 
 import com.plaything.api.domain.matching.model.response.UserMatching;
-import com.plaything.api.domain.repository.entity.user.profile.Profile;
-import com.plaything.api.domain.repository.repo.user.ProfileRepository;
+import com.plaything.api.domain.repository.entity.profile.Profile;
+import com.plaything.api.domain.repository.repo.profile.ProfileRepository;
 import com.plaything.api.domain.user.constants.PersonalityTraitConstant;
 import com.plaything.api.domain.user.constants.PrimaryRole;
 import com.plaything.api.util.UserGenerator;

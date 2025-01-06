@@ -14,7 +14,7 @@ import com.plaything.api.domain.repository.repo.chat.ChatRepository;
 import com.plaything.api.domain.repository.repo.chat.ChatRoomRepository;
 import com.plaything.api.domain.repository.repo.matching.MatchingRepository;
 import com.plaything.api.domain.repository.repo.monitor.ProfileRecordRepository;
-import com.plaything.api.domain.repository.repo.user.ProfileRepository;
+import com.plaything.api.domain.repository.repo.profile.ProfileRepository;
 import com.plaything.api.domain.repository.repo.user.UserRepository;
 import com.plaything.api.domain.user.constants.PersonalityTraitConstant;
 import com.plaything.api.domain.user.constants.PrimaryRole;

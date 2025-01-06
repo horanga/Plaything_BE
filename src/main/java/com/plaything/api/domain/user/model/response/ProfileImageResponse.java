@@ -1,6 +1,6 @@
 package com.plaything.api.domain.user.model.response;
 
-import com.plaything.api.domain.repository.entity.user.profile.ProfileImage;
+import com.plaything.api.domain.repository.entity.profile.ProfileImage;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

@@ -11,7 +11,7 @@ import com.plaything.api.domain.matching.model.response.UserMatching;
 import com.plaything.api.domain.notification.service.NotificationServiceV1;
 import com.plaything.api.domain.repository.entity.matching.Matching;
 import com.plaything.api.domain.repository.entity.user.User;
-import com.plaything.api.domain.repository.entity.user.profile.Profile;
+import com.plaything.api.domain.repository.entity.profile.Profile;
 import com.plaything.api.domain.repository.repo.matching.MatchingRepository;
 import com.plaything.api.domain.repository.repo.query.ProfileQueryRepository;
 import com.plaything.api.domain.user.constants.MatchingRelationship;

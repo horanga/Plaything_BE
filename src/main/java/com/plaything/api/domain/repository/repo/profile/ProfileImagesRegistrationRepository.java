@@ -1,4 +1,4 @@
-package com.plaything.api.domain.repository.repo.user;
+package com.plaything.api.domain.repository.repo.profile;
 
 import com.plaything.api.domain.repository.entity.monitor.ProfileImageRegistration;
 import org.springframework.data.jpa.repository.JpaRepository;

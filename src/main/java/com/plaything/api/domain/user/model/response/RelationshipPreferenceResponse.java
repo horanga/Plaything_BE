@@ -1,6 +1,6 @@
 package com.plaything.api.domain.user.model.response;
 
-import com.plaything.api.domain.repository.entity.user.profile.RelationshipPreference;
+import com.plaything.api.domain.repository.entity.profile.RelationshipPreference;
 import com.plaything.api.domain.user.constants.RelationshipPreferenceConstant;
 import io.swagger.v3.oas.annotations.media.Schema;
 

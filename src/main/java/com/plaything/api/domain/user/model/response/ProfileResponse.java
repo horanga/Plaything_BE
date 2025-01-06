@@ -1,7 +1,6 @@
 package com.plaything.api.domain.user.model.response;
 
-import com.plaything.api.domain.repository.entity.user.profile.Profile;
-import com.plaything.api.domain.repository.entity.user.profile.ProfileImage;
+import com.plaything.api.domain.repository.entity.profile.Profile;
 import com.plaything.api.domain.user.constants.Gender;
 import com.plaything.api.domain.user.constants.ProfileStatus;
 import io.swagger.v3.oas.annotations.media.Schema;

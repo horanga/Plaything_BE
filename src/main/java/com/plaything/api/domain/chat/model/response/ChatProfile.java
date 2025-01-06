@@ -1,6 +1,6 @@
 package com.plaything.api.domain.chat.model.response;
 
-import com.plaything.api.domain.repository.entity.user.profile.Profile;
+import com.plaything.api.domain.repository.entity.profile.Profile;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record ChatProfile(

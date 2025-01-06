@@ -4,7 +4,7 @@ import com.plaything.api.domain.notification.constant.NotificationType;
 import com.plaything.api.domain.notification.model.response.NotificationResponse;
 import com.plaything.api.domain.repository.entity.notification.Notification;
 import com.plaything.api.domain.repository.entity.user.User;
-import com.plaything.api.domain.repository.entity.user.profile.Profile;
+import com.plaything.api.domain.repository.entity.profile.Profile;
 import com.plaything.api.domain.repository.repo.notification.NotificationRepository;
 import com.plaything.api.domain.user.util.ImageUrlGenerator;
 import lombok.RequiredArgsConstructor;

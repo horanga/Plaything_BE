@@ -1,7 +1,6 @@
 package com.plaything.api.domain.user.constants;
 
-import com.plaything.api.domain.repository.entity.user.User;
-import com.plaything.api.domain.repository.entity.user.profile.Profile;
+import com.plaything.api.domain.repository.entity.profile.Profile;
 
 import java.util.Arrays;
 

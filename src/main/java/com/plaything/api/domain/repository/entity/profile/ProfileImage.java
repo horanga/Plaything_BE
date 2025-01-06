@@ -1,4 +1,4 @@
-package com.plaything.api.domain.repository.entity.user.profile;
+package com.plaything.api.domain.repository.entity.profile;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

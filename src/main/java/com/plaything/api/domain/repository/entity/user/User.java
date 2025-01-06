@@ -1,7 +1,7 @@
 package com.plaything.api.domain.repository.entity.user;
 
 import com.plaything.api.domain.repository.entity.common.BaseEntity;
-import com.plaything.api.domain.repository.entity.user.profile.Profile;
+import com.plaything.api.domain.repository.entity.profile.Profile;
 import com.plaything.api.domain.user.constants.ProfileStatus;
 import com.plaything.api.domain.user.constants.Role;
 import jakarta.persistence.*;

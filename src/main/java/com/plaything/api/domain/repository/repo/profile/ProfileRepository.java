@@ -1,6 +1,6 @@
-package com.plaything.api.domain.repository.repo.user;
+package com.plaything.api.domain.repository.repo.profile;
 
-import com.plaything.api.domain.repository.entity.user.profile.Profile;
+import com.plaything.api.domain.repository.entity.profile.Profile;
 import feign.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
