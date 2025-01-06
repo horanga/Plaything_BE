@@ -1,4 +1,4 @@
-package com.plaything.api.domain.user.constants;
+package com.plaything.api.domain.profile.constants;
 
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorCode;

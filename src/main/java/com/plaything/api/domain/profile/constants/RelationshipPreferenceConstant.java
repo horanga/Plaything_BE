@@ -1,4 +1,4 @@
-package com.plaything.api.domain.user.constants;
+package com.plaything.api.domain.profile.constants;
 
 public enum RelationshipPreferenceConstant {
 

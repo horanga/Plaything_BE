@@ -6,7 +6,7 @@ import com.plaything.api.domain.repository.entity.notification.Notification;
 import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.entity.profile.Profile;
 import com.plaything.api.domain.repository.repo.notification.NotificationRepository;
-import com.plaything.api.domain.user.util.ImageUrlGenerator;
+import com.plaything.api.domain.profile.util.ImageUrlGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

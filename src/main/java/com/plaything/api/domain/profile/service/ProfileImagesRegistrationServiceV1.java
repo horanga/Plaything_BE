@@ -1,4 +1,4 @@
-package com.plaything.api.domain.user.service;
+package com.plaything.api.domain.profile.service;
 
 import com.plaything.api.domain.repository.entity.monitor.ProfileImageRegistration;
 import com.plaything.api.domain.repository.entity.profile.ProfileImage;

@@ -2,7 +2,7 @@ package com.plaything.api.domain.admin.controller;
 
 import com.plaything.api.domain.admin.model.response.ProfileRecordResponse;
 import com.plaything.api.domain.admin.sevice.ProfileMonitoringFacadeV1;
-import com.plaything.api.domain.user.model.response.UserStats;
+import com.plaything.api.domain.profile.model.response.UserStats;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

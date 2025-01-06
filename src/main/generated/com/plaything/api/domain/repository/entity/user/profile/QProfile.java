@@ -22,7 +22,7 @@ public class QProfile extends EntityPathBase<Profile> {
 
     public final DatePath<java.time.LocalDate> birthDate = createDate("birthDate", java.time.LocalDate.class);
 
-    public final EnumPath<com.plaything.api.domain.user.constants.Gender> gender = createEnum("gender", com.plaything.api.domain.user.constants.Gender.class);
+    public final EnumPath<com.plaything.api.domain.profile.constants.Gender> gender = createEnum("gender", com.plaything.api.domain.profile.constants.Gender.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
@@ -36,11 +36,11 @@ public class QProfile extends EntityPathBase<Profile> {
 
     public final ListPath<PersonalityTrait, QPersonalityTrait> personalityTrait = this.<PersonalityTrait, QPersonalityTrait>createList("personalityTrait", PersonalityTrait.class, QPersonalityTrait.class, PathInits.DIRECT2);
 
-    public final EnumPath<com.plaything.api.domain.user.constants.PrimaryRole> primaryRole = createEnum("primaryRole", com.plaything.api.domain.user.constants.PrimaryRole.class);
+    public final EnumPath<com.plaything.api.domain.profile.constants.PrimaryRole> primaryRole = createEnum("primaryRole", com.plaything.api.domain.profile.constants.PrimaryRole.class);
 
     public final ListPath<ProfileImage, QProfileImage> profileImages = this.<ProfileImage, QProfileImage>createList("profileImages", ProfileImage.class, QProfileImage.class, PathInits.DIRECT2);
 
-    public final EnumPath<com.plaything.api.domain.user.constants.ProfileStatus> profileStatus = createEnum("profileStatus", com.plaything.api.domain.user.constants.ProfileStatus.class);
+    public final EnumPath<com.plaything.api.domain.profile.constants.ProfileStatus> profileStatus = createEnum("profileStatus", com.plaything.api.domain.profile.constants.ProfileStatus.class);
 
     public final ListPath<RelationshipPreference, QRelationshipPreference> relationshipPreference = this.<RelationshipPreference, QRelationshipPreference>createList("relationshipPreference", RelationshipPreference.class, QRelationshipPreference.class, PathInits.DIRECT2);
 

@@ -13,7 +13,7 @@ import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.entity.profile.Profile;
 import com.plaything.api.domain.repository.repo.profile.ProfileRepository;
 import com.plaything.api.domain.repository.repo.user.UserRepository;
-import com.plaything.api.domain.user.util.ImageUrlGenerator;
+import com.plaything.api.domain.profile.util.ImageUrlGenerator;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

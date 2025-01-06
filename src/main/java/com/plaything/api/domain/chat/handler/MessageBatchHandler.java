@@ -5,7 +5,7 @@ import com.plaything.api.domain.chat.model.response.ChatProfile;
 import com.plaything.api.domain.notification.service.FcmServiceV1;
 import com.plaything.api.domain.repository.entity.profile.Profile;
 import com.plaything.api.domain.repository.repo.profile.ProfileRepository;
-import com.plaything.api.domain.user.util.ImageUrlGenerator;
+import com.plaything.api.domain.profile.util.ImageUrlGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

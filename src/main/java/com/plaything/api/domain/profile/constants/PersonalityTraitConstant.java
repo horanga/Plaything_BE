@@ -1,10 +1,10 @@
-package com.plaything.api.domain.user.constants;
+package com.plaything.api.domain.profile.constants;
 
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorCode;
 
-import static com.plaything.api.domain.user.constants.PrimaryRole.BOTTOM;
-import static com.plaything.api.domain.user.constants.PrimaryRole.TOP;
+import static com.plaything.api.domain.profile.constants.PrimaryRole.BOTTOM;
+import static com.plaything.api.domain.profile.constants.PrimaryRole.TOP;
 
 public enum PersonalityTraitConstant {
 

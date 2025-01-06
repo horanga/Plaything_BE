@@ -16,11 +16,11 @@ import com.plaything.api.domain.repository.repo.matching.MatchingRepository;
 import com.plaything.api.domain.repository.repo.monitor.ProfileRecordRepository;
 import com.plaything.api.domain.repository.repo.profile.ProfileRepository;
 import com.plaything.api.domain.repository.repo.user.UserRepository;
-import com.plaything.api.domain.user.constants.PersonalityTraitConstant;
-import com.plaything.api.domain.user.constants.PrimaryRole;
-import com.plaything.api.domain.user.constants.RelationshipPreferenceConstant;
-import com.plaything.api.domain.user.model.request.ProfileRegistration;
-import com.plaything.api.domain.user.service.ProfileFacadeV1;
+import com.plaything.api.domain.profile.constants.PersonalityTraitConstant;
+import com.plaything.api.domain.profile.constants.PrimaryRole;
+import com.plaything.api.domain.profile.constants.RelationshipPreferenceConstant;
+import com.plaything.api.domain.profile.model.request.ProfileRegistration;
+import com.plaything.api.domain.profile.service.ProfileFacadeV1;
 import com.plaything.api.security.JWTProvider;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
@@ -48,7 +48,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static com.plaything.api.domain.user.constants.Gender.M;
+import static com.plaything.api.domain.profile.constants.Gender.M;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional

@@ -11,11 +11,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static com.plaything.api.domain.matching.constants.MatchingConstants.KEYWORD_DUMMY_CACHE;
+import static com.plaything.api.domain.repository.entity.profile.QPersonalityTrait.personalityTrait;
+import static com.plaything.api.domain.repository.entity.profile.QProfile.profile;
+import static com.plaything.api.domain.repository.entity.profile.QProfileImage.profileImage;
+import static com.plaything.api.domain.repository.entity.profile.QRelationshipPreference.relationshipPreference1;
 import static com.plaything.api.domain.repository.entity.user.QUser.user;
-import static com.plaything.api.domain.repository.entity.user.profile.QPersonalityTrait.personalityTrait;
-import static com.plaything.api.domain.repository.entity.user.profile.QProfile.profile;
-import static com.plaything.api.domain.repository.entity.user.profile.QProfileImage.profileImage;
-import static com.plaything.api.domain.repository.entity.user.profile.QRelationshipPreference.relationshipPreference1;
 
 @RequiredArgsConstructor
 @Repository
@@ -24,9 +24,9 @@ public class ProfileQueryRepository {
     private final static int LIMIT_OF_PARTNER = 10;
     private final JPAQueryFactory jpaQueryFactory;
 
-    public List<Profile> searchUser(MatchRequest request, List<String> candidateIds, List<String> matchingList) {
+    public List<Profile> searchUser(MatchRequest request, List<String> candidateIds, List<String> matchingList, List<String> hideList) {
 
-        BooleanBuilder booleanBuilder = getBooleanBuilder(candidateIds, matchingList);
+        BooleanBuilder booleanBuilder = getBooleanBuilder(candidateIds, matchingList, hideList);
 
         List<Profile> list = jpaQueryFactory
                 .selectFrom(profile)
@@ -48,15 +48,15 @@ public class ProfileQueryRepository {
         //재귀함수 무한 반복을 막기 위한 조건 설정 lastId>0
         if (list.isEmpty() && request.lastId() > 0) {
             MatchRequest newRequest = new MatchRequest(request.primaryRole(), request.personalityTraitConstant(), 0, request.userName());
-            return searchUser(newRequest, candidateIds, matchingList);
+            return searchUser(newRequest, candidateIds, matchingList, hideList);
 
         }
 
         return list;
     }
 
-    public List<Profile> searchUserForOthers(MatchRequestForOthers request, List<String> candidateIds, List<String> matchingList) {
-        BooleanBuilder booleanBuilder = getBooleanBuilder(candidateIds, matchingList);
+    public List<Profile> searchUserForOthers(MatchRequestForOthers request, List<String> candidateIds, List<String> matchingList, List<String> hideList) {
+        BooleanBuilder booleanBuilder = getBooleanBuilder(candidateIds, matchingList, hideList);
 
         List<Profile> list = jpaQueryFactory
                 .selectFrom(profile)
@@ -74,13 +74,13 @@ public class ProfileQueryRepository {
 
         if (list.isEmpty() && request.lastId() > 0) {
             MatchRequestForOthers matchRequestForOthers = new MatchRequestForOthers(request.primaryRole(), 0, request.userName());
-            return searchUserForOthers(matchRequestForOthers, candidateIds, matchingList);
+            return searchUserForOthers(matchRequestForOthers, candidateIds, matchingList, hideList);
 
         }
         return list;
     }
 
-    private BooleanBuilder getBooleanBuilder(List<String> loginIds, List<String> matchingList) {
+    private BooleanBuilder getBooleanBuilder(List<String> loginIds, List<String> matchingList, List<String> hideList) {
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
         if (loginIds != null && !loginIds.isEmpty()) {
@@ -92,6 +92,12 @@ public class ProfileQueryRepository {
         if (matchingList != null && !matchingList.isEmpty()) {
             if (!matchingList.get(0).equals(KEYWORD_DUMMY_CACHE)) {
                 booleanBuilder.and(user.loginId.notIn(matchingList));
+            }
+        }
+
+        if(hideList !=null && !hideList.isEmpty()) {
+            if(!hideList.get(0).equals(KEYWORD_DUMMY_CACHE)) {
+                booleanBuilder.and(user.loginId.notIn(hideList));
             }
         }
 

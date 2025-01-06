@@ -1,10 +1,10 @@
-package com.plaything.api.domain.user.constants;
+package com.plaything.api.domain.profile.constants;
 
 import com.plaything.api.domain.repository.entity.profile.Profile;
 
 import java.util.Arrays;
 
-import static com.plaything.api.domain.user.constants.PersonalityTraitConstant.*;
+import static com.plaything.api.domain.profile.constants.PersonalityTraitConstant.*;
 
 public enum MatchingRelationship {
 

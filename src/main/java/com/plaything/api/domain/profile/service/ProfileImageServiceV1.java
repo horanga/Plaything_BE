@@ -1,4 +1,4 @@
-package com.plaything.api.domain.user.service;
+package com.plaything.api.domain.profile.service;
 
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorCode;

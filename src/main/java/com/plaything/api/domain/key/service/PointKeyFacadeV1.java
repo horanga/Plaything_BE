@@ -7,7 +7,7 @@ import com.plaything.api.domain.key.model.request.AdRewardRequest;
 import com.plaything.api.domain.key.model.response.AvailablePointKey;
 import com.plaything.api.domain.key.model.response.PointKeyLog;
 import com.plaything.api.domain.repository.entity.user.User;
-import com.plaything.api.domain.user.service.UserServiceV1;
+import com.plaything.api.domain.profile.service.UserServiceV1;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

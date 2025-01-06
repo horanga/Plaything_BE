@@ -13,18 +13,18 @@ import com.plaything.api.domain.repository.entity.profile.ProfileImage;
 import com.plaything.api.domain.repository.repo.pay.PointKeyRepository;
 import com.plaything.api.domain.repository.repo.profile.ProfileRepository;
 import com.plaything.api.domain.repository.repo.user.UserRepository;
-import com.plaything.api.domain.user.constants.PersonalityTraitConstant;
-import com.plaything.api.domain.user.constants.PrimaryRole;
-import com.plaything.api.domain.user.constants.RelationshipPreferenceConstant;
-import com.plaything.api.domain.user.model.request.ProfileRegistration;
-import com.plaything.api.domain.user.service.ProfileFacadeV1;
+import com.plaything.api.domain.profile.constants.PersonalityTraitConstant;
+import com.plaything.api.domain.profile.constants.PrimaryRole;
+import com.plaything.api.domain.profile.constants.RelationshipPreferenceConstant;
+import com.plaything.api.domain.profile.model.request.ProfileRegistration;
+import com.plaything.api.domain.profile.service.ProfileFacadeV1;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-import static com.plaything.api.domain.user.constants.Gender.M;
+import static com.plaything.api.domain.profile.constants.Gender.M;
 
 @Component
 public class UserGenerator {

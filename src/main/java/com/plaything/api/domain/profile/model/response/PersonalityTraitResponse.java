@@ -1,7 +1,7 @@
-package com.plaything.api.domain.user.model.response;
+package com.plaything.api.domain.profile.model.response;
 
 import com.plaything.api.domain.repository.entity.profile.PersonalityTrait;
-import com.plaything.api.domain.user.constants.PersonalityTraitConstant;
+import com.plaything.api.domain.profile.constants.PersonalityTraitConstant;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "User의 세부 성향")

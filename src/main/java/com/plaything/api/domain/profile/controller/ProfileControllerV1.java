@@ -1,9 +1,9 @@
-package com.plaything.api.domain.user.controller;
+package com.plaything.api.domain.profile.controller;
 
-import com.plaything.api.domain.user.model.request.ProfileRegistration;
-import com.plaything.api.domain.user.model.request.ProfileUpdate;
-import com.plaything.api.domain.user.model.response.ProfileResponse;
-import com.plaything.api.domain.user.service.ProfileFacadeV1;
+import com.plaything.api.domain.profile.model.request.ProfileRegistration;
+import com.plaything.api.domain.profile.model.request.ProfileUpdate;
+import com.plaything.api.domain.profile.model.response.ProfileResponse;
+import com.plaything.api.domain.profile.service.ProfileFacadeV1;
 import com.plaything.api.security.JWTProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -15,13 +15,14 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Tag(name = "User API", description = "V1 User API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/user")
-public class UserControllerV1 {
+public class ProfileControllerV1 {
 
     private final ProfileFacadeV1 profileFacadeV1;
 
@@ -68,6 +69,21 @@ public class UserControllerV1 {
         String user = JWTProvider.getUserFromToken(token);
         return profileFacadeV1.getProfileByLoginId(user);
     }
+
+    @Operation(
+            summary = "특정 이용자의 프로필이 매칭에 포함되지 않도록 합니다",
+            description = "매칭 조회 시 특정 이용자의 프로필이 일주일간 포함되지 않도록 설정합니다"
+    )
+    @SecurityRequirement(name = "Authorization")
+    @PostMapping(value = "/hide-profile/{loginId}")
+    public void hideProfile(
+            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString,
+            @RequestParam(value = "loginId") String loginId) {
+        String token = JWTProvider.extractToken(authString);
+        String user = JWTProvider.getUserFromToken(token);
+        profileFacadeV1.hideProfile(user, loginId, LocalDate.now());
+    }
+
 
     @Operation(
             summary = "Set profile private",
@@ -122,6 +138,11 @@ public class UserControllerV1 {
         String user = JWTProvider.getUserFromToken(token);
         profileFacadeV1.delete(user);
     }
+
+
+
+
+
 //
 //    @DeleteMapping("/{id}/image")
 //    public ResponseEntity<Object> deleteUserImage(@PathVariable Long id,

@@ -1,6 +1,7 @@
 package com.plaything.api.domain.matching.service;
 
 import com.plaything.api.domain.matching.model.response.UserMatching;
+import com.plaything.api.domain.profile.service.ProfileFacadeV1;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ public class RedisService {
 
     private final RedisTemplate<String, String> redisTemplate;
     private final MatchingServiceV1 matchingServiceV1;
+    private final ProfileFacadeV1 profileFacadeV1;
     private final Map<String, int[]> viewCountMap = new ConcurrentHashMap<>();
 
     @CircuitBreaker(name = SIMPLE_CIRCUIT_BREAKER_CONIFG, fallbackMethod = "findMatchingCandidatesFallback")
@@ -36,12 +38,15 @@ public class RedisService {
         String matchingKey = loginId + MATCHING_LIST_REDIS_KEY;
         String profileKey = loginId + LAST_PROFILE_ID_REDIS_KEY;
         String countKey = loginId + COUNT_REDIS_KEY;
+        String profileHideKey = loginId +HIDE_PROFILE_KEY;
 
         List<Object> results = redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
             connection.keyCommands().exists(candidateKey.getBytes());
             connection.keyCommands().exists(matchingKey.getBytes());
+            connection.keyCommands().exists(profileHideKey.getBytes());
             connection.listCommands().lRange(candidateKey.getBytes(), 0, -1);
             connection.listCommands().lRange(matchingKey.getBytes(), 0, -1);
+            connection.listCommands().lRange(profileHideKey.getBytes(), 0, -1);
             connection.stringCommands().get(profileKey.getBytes());
             connection.stringCommands().get(countKey.getBytes());
             return null;
@@ -49,16 +54,20 @@ public class RedisService {
 
         boolean hasCandidates = (Boolean) results.get(0);  // exists는 Long 타입으로 반환
         boolean hasMatching = (Boolean) results.get(1);
-        List<String> candidateList = (List<String>) results.get(2);
-        List<String> matchingList = (List<String>) results.get(3);
-        String lastProfileId = (String) results.get(4);
-        String count = (String) results.get(5);
+        boolean hasHideProfile = (Boolean) results.get(2);
+        List<String> candidateList = (List<String>) results.get(3);
+        List<String> matchingList = (List<String>) results.get(4);
+        List<String> hideList = (List<String>) results.get(5);
+        String lastProfileId = (String) results.get(6);
+        String count = (String) results.get(7);
 
         return getUserMatchingInfo(loginId,
                 hasMatching,
                 hasCandidates,
+                hasHideProfile,
                 candidateList,
                 matchingList,
+                hideList,
                 lastProfileId,
                 count,
                 duration,
@@ -69,13 +78,14 @@ public class RedisService {
         logError(ex);
         List<String> candidates = matchingServiceV1.getMatchingCandidate(loginId);
         List<String> partners = matchingServiceV1.getMatchingPartner(loginId);
+        List<String> hideList = profileFacadeV1.getHideList(loginId);
 
         if (!viewCountMap.containsKey(loginId)) {
-            return matchingServiceV1.searchPartner(loginId, candidates, partners, 0);
+            return matchingServiceV1.searchPartner(loginId, candidates, partners, hideList, 0);
         }
         int[] counts = viewCountMap.get(loginId);
         List<String> availableCandidate = getAvailableCandidates(candidates, counts[0] / MAX_SKIP_COUNT);
-        return matchingServiceV1.searchPartner(loginId, availableCandidate, partners, counts[1]);
+        return matchingServiceV1.searchPartner(loginId, availableCandidate, partners, hideList, counts[1]);
     }
 
 
@@ -105,20 +115,24 @@ public class RedisService {
             String loginId,
             boolean hasMatching,
             boolean hasCandidates,
+            boolean hasHideProfile,
             List<String> candidateList,
             List<String> matchingList,
+            List<String> hideList,
             String lastProfileId,
             String count,
             int duration,
             TimeUnit timeUnit) {
 
 
-        if (!hasMatching || !hasCandidates) {
+        if (!hasMatching || !hasCandidates || !hasHideProfile) {
             return refreshCacheFromDB(
                     hasCandidates,
                     hasMatching,
+                    hasHideProfile,
                     candidateList,
                     matchingList,
+                    hideList,
                     lastProfileId,
                     loginId,
                     duration,
@@ -132,6 +146,7 @@ public class RedisService {
                 loginId,
                 candidates,
                 matchingList,
+                hideList,
                 lastProfileId != null ? Long.parseLong(lastProfileId) : 0L
         );
     }
@@ -146,8 +161,10 @@ public class RedisService {
     private List<UserMatching> refreshCacheFromDB(
             boolean candidateExist,
             boolean matchingExist,
+            boolean hasHideProfile,
             List<String> candidateList,
             List<String> matchingList,
+            List<String> hideList,
             String lastProfileId,
             String loginId,
             int duration,
@@ -163,12 +180,18 @@ public class RedisService {
             cacheListWithExpiry(loginId + MATCHING_LIST_REDIS_KEY, matchingList, duration, timeUnit);
         }
 
+        if(!hasHideProfile){
+            hideList = profileFacadeV1.getHideList(loginId);
+            cacheListWithExpiry(loginId+HIDE_PROFILE_KEY, hideList, duration, timeUnit);
+        }
+
         List<String> candidates = getAvailableCandidates(candidateList, count == null ? 0 : Integer.parseInt(count) / MAX_SKIP_COUNT);
 
         return matchingServiceV1.searchPartner(
                 loginId,
                 candidates,
                 matchingList,
+                hideList,
                 lastProfileId != null ? Long.parseLong(lastProfileId) : 0L);
     }
 
@@ -192,45 +215,5 @@ public class RedisService {
     public void cleanupViewCountMap() {
         viewCountMap.clear();
         log.info("View count map cleared");
-    }
-
-
-    // 조회할 때 7일 이상 지난 항목은 제외
-    public List<String> getActiveBlacklistedUsers(String key, LocalDateTime now) {
-        String redisKey = key + "::blackList";
-        List<String> allItems = redisTemplate.opsForList().range(redisKey, 0, -1);
-        if (allItems == null) {
-            return Collections.emptyList();
-        }
-
-        LocalDate weekAgo = now.toLocalDate().minusDays(RE_MATCHING_PERIOD);
-
-        // 유효한 항목과 만료된 항목 분리
-        List<String> validItems = new ArrayList<>();
-        List<String> expiredItems = new ArrayList<>();
-
-        for (String item : allItems) {
-            String[] parts = item.split(":");
-            LocalDate blacklistDate = LocalDate.parse(parts[1]);
-            if (blacklistDate.isAfter(weekAgo)) {
-                validItems.add(parts[0]);  // 유효한 loginId 저장
-            } else {
-                expiredItems.add(item);    // 만료된 항목 저장
-            }
-        }
-
-        // 만료된 항목들 삭제
-        for (String expired : expiredItems) {
-            redisTemplate.opsForList().remove(redisKey, 1, expired);
-        }
-
-        return validItems;
-    }
-
-    public void addToBlackList(String key, LocalDate now, String loginId) {
-        String redisKey = key + "::blackList";
-        // loginId:등록날짜 형태로 저장
-        String value = loginId + ":" + now.toString();
-        redisTemplate.opsForList().rightPush(redisKey, value);
     }
 }

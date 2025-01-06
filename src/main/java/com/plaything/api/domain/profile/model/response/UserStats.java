@@ -1,6 +1,5 @@
-package com.plaything.api.domain.user.model.response;
+package com.plaything.api.domain.profile.model.response;
 
-import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.entity.user.UserViolationStats;
 import io.swagger.v3.oas.annotations.media.Schema;
 

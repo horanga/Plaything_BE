@@ -1,8 +1,8 @@
 package com.plaything.api.domain.matching.service;
 
 import com.plaything.api.domain.matching.model.response.UserMatching;
-import com.plaything.api.domain.user.constants.PersonalityTraitConstant;
-import com.plaything.api.domain.user.constants.PrimaryRole;
+import com.plaything.api.domain.profile.constants.PersonalityTraitConstant;
+import com.plaything.api.domain.profile.constants.PrimaryRole;
 import com.plaything.api.util.UserGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static com.plaything.api.domain.matching.constants.MatchingConstants.*;
-import static com.plaything.api.domain.user.constants.PersonalityTraitConstant.SERVANT;
+import static com.plaything.api.domain.profile.constants.PersonalityTraitConstant.SERVANT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional

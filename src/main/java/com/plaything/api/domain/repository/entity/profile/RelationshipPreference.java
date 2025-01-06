@@ -1,6 +1,6 @@
 package com.plaything.api.domain.repository.entity.profile;
 
-import com.plaything.api.domain.user.constants.RelationshipPreferenceConstant;
+import com.plaything.api.domain.profile.constants.RelationshipPreferenceConstant;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

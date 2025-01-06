@@ -1,8 +1,8 @@
-package com.plaything.api.domain.user.model.response;
+package com.plaything.api.domain.profile.model.response;
 
 import com.plaything.api.domain.repository.entity.profile.Profile;
-import com.plaything.api.domain.user.constants.Gender;
-import com.plaything.api.domain.user.constants.ProfileStatus;
+import com.plaything.api.domain.profile.constants.Gender;
+import com.plaything.api.domain.profile.constants.ProfileStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;

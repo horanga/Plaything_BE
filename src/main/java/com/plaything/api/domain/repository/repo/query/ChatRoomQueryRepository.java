@@ -1,7 +1,7 @@
 package com.plaything.api.domain.repository.repo.query;
 
 import com.plaything.api.domain.repository.entity.chat.ChatRoom;
-import com.plaything.api.domain.repository.entity.user.profile.QProfile;
+import com.plaything.api.domain.repository.entity.profile.QProfile;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;

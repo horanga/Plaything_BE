@@ -2,8 +2,8 @@ package com.plaything.api.domain.matching.service;
 
 
 import com.plaything.api.domain.matching.model.response.UserMatching;
-import com.plaything.api.domain.user.constants.PersonalityTraitConstant;
-import com.plaything.api.domain.user.constants.PrimaryRole;
+import com.plaything.api.domain.profile.constants.PersonalityTraitConstant;
+import com.plaything.api.domain.profile.constants.PrimaryRole;
 import com.plaything.api.util.UserGenerator;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
@@ -23,7 +23,7 @@ import java.util.List;
 
 import static com.plaything.api.common.validator.DuplicateRequestChecker.SIMPLE_CIRCUIT_BREAKER_CONIFG;
 import static com.plaything.api.domain.matching.constants.MatchingConstants.*;
-import static com.plaything.api.domain.user.constants.PersonalityTraitConstant.PREY;
+import static com.plaything.api.domain.profile.constants.PersonalityTraitConstant.PREY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;

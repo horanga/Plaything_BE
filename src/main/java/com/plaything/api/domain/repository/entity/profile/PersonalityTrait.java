@@ -1,6 +1,6 @@
 package com.plaything.api.domain.repository.entity.profile;
 
-import com.plaything.api.domain.user.constants.PersonalityTraitConstant;
+import com.plaything.api.domain.profile.constants.PersonalityTraitConstant;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
