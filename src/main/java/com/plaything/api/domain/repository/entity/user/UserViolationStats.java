@@ -19,10 +19,6 @@ public class UserViolationStats {
 
     private long bannedImageCount;        // 이미지 위반으로 인한 제재 횟수
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
     public void increaseBannedImageCount() {
         this.bannedImageCount++;
     }
@@ -32,6 +28,6 @@ public class UserViolationStats {
     }
 
     public void increaseBannedProfileCount() {
-        this.bannedImageCount++;
+        this.bannedProfileCount++;
     }
 }

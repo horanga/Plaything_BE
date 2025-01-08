@@ -26,7 +26,6 @@ public class UserServiceV1 {
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
     }
 
-
     @Transactional(readOnly = true)
     public User findByLoginId(String loginId) {
         User user = userRepository.findByLoginId(loginId)
@@ -53,19 +52,4 @@ public class UserServiceV1 {
         user.delete();
     }
 
-    @Transactional
-    public void increaseBannedProfileCount(User user) {
-        Optional<UserViolationStats> violationStats = userViolationStatsRepository.findByUser(user);
-        if (violationStats.isEmpty()) {
-            UserViolationStats userViolationStats = UserViolationStats.builder().user(user)
-                    .bannedImageCount(0L)
-                    .bannedProfileCount(1L)
-                    .reportViolationCount(0L)
-                    .user(user)
-                    .build();
-            userViolationStatsRepository.save(userViolationStats);
-        } else {
-            violationStats.get().increaseBannedProfileCount();
-        }
-    }
 }

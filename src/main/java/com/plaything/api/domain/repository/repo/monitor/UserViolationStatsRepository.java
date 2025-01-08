@@ -8,5 +8,4 @@ import java.util.Optional;
 
 public interface UserViolationStatsRepository extends JpaRepository<UserViolationStats, Long> {
 
-    Optional<UserViolationStats> findByUser(User user);
 }

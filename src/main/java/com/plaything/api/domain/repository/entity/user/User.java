@@ -30,13 +30,17 @@ public class User extends BaseEntity {
     @Column
     private boolean isDeleted;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name = "User_credentials_id", referencedColumnName = "id")
     private UserCredentials credentials;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name = "profile_id", referencedColumnName = "id")
     private Profile profile;
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JoinColumn(name = "violation_stats_id")
+    private UserViolationStats violationStats;
 
     public void setProfile(Profile profile) {
         this.profile = profile;
@@ -44,6 +48,10 @@ public class User extends BaseEntity {
 
     public void setCredentials(UserCredentials credentials) {
         this.credentials = credentials;
+    }
+
+    public void setViolationStats(UserViolationStats violationStats) {
+        this.violationStats = violationStats;
     }
 
     public boolean isProfileEmpty() {
