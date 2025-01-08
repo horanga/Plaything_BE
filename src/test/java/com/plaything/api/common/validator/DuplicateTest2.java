@@ -48,7 +48,7 @@ public class DuplicateTest2 {
         // 슬로우콜로 OPEN 상태 만들기
         when(valueOperations.setIfAbsent(any(), any(), anyLong(), any()))
                 .thenAnswer(invocation -> {
-                    Thread.sleep(2000); // slow-call-duration-threshold보다 길게
+                    Thread.sleep(6000); // slow-call-duration-threshold보다 길게
                     return true;
                 });
 
@@ -59,13 +59,13 @@ public class DuplicateTest2 {
 
         assertThat(circuitBreaker.getState()).isEqualTo(CircuitBreaker.State.OPEN);
 
-        Thread.sleep(4000);
+        Thread.sleep(7000);
 
-        // 성공 케이스
+        // HALF_OPEN 상태에서의 성공 케이스 설정
         when(valueOperations.setIfAbsent(any(), any(), anyLong(), any()))
                 .thenReturn(true);
 
-        // HALF_OPEN에서 permitted-number-of-calls-in-half-open-state만큼 성공
+        // permitted-number-of-calls-in-half-open-state(5)만큼 성공 케이스 실행
         for (int i = 0; i < 5; i++) {
             duplicateRequestChecker.checkDuplicateRequest("user" + i, "tx" + i);
         }

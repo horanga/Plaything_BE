@@ -7,7 +7,6 @@ import io.lettuce.core.RedisCommandTimeoutException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -15,7 +14,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
 import java.util.Set;
 
 import static com.plaything.api.common.validator.DuplicateRequestChecker.SIMPLE_CIRCUIT_BREAKER_CONIFG;
@@ -41,7 +39,7 @@ public class CircuitBreakerTest {
     RedisTemplate<String, String> mockRedis;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         Set<String> keys = mockRedis.keys("*"); // 모든 키 조회
         if (keys != null && !keys.isEmpty()) {  // null과 빈 set 체크
             mockRedis.delete(keys);
@@ -61,19 +59,19 @@ public class CircuitBreakerTest {
         assertThat(circuitBreaker.getState()).isEqualTo(CircuitBreaker.State.CLOSED);
 
         // CircuitBreaker가 OPEN 상태가 될 때까지 충분한 실패 요청 발생
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 8; i++) {
             try {
                 duplicateRequestChecker.checkDuplicateRequest("user" + i, "tx" + i);
             } catch (Exception ignored) {
             }
         }
 
-        verify(duplicateRequestChecker, times(10)).fallback(any(), any(), any());
-        verify(pointKeyRepository, times(10)).existsByTransactionId(any()); // 모든 요청이 fallback으로
+        verify(duplicateRequestChecker, times(8)).fallback(any(), any(), any());
+        verify(pointKeyRepository, times(8)).existsByTransactionId(any()); // 모든 요청이 fallback으로
         assertThat(circuitBreaker.getState()).isEqualTo(CircuitBreaker.State.OPEN);
 
         try {
-            Thread.sleep(5000);
+            Thread.sleep(7000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
