@@ -18,10 +18,6 @@ public class RelationshipPreference {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "profile_id", nullable = false)
-    private Profile profile;
-
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private RelationshipPreferenceConstant relationshipPreference;
