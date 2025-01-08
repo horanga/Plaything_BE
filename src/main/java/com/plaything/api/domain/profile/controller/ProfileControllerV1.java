@@ -27,8 +27,8 @@ public class ProfileControllerV1 {
     private final ProfileFacadeV1 profileFacadeV1;
 
     @Operation(
-            summary = "Register profile",
-            description = "User의 프로필을 등록"
+            summary = "프로필 등록",
+            description = "유저의 신규 프로필을 등록합니다."
     )
     @SecurityRequirement(name = "Authorization")
     @PostMapping("/register-profile")

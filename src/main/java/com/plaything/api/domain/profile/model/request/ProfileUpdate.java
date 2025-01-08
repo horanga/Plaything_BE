@@ -10,6 +10,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.util.List;
+
 @Schema(description = "유저 프로필 변경")
 public record ProfileUpdate(
 
@@ -30,11 +32,22 @@ public record ProfileUpdate(
         @NotNull
         PrimaryRole primaryRole,
 
-        @Schema(description = "상세 성향")
+        @Schema(description = "제거할 상세 성향의 id")
         @NotNull
-        PersonalityTraitConstant personalityTraitConstant,
+        List<Integer> personalityTraitsToRemove,
+
+        @Schema(description = "새로 넣을 상세 성향")
+        @NotNull
+        List<PersonalityTraitConstant> personalityTraitConstant,
+
+        @Schema(description = "대표 상세 성향")
+        PersonalityTraitConstant primaryTrait,
+
+        @Schema(description = "제거할 선호 관계의 id")
+        @NotNull
+        List<Integer> relationshipPreferenceConstantToRemove,
 
         @Schema(description = "선호하는 관계")
         @NotNull
-        RelationshipPreferenceConstant relationshipPreferenceConstant
+        List<RelationshipPreferenceConstant> relationshipPreferenceConstant
 ) {}

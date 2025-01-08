@@ -1,18 +1,21 @@
 package com.plaything.api.domain.profile.service;
 
 import com.plaything.api.common.exception.CustomException;
-import com.plaything.api.domain.repository.entity.profile.ProfileHidePreference;
-import com.plaything.api.domain.repository.entity.user.User;
-import com.plaything.api.domain.repository.entity.user.UserCredentials;
+import com.plaything.api.domain.auth.model.request.CreateUserRequest;
+import com.plaything.api.domain.auth.service.AuthServiceV1;
+import com.plaything.api.domain.profile.constants.*;
+import com.plaything.api.domain.profile.model.request.ProfileRegistration;
+import com.plaything.api.domain.profile.model.request.ProfileUpdate;
+import com.plaything.api.domain.profile.model.response.ProfileResponse;
 import com.plaything.api.domain.repository.entity.profile.PersonalityTrait;
 import com.plaything.api.domain.repository.entity.profile.Profile;
+import com.plaything.api.domain.repository.entity.profile.ProfileHidePreference;
 import com.plaything.api.domain.repository.entity.profile.RelationshipPreference;
+import com.plaything.api.domain.repository.entity.user.User;
+import com.plaything.api.domain.repository.entity.user.UserCredentials;
 import com.plaything.api.domain.repository.repo.profile.ProfileHidePreferenceRepository;
 import com.plaything.api.domain.repository.repo.profile.ProfileRepository;
 import com.plaything.api.domain.repository.repo.user.UserRepository;
-import com.plaything.api.domain.profile.constants.*;
-import com.plaything.api.domain.profile.model.request.ProfileRegistration;
-import com.plaything.api.domain.profile.model.response.ProfileResponse;
 import com.plaything.api.util.UserGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,6 +37,7 @@ import static com.plaything.api.domain.profile.constants.Gender.*;
 import static com.plaything.api.domain.profile.constants.PersonalityTraitConstant.*;
 import static com.plaything.api.domain.profile.constants.PrimaryRole.*;
 import static com.plaything.api.domain.profile.constants.ProfileStatus.NEW;
+import static com.plaything.api.domain.profile.constants.RelationshipPreferenceConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -56,6 +60,8 @@ class ProfileFacadeV1Test {
 
     @Autowired
     private ProfileHidePreferenceRepository profileHidePreferenceRepository;
+    @Autowired
+    private AuthServiceV1 authServiceV1;
 
     @BeforeEach
     void setUp() {
@@ -525,6 +531,162 @@ class ProfileFacadeV1Test {
     }
 
 
+    @DisplayName("프로필을 업데이트할 수 있다.")
+    @Test
+    void test16() {
+
+
+        CreateUserRequest request = new CreateUserRequest("fnel123", "1234", "aa");
+        authServiceV1.creatUser(request);
+
+        ProfileRegistration registration = new ProfileRegistration(
+                "알렉1",
+                "안녕하세요",
+                M,
+                TOP,
+                List.of(SPANKER, HUNTER),
+                HUNTER,
+                List.of(RelationshipPreferenceConstant.DATE_DS, DS),
+                LocalDate.of(1995, 3, 30));
+
+        profileFacadeV1.registerProfile(registration, "fnel123");
+
+
+        ProfileUpdate profileUpdate = new ProfileUpdate(
+                "알렉2",
+                M,
+                "안녕하세요",
+                TOP,
+                List.of(0),
+                List.of(BRAT_TAMER),
+                null,
+                List.of(0),
+                List.of(HOM)
+        );
+
+        profileFacadeV1.updateProfile(profileUpdate, "fnel123");
+        ProfileResponse profile2 = profileFacadeV1.getProfileByLoginId("fnel123");
+
+        assertThat(profile2.isPrivate()).isFalse();
+        assertThat(profile2.age()).isEqualTo(30);
+        assertThat(profile2.gender()).isEqualTo(M);
+        assertThat(profile2.nickName()).isEqualTo("알렉2");
+        assertThat(profile2.primaryRole()).isEqualTo("MT");
+        assertThat(profile2.introduction()).isEqualTo("안녕하세요");
+        assertThat(profile2.personalityTrait()).extracting("personalityTrait").containsExactly(HUNTER, BRAT_TAMER);
+        assertThat(profile2.personalityTrait()).extracting("isPrimaryTrait").containsExactly(true, false);
+        assertThat(profile2.relationshipPreference()).extracting("relationshipPreference").containsExactly(DS, HOM);
+    }
+
+
+    @DisplayName("세부성향과 관계지향을 추가만 해도 프로필 업데이트 된다.")
+    @Test
+    void test17() {
+
+        CreateUserRequest request = new CreateUserRequest("fnel123", "1234", "aa");
+        authServiceV1.creatUser(request);
+
+        ProfileRegistration registration = new ProfileRegistration(
+                "알렉1",
+                "안녕하세요",
+                M,
+                TOP,
+                List.of(SPANKER, HUNTER),
+                HUNTER,
+                List.of(RelationshipPreferenceConstant.DATE_DS, DS),
+                LocalDate.of(1995, 3, 30));
+
+        profileFacadeV1.registerProfile(registration, "fnel123");
+
+        ProfileUpdate profileUpdate = new ProfileUpdate(
+                "알렉1",
+                M,
+                "안녕하세요",
+                TOP,
+                null,
+                List.of(BRAT_TAMER),
+                null,
+                null,
+                List.of(HOM)
+        );
+
+        profileFacadeV1.updateProfile(profileUpdate, "fnel123");
+        ProfileResponse profile2 = profileFacadeV1.getProfileByLoginId("fnel123");
+
+        assertThat(profile2.isPrivate()).isFalse();
+        assertThat(profile2.age()).isEqualTo(30);
+        assertThat(profile2.gender()).isEqualTo(M);
+        assertThat(profile2.nickName()).isEqualTo("알렉1");
+        assertThat(profile2.primaryRole()).isEqualTo("MT");
+        assertThat(profile2.introduction()).isEqualTo("안녕하세요");
+        assertThat(profile2.personalityTrait()).extracting("personalityTrait").containsExactly(SPANKER, HUNTER, BRAT_TAMER);
+        assertThat(profile2.personalityTrait()).extracting("isPrimaryTrait").containsExactly(false, true, false);
+        assertThat(profile2.relationshipPreference()).extracting("relationshipPreference").containsExactly(DATE_DS, DS, HOM);
+    }
+
+    @DisplayName("세부성향과 관계지향을 리미트를 초과하면, 초과하기 건까지의 값만 업데이트된다")
+    @Test
+    void test18() {
+
+        CreateUserRequest request = new CreateUserRequest("fnel123", "1234", "aa");
+        authServiceV1.creatUser(request);
+
+        ProfileRegistration registration = new ProfileRegistration(
+                "알렉1",
+                "안녕하세요",
+                M,
+                TOP,
+                List.of(SPANKER, HUNTER),
+                HUNTER,
+                List.of(MARRIAGE_DS,
+                        DATE_DS,
+                        DS,
+                        FWB,
+                        PLAYPARTNER,
+                        HOM),
+                LocalDate.of(1995, 3, 30));
+
+        profileFacadeV1.registerProfile(registration, "fnel123");
+
+        ProfileUpdate profileUpdate = new ProfileUpdate(
+                "알렉1",
+                M,
+                "안녕하세요",
+                TOP,
+                null,
+                List.of(BRAT_TAMER, DOMINANT, DEGRADER, DADDY_MOMMY, MASTER_MISTRESS, OWNER),
+                null,
+                null,
+                List.of(HOM)
+        );
+
+        profileFacadeV1.updateProfile(profileUpdate, "fnel123");
+        ProfileResponse profile2 = profileFacadeV1.getProfileByLoginId("fnel123");
+
+
+        assertThat(profile2.personalityTrait()).extracting("personalityTrait").containsExactly(
+                SPANKER,
+                HUNTER,
+                BRAT_TAMER,
+                DOMINANT,
+                DEGRADER,
+                DADDY_MOMMY);
+        assertThat(profile2.personalityTrait()).extracting("isPrimaryTrait").containsExactly(
+                false,
+                true,
+                false,
+                false,
+                false,
+                false);
+        assertThat(profile2.relationshipPreference()).extracting("relationshipPreference").containsExactly(
+                MARRIAGE_DS,
+                DATE_DS,
+                DS,
+                FWB,
+                PLAYPARTNER,
+                HOM
+        );
+    }
 
     private Profile getProfileFromDb(
             String nickname,
