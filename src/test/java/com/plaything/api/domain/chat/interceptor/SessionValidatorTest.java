@@ -4,16 +4,16 @@ import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
 import com.plaything.api.domain.auth.service.AuthServiceV1;
 import com.plaything.api.domain.chat.model.reqeust.ChatRequest;
-import com.plaything.api.domain.repository.entity.matching.Matching;
-import com.plaything.api.domain.repository.entity.user.User;
-import com.plaything.api.domain.repository.repo.matching.MatchingRepository;
 import com.plaything.api.domain.profile.constants.PersonalityTraitConstant;
 import com.plaything.api.domain.profile.constants.PrimaryRole;
 import com.plaything.api.domain.profile.constants.RelationshipPreferenceConstant;
 import com.plaything.api.domain.profile.model.request.ProfileRegistration;
-import com.plaything.api.domain.profile.model.response.ProfileResponse;
+import com.plaything.api.domain.profile.model.response.MyPageProfile;
 import com.plaything.api.domain.profile.service.ProfileFacadeV1;
 import com.plaything.api.domain.profile.service.UserServiceV1;
+import com.plaything.api.domain.repository.entity.matching.Matching;
+import com.plaything.api.domain.repository.entity.user.User;
+import com.plaything.api.domain.repository.repo.matching.MatchingRepository;
 import com.plaything.api.security.JWTProvider;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -123,7 +123,7 @@ class SessionValidatorTest {
         String token = JWTProvider.createToken(loginId);
         String sessionId = "session";
 
-        ProfileResponse profileByLoginId = profileFacadeV1.getProfileByLoginId("dusgh1234");
+        MyPageProfile profileByLoginId = profileFacadeV1.getMyPageProfile("dusgh1234");
         User user = userServiceV1.findByLoginId("dusgh1234");
 
         profileFacadeV1.banProfile(profileByLoginId.id(), "부적절한 사진", user);
