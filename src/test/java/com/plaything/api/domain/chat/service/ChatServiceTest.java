@@ -250,7 +250,7 @@ public class ChatServiceTest {
     }
 
 
-    @DisplayName("채팅 메시지를 보낼 때 누락된 메시지가 있으면 이를 받게 된다")
+    @DisplayName("동시성 테스트")
     @Test
     void test5() {
         LocalDateTime date1 = LocalDateTime.now();
