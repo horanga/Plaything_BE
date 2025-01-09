@@ -39,11 +39,14 @@ public class MatchingControllerV1 {
                     성공: 200 OK
                     
                     #예외#
-                    (1) 409 Conflict : 네트워크 에러로 인한 중복 요청
+                    (1) 409 Conflict
+                    - 네트워크 에러로 인한 중복 요청
                     
-                    (2) 404 NOT FOUND: 매칭에 필요한 재화 부족
+                    (2) 404 NOT FOUND
+                    - 매칭에 필요한 재화 부족
                     
-                    (3) 500 Server-error : 알림 전송 실패
+                    (3) 500 Server-error
+                    - 알림 전송 실패
                     """
     )
     @SecurityRequirement(name = "Authorization")
@@ -75,13 +78,15 @@ public class MatchingControllerV1 {
                     
                     #예외#
                     
-                    (1) 409 Conflict : 네트워크 에러로 인한 중복 요청
+                    (1) 409 Conflict
+                    - 네트워크 에러로 인한 중복 요청
                     
-                    (2) 404 NOT FOUND: 매칭에 필요한 재화 부족
+                    (2) 404 NOT FOUND
+                    - 매칭에 필요한 재화 부족
+                    - 수락하려는 매칭 요청이 존재하지 않음
                     
-                    (3) 404 NOT FOUND: 수락하려는 매칭 요청이 존재하지 않음
-                    
-                    (4) 401 Unauthorized: 인증되지 않은 사용자
+                    (4) 401 Unauthorized
+                    - 인증되지 않은 사용자
                     """
     )
     @SecurityRequirement(name = "Authorization")
@@ -102,11 +107,15 @@ public class MatchingControllerV1 {
                     이용자 성향에 맞춰 매칭 가능한 프로필 목록을 조회합니다.
                     매칭 시 프로필에 있는 로그인 id를 활용할 수 있습니다.
                     
+                    #매칭 목록에서 제외되는 대상
+                    (1) 매칭을 신청한 사람
+                    (2) 매칭이 성사된 사람
+                    (3) 프로필 숨기기를 한 사람
+                    
+                    위 세 대상들은 캐싱을 하기 때문에 실시간 반영이 안 될 수 있습니다.
+                    
                     #응답#
                     성공: 200 OK
-                    
-                    
-                    
                     """
     )
     @SecurityRequirement(name = "Authorization")
