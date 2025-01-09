@@ -9,7 +9,6 @@ import com.plaything.api.domain.auth.model.response.LoginResponse;
 import com.plaything.api.domain.key.service.PointKeyFacadeV1;
 import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.entity.user.UserCredentials;
-import com.plaything.api.domain.repository.entity.user.UserViolationStats;
 import com.plaything.api.domain.repository.repo.user.UserRepository;
 import com.plaything.api.security.Hasher;
 import com.plaything.api.security.JWTProvider;
@@ -88,18 +87,9 @@ public class AuthServiceV1 {
         try {
             User newUser = this.newUser(request.loginId(), request.fcmToken());
             UserCredentials newCredentials = this.newUserCredentials(request.password(), newUser);
-            UserViolationStats userViolationStats = UserViolationStats.builder()
-                    .bannedImageCount(0)
-                    .bannedProfileCount(0)
-                    .reportViolationCount(0).build();
-            newUser.setCredentials(newCredentials);
-            newUser.setViolationStats(userViolationStats);
+            User.createUser(newUser, newCredentials);
+            userRepository.save(newUser);
 
-            User savedUser = userRepository.save(newUser);
-
-            if (savedUser == null) {
-                throw new CustomException(ErrorCode.USER_SAVED_FAILED);
-            }
         } catch (Exception e) {
             throw new CustomException(ErrorCode.USER_SAVED_FAILED);
         }
