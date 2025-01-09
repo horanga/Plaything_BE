@@ -6,7 +6,7 @@ import com.plaything.api.domain.auth.service.AuthServiceV1;
 import com.plaything.api.domain.profile.constants.RelationshipPreferenceConstant;
 import com.plaything.api.domain.profile.model.request.ProfileRegistration;
 import com.plaything.api.domain.profile.model.request.ProfileUpdate;
-import com.plaything.api.domain.profile.model.response.ProfileResponse;
+import com.plaything.api.domain.profile.model.response.MyPageProfile;
 import com.plaything.api.domain.repository.repo.monitor.ProfileRecordRepository;
 import com.plaything.api.domain.repository.repo.profile.ProfileRepository;
 import com.plaything.api.domain.repository.repo.user.UserRepository;
@@ -102,7 +102,7 @@ public class ProfileRollbackTest {
         TestTransaction.end();
         TestTransaction.start();
 
-        assertThatThrownBy(()->profileFacadeV1.updateProfile(profileUpdate, "fnel123"))
+        assertThatThrownBy(() -> profileFacadeV1.updateProfile(profileUpdate, "fnel123"))
                 .isInstanceOf(CustomException.class)
                 .hasMessage("이미 등록된 닉네임입니다");
 
@@ -110,7 +110,7 @@ public class ProfileRollbackTest {
         TestTransaction.end();
         TestTransaction.start();
 
-        ProfileResponse profile = profileFacadeV1.getProfileByLoginId("fnel123");
+        MyPageProfile profile = profileFacadeV1.getMyPageProfile("fnel123");
         assertThat(profile.nickName()).isEqualTo("알렉1");
         assertThat(profile.gender()).isEqualTo(M);
         assertThat(profile.primaryRole()).isEqualTo("MT");
@@ -157,7 +157,7 @@ public class ProfileRollbackTest {
         TestTransaction.end();
         TestTransaction.start();
 
-        assertThatThrownBy(()->profileFacadeV1.updateProfile(profileUpdate, "fnel123"))
+        assertThatThrownBy(() -> profileFacadeV1.updateProfile(profileUpdate, "fnel123"))
                 .isInstanceOf(CustomException.class)
                 .hasMessage("대표성향을 선택하지 않았습니다");
 
@@ -165,7 +165,7 @@ public class ProfileRollbackTest {
         TestTransaction.end();
         TestTransaction.start();
 
-        ProfileResponse profile = profileFacadeV1.getProfileByLoginId("fnel123");
+        MyPageProfile profile = profileFacadeV1.getMyPageProfile("fnel123");
         assertThat(profile.nickName()).isEqualTo("알렉1");
         assertThat(profile.gender()).isEqualTo(M);
         assertThat(profile.primaryRole()).isEqualTo("MT");
@@ -210,7 +210,7 @@ public class ProfileRollbackTest {
         TestTransaction.end();
         TestTransaction.start();
 
-        assertThatThrownBy(()->profileFacadeV1.updateProfile(profileUpdate, "fnel123"))
+        assertThatThrownBy(() -> profileFacadeV1.updateProfile(profileUpdate, "fnel123"))
                 .isInstanceOf(CustomException.class)
                 .hasMessage("대표성향과 일치하지 않는 세부성향입니다");
 
@@ -218,7 +218,7 @@ public class ProfileRollbackTest {
         TestTransaction.end();
         TestTransaction.start();
 
-        ProfileResponse profile = profileFacadeV1.getProfileByLoginId("fnel123");
+        MyPageProfile profile = profileFacadeV1.getMyPageProfile("fnel123");
         assertThat(profile.nickName()).isEqualTo("알렉1");
         assertThat(profile.gender()).isEqualTo(M);
         assertThat(profile.primaryRole()).isEqualTo("MT");
@@ -263,7 +263,7 @@ public class ProfileRollbackTest {
         TestTransaction.end();
         TestTransaction.start();
 
-        assertThatThrownBy(()->profileFacadeV1.updateProfile(profileUpdate, "fnel123"))
+        assertThatThrownBy(() -> profileFacadeV1.updateProfile(profileUpdate, "fnel123"))
                 .isInstanceOf(CustomException.class)
                 .hasMessage("대표성향과 일치하지 않는 세부성향입니다");
 
@@ -271,12 +271,12 @@ public class ProfileRollbackTest {
         TestTransaction.end();
         TestTransaction.start();
 
-        ProfileResponse profile = profileFacadeV1.getProfileByLoginId("fnel123");
+        MyPageProfile profile = profileFacadeV1.getMyPageProfile("fnel123");
         assertThat(profile.nickName()).isEqualTo("알렉1");
         assertThat(profile.gender()).isEqualTo(M);
         assertThat(profile.introduction()).isEqualTo("안녕하세요");
         assertThat(profile.personalityTrait()).extracting("personalityTrait").containsExactly(SPANKEE);
-        assertThat(profile.personalityTrait()).extracting("isPrimaryTrait").containsExactly( true);
+        assertThat(profile.personalityTrait()).extracting("isPrimaryTrait").containsExactly(true);
         assertThat(profile.relationshipPreference()).extracting("relationshipPreference").containsExactly(DATE_DS, DS);
     }
 
@@ -315,7 +315,7 @@ public class ProfileRollbackTest {
         TestTransaction.end();
         TestTransaction.start();
 
-        assertThatThrownBy(()->profileFacadeV1.updateProfile(profileUpdate, "fnel123"))
+        assertThatThrownBy(() -> profileFacadeV1.updateProfile(profileUpdate, "fnel123"))
                 .isInstanceOf(CustomException.class)
                 .hasMessage("대표성향과 일치하지 않는 세부성향입니다");
 
@@ -323,7 +323,7 @@ public class ProfileRollbackTest {
         TestTransaction.end();
         TestTransaction.start();
 
-        ProfileResponse profile = profileFacadeV1.getProfileByLoginId("fnel123");
+        MyPageProfile profile = profileFacadeV1.getMyPageProfile("fnel123");
         assertThat(profile.nickName()).isEqualTo("알렉1");
         assertThat(profile.gender()).isEqualTo(M);
         assertThat(profile.primaryRole()).isEqualTo("MT");
@@ -368,7 +368,7 @@ public class ProfileRollbackTest {
         TestTransaction.end();
         TestTransaction.start();
 
-        assertThatThrownBy(()->profileFacadeV1.updateProfile(profileUpdate, "fnel123"))
+        assertThatThrownBy(() -> profileFacadeV1.updateProfile(profileUpdate, "fnel123"))
                 .isInstanceOf(CustomException.class)
                 .hasMessage("대표성향과 일치하지 않는 세부성향입니다");
 
@@ -376,7 +376,7 @@ public class ProfileRollbackTest {
         TestTransaction.end();
         TestTransaction.start();
 
-        ProfileResponse profile = profileFacadeV1.getProfileByLoginId("fnel123");
+        MyPageProfile profile = profileFacadeV1.getMyPageProfile("fnel123");
         assertThat(profile.nickName()).isEqualTo("알렉1");
         assertThat(profile.gender()).isEqualTo(M);
         assertThat(profile.introduction()).isEqualTo("안녕하세요");
@@ -420,7 +420,7 @@ public class ProfileRollbackTest {
         TestTransaction.end();
         TestTransaction.start();
 
-        assertThatThrownBy(()->profileFacadeV1.updateProfile(profileUpdate, "fnel123"))
+        assertThatThrownBy(() -> profileFacadeV1.updateProfile(profileUpdate, "fnel123"))
                 .isInstanceOf(CustomException.class)
                 .hasMessage("대표성향과 일치하지 않는 세부성향입니다");
 
@@ -428,7 +428,7 @@ public class ProfileRollbackTest {
         TestTransaction.end();
         TestTransaction.start();
 
-        ProfileResponse profile = profileFacadeV1.getProfileByLoginId("fnel123");
+        MyPageProfile profile = profileFacadeV1.getMyPageProfile("fnel123");
         assertThat(profile.nickName()).isEqualTo("알렉1");
         assertThat(profile.gender()).isEqualTo(M);
         assertThat(profile.primaryRole()).isEqualTo("MT");
@@ -473,7 +473,7 @@ public class ProfileRollbackTest {
         TestTransaction.end();
         TestTransaction.start();
 
-        assertThatThrownBy(()->profileFacadeV1.updateProfile(profileUpdate, "fnel123"))
+        assertThatThrownBy(() -> profileFacadeV1.updateProfile(profileUpdate, "fnel123"))
                 .isInstanceOf(CustomException.class)
                 .hasMessage("대표성향과 일치하지 않는 세부성향입니다");
 
@@ -481,7 +481,7 @@ public class ProfileRollbackTest {
         TestTransaction.end();
         TestTransaction.start();
 
-        ProfileResponse profile = profileFacadeV1.getProfileByLoginId("fnel123");
+        MyPageProfile profile = profileFacadeV1.getMyPageProfile("fnel123");
         assertThat(profile.nickName()).isEqualTo("알렉1");
         assertThat(profile.gender()).isEqualTo(M);
         assertThat(profile.introduction()).isEqualTo("안녕하세요");
@@ -490,7 +490,7 @@ public class ProfileRollbackTest {
         assertThat(profile.relationshipPreference()).extracting("relationshipPreference").containsExactly(DATE_DS, DS);
     }
 
-    @DisplayName("대표성향과 다른 상세성향을 선택하면 프로필 업데이트가 실패한다4(탑)")
+    @DisplayName("대표성향을 두개 이상 선택하면 프로필 업데이트에 실패한다(탑)")
     @Test
     void test9() {
 
@@ -525,7 +525,7 @@ public class ProfileRollbackTest {
         TestTransaction.end();
         TestTransaction.start();
 
-        assertThatThrownBy(()->profileFacadeV1.updateProfile(profileUpdate, "fnel123"))
+        assertThatThrownBy(() -> profileFacadeV1.updateProfile(profileUpdate, "fnel123"))
                 .isInstanceOf(CustomException.class)
                 .hasMessage("대표성향은 두 개 이상일 수 없습니다");
 
@@ -533,7 +533,7 @@ public class ProfileRollbackTest {
         TestTransaction.end();
         TestTransaction.start();
 
-        ProfileResponse profile = profileFacadeV1.getProfileByLoginId("fnel123");
+        MyPageProfile profile = profileFacadeV1.getMyPageProfile("fnel123");
         assertThat(profile.nickName()).isEqualTo("알렉1");
         assertThat(profile.gender()).isEqualTo(M);
         assertThat(profile.introduction()).isEqualTo("안녕하세요");
@@ -542,7 +542,7 @@ public class ProfileRollbackTest {
         assertThat(profile.relationshipPreference()).extracting("relationshipPreference").containsExactly(DATE_DS, DS);
     }
 
-    @DisplayName("대표성향과 다른 상세성향을 선택하면 프로필 업데이트가 실패한다4(바텀)")
+    @DisplayName("대표성향을 두개 이상 선택하면 프로필 업데이트에 실패한다(바텀)")
     @Test
     void test10() {
 
@@ -577,7 +577,7 @@ public class ProfileRollbackTest {
         TestTransaction.end();
         TestTransaction.start();
 
-        assertThatThrownBy(()->profileFacadeV1.updateProfile(profileUpdate, "fnel123"))
+        assertThatThrownBy(() -> profileFacadeV1.updateProfile(profileUpdate, "fnel123"))
                 .isInstanceOf(CustomException.class)
                 .hasMessage("대표성향은 두 개 이상일 수 없습니다");
 
@@ -585,7 +585,7 @@ public class ProfileRollbackTest {
         TestTransaction.end();
         TestTransaction.start();
 
-        ProfileResponse profile = profileFacadeV1.getProfileByLoginId("fnel123");
+        MyPageProfile profile = profileFacadeV1.getMyPageProfile("fnel123");
         assertThat(profile.nickName()).isEqualTo("알렉1");
         assertThat(profile.gender()).isEqualTo(M);
         assertThat(profile.introduction()).isEqualTo("안녕하세요");
