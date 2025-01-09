@@ -3,25 +3,21 @@ package com.plaything.api.domain.chat.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
-import com.plaything.api.domain.auth.model.request.CreateUserRequest;
-import com.plaything.api.domain.auth.service.AuthServiceV1;
 import com.plaything.api.domain.chat.model.reqeust.ChatRequest;
 import com.plaything.api.domain.index.model.response.IndexResponse;
 import com.plaything.api.domain.index.service.IndexServiceV1;
-import com.plaything.api.domain.repository.entity.chat.ChatRoom;
-import com.plaything.api.domain.repository.entity.matching.Matching;
+import com.plaything.api.domain.profile.constants.PersonalityTraitConstant;
 import com.plaything.api.domain.repository.repo.chat.ChatRepository;
 import com.plaything.api.domain.repository.repo.chat.ChatRoomRepository;
+import com.plaything.api.domain.repository.repo.log.KeyLogRepository;
 import com.plaything.api.domain.repository.repo.matching.MatchingRepository;
 import com.plaything.api.domain.repository.repo.monitor.ProfileRecordRepository;
+import com.plaything.api.domain.repository.repo.notification.NotificationRepository;
+import com.plaything.api.domain.repository.repo.pay.PointKeyRepository;
 import com.plaything.api.domain.repository.repo.profile.ProfileRepository;
 import com.plaything.api.domain.repository.repo.user.UserRepository;
-import com.plaything.api.domain.profile.constants.PersonalityTraitConstant;
-import com.plaything.api.domain.profile.constants.PrimaryRole;
-import com.plaything.api.domain.profile.constants.RelationshipPreferenceConstant;
-import com.plaything.api.domain.profile.model.request.ProfileRegistration;
-import com.plaything.api.domain.profile.service.ProfileFacadeV1;
 import com.plaything.api.security.JWTProvider;
+import com.plaything.api.util.UserGenerator;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,14 +37,13 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 import java.lang.reflect.Type;
-import java.time.LocalDate;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static com.plaything.api.domain.profile.constants.Gender.M;
+import static com.plaything.api.domain.profile.constants.PrimaryRole.BOTTOM;
+import static com.plaything.api.domain.profile.constants.PrimaryRole.TOP;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
@@ -60,12 +55,6 @@ public class StompTest {
 
     private WebSocketStompClient stompClient;
     private String url;
-
-    @Autowired
-    private AuthServiceV1 authServiceV1;
-
-    @Autowired
-    private ProfileFacadeV1 profileFacadeV1;
 
     @Autowired
     private MatchingRepository matchingRepository;
@@ -88,32 +77,40 @@ public class StompTest {
     @Autowired
     private ProfileRecordRepository profileRecordRepository;
 
+    @Autowired
+    private UserGenerator userGenerator;
+
+    @Autowired
+    private KeyLogRepository keyLogRepository;
+
+    @Autowired
+    private PointKeyRepository pointKeyRepository;
+
+    @Autowired
+    private NotificationRepository notificationRepository;
 
     @BeforeEach
     void setup() {
 
-        CreateUserRequest request = new CreateUserRequest("dusgh1234", "1234", "1");
-        authServiceV1.creatUser(request);
+        userGenerator.generateWithRole(
+                "dusgh1234",
+                "123",
+                "c",
+                "alex",
+                TOP,
+                PersonalityTraitConstant.BOSS);
+        userGenerator.addImages("alex", "a");
 
-        LocalDate now = LocalDate.now();
-        ProfileRegistration profileRegistration = new ProfileRegistration(
-                "alex", "hi", M, PrimaryRole.TOP, List.of(PersonalityTraitConstant.BOSS), PersonalityTraitConstant.BOSS, List.of(RelationshipPreferenceConstant.DATE_DS), now);
+        userGenerator.generateWithRole(
+                "dusgh12345",
+                "123",
+                "d",
+                "alex2",
+                BOTTOM,
+                PersonalityTraitConstant.SERVANT);
+        userGenerator.addImages("alex2", "a");
 
-        profileFacadeV1.registerProfile(profileRegistration, "dusgh1234");
-
-        CreateUserRequest request2 = new CreateUserRequest("dusgh12345", "1234", "1");
-        authServiceV1.creatUser(request2);
-
-        ProfileRegistration profileRegistration2 = new ProfileRegistration(
-                "alex2", "hi", M, PrimaryRole.TOP, List.of(PersonalityTraitConstant.BOSS), PersonalityTraitConstant.BOSS, List.of(RelationshipPreferenceConstant.DATE_DS), now);
-
-        profileFacadeV1.registerProfile(profileRegistration2, "dusgh12345");
-
-        ChatRoom room = ChatRoom.builder().senderLoginId("alex").receiverLoginId("alex2").build();
-        chatRoomRepository.save(room);
-
-        Matching matching = Matching.builder().receiverLoginId("alex").senderLoginId("alex2").isMatched(true).isOvered(false).build();
-        matchingRepository.save(matching);
+        userGenerator.createMatching("dusgh1234", "123", "dusgh12345", "123");
 
         TestTransaction.flagForCommit();
         TestTransaction.end();
@@ -139,6 +136,9 @@ public class StompTest {
         matchingRepository.deleteAll();
         // profile_record는 user를 참조하므로 먼저 삭제
         profileRecordRepository.deleteAll();  // profile_record 레포지토리 추가 필요
+        keyLogRepository.deleteAll();
+        pointKeyRepository.deleteAll();
+        notificationRepository.deleteAll();
         // user는 profile을 참조하므로 user 먼저 삭제
         userRepository.deleteAll();
         // 마지막으로 profile 삭제
@@ -167,7 +167,7 @@ public class StompTest {
         // 메시지 구독 설정
         CompletableFuture<ChatRequest> messageFuture = new CompletableFuture<>();
         StompHeaders subscribeHeaders = new StompHeaders();
-        subscribeHeaders.setDestination("/user/alex/chat");
+        subscribeHeaders.setDestination("/user/dusgh1234/chat");
         subscribeHeaders.add("Authorization", "Bearer " + token);
 
         receiverSession.subscribe(subscribeHeaders, new StompFrameHandler() {
@@ -195,9 +195,9 @@ public class StompTest {
         ).get(15, TimeUnit.SECONDS);
 
         // when
-        ChatRequest testChatRequest = new ChatRequest(1, "발신자", "alex", "test chat");
+        ChatRequest testChatRequest = new ChatRequest(1, "dusgh12345", "dusgh1234", "test chat");
         StompHeaders sendHeaders = new StompHeaders();
-        sendHeaders.setDestination("/pub/chat/chat/alex");
+        sendHeaders.setDestination("/pub/chat/message/dusgh1234");
         sendHeaders.add("Authorization", "Bearer " + token2);
 
         senderSession.send(sendHeaders, testChatRequest);
@@ -205,8 +205,8 @@ public class StompTest {
         // then
         ChatRequest receivedChatRequest = messageFuture.get(10, TimeUnit.SECONDS);
         assertThat(receivedChatRequest.chat()).isEqualTo("test chat");
-        assertThat(receivedChatRequest.senderLoginId()).isEqualTo("발신자");
-        assertThat(receivedChatRequest.receiverLoginId()).isEqualTo("alex");
+        assertThat(receivedChatRequest.senderLoginId()).isEqualTo("dusgh12345");
+        assertThat(receivedChatRequest.receiverLoginId()).isEqualTo("dusgh1234");
 
     }
 
@@ -240,7 +240,7 @@ public class StompTest {
 
         CompletableFuture<ChatRequest> messageFuture = new CompletableFuture<>();
         StompHeaders subscribeHeaders = new StompHeaders();
-        subscribeHeaders.setDestination("/user/alex2/chat");
+        subscribeHeaders.setDestination("/user/dusgh12345/chat");
         subscribeHeaders.add("Authorization", "Bearer " + token2);
 
         receiverSession.subscribe(subscribeHeaders, new StompFrameHandler() {
@@ -256,9 +256,9 @@ public class StompTest {
         });
 
         // when
-        ChatRequest testChatRequest = new ChatRequest(1, "alex", "alex2", "test chat");
+        ChatRequest testChatRequest = new ChatRequest(1, "dusgh1234", "dusgh12345", "test chat");
         StompHeaders sendHeaders = new StompHeaders();
-        sendHeaders.setDestination("/pub/chat/chat/alex2");
+        sendHeaders.setDestination("/pub/chat/message/dusgh12345");
         sendHeaders.add("Authorization", "Bearer " + token);
 
         senderSession.send(sendHeaders, testChatRequest);
@@ -275,7 +275,5 @@ public class StompTest {
 
         assertThat(noti1.hasNewChat()).isFalse();
         assertThat(noti2.hasNewChat()).isTrue();
-
     }
-
 }

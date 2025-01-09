@@ -29,7 +29,6 @@ public class AuthServiceV1 {
 
     private final UserRepository userRepository;
     private final Hasher hasher;
-
     private final PointKeyFacadeV1 pointKeyFacadeV1;
 
     public String getUserFromToken(String token) {
@@ -88,13 +87,9 @@ public class AuthServiceV1 {
         try {
             User newUser = this.newUser(request.loginId(), request.fcmToken());
             UserCredentials newCredentials = this.newUserCredentials(request.password(), newUser);
-            newUser.setCredentials(newCredentials);
+            User.createUser(newUser, newCredentials);
+            userRepository.save(newUser);
 
-            User savedUser = userRepository.save(newUser);
-
-            if (savedUser == null) {
-                throw new CustomException(ErrorCode.USER_SAVED_FAILED);
-            }
         } catch (Exception e) {
             throw new CustomException(ErrorCode.USER_SAVED_FAILED);
         }

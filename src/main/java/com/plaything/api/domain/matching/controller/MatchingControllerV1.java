@@ -4,6 +4,7 @@ package com.plaything.api.domain.matching.controller;
 import com.plaything.api.domain.key.model.request.MatchingRequest;
 import com.plaything.api.domain.matching.model.response.UserMatching;
 import com.plaything.api.domain.matching.service.MatchingFacadeV1;
+import com.plaything.api.domain.profile.service.ProfileFacadeV1;
 import com.plaything.api.security.JWTProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,17 +13,19 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.plaything.api.domain.matching.constants.MatchingConstants.*;
 
-@Tag(name = "Matching API", description = "V1 Matching API")
+@Tag(name = "매칭 API", description = "V1 매칭 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/matching")
 public class MatchingControllerV1 {
 
     private final MatchingFacadeV1 matchingFacadeV1;
+    private final ProfileFacadeV1 profileFacadeV1;
 
     @Operation(
             summary = "매칭 요청",
@@ -39,11 +42,14 @@ public class MatchingControllerV1 {
                     성공: 200 OK
                     
                     #예외#
-                    (1) 409 Conflict : 네트워크 에러로 인한 중복 요청
+                    (1) 409 Conflict
+                    - 네트워크 에러로 인한 중복 요청
                     
-                    (2) 404 NOT FOUND: 매칭에 필요한 재화 부족
+                    (2) 404 NOT FOUND
+                    - 매칭에 필요한 재화 부족
                     
-                    (3) 500 Server-error : 알림 전송 실패
+                    (3) 500 Server-error
+                    - 알림 전송 실패
                     """
     )
     @SecurityRequirement(name = "Authorization")
@@ -75,13 +81,15 @@ public class MatchingControllerV1 {
                     
                     #예외#
                     
-                    (1) 409 Conflict : 네트워크 에러로 인한 중복 요청
+                    (1) 409 Conflict
+                    - 네트워크 에러로 인한 중복 요청
                     
-                    (2) 404 NOT FOUND: 매칭에 필요한 재화 부족
+                    (2) 404 NOT FOUND
+                    - 매칭에 필요한 재화 부족
+                    - 수락하려는 매칭 요청이 존재하지 않음
                     
-                    (3) 404 NOT FOUND: 수락하려는 매칭 요청이 존재하지 않음
-                    
-                    (4) 401 Unauthorized: 인증되지 않은 사용자
+                    (4) 401 Unauthorized
+                    - 인증되지 않은 사용자
                     """
     )
     @SecurityRequirement(name = "Authorization")
@@ -102,11 +110,15 @@ public class MatchingControllerV1 {
                     이용자 성향에 맞춰 매칭 가능한 프로필 목록을 조회합니다.
                     매칭 시 프로필에 있는 로그인 id를 활용할 수 있습니다.
                     
+                    #매칭 목록에서 제외되는 대상
+                    (1) 매칭을 신청한 사람
+                    (2) 매칭이 성사된 사람
+                    (3) 프로필 숨기기를 한 사람
+                    
+                    위 세 대상들은 캐싱을 하기 때문에 실시간 반영이 안 될 수 있습니다.
+                    
                     #응답#
                     성공: 200 OK
-                    
-                    
-                    
                     """
     )
     @SecurityRequirement(name = "Authorization")
@@ -147,6 +159,20 @@ public class MatchingControllerV1 {
                 CACHE_DURATION_UNIT_DAYS);
     }
 
-    //TODO 블랙리스트 기능 넣기
+    @Operation(
+            summary = "특정 이용자 프로필을 매칭에서 차단",
+            description = """
+                    매칭 조회 시 특정 이용자의 프로필이 일주일간 포함되지 않도록 설정합니다
+                    """
 
+    )
+    @SecurityRequirement(name = "Authorization")
+    @PostMapping(value = "/hide-profile/{loginId}")
+    public void hideProfile(
+            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString,
+            @RequestParam(value = "loginId") String loginId) {
+        String token = JWTProvider.extractToken(authString);
+        String user = JWTProvider.getUserFromToken(token);
+        profileFacadeV1.hideProfile(user, loginId, LocalDate.now());
+    }
 }

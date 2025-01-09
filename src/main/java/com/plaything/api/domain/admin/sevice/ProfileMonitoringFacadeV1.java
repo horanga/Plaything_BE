@@ -6,7 +6,6 @@ import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.profile.model.response.UserStats;
 import com.plaything.api.domain.profile.service.ProfileFacadeV1;
 import com.plaything.api.domain.profile.service.UserServiceV1;
-import com.plaything.api.domain.profile.service.UserViolationServiceV1;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +16,6 @@ import java.util.List;
 @Service
 public class ProfileMonitoringFacadeV1 {
 
-    private final UserViolationServiceV1 userViolationServiceV1;
     private final UserServiceV1 userServiceV1;
     private final ProfileMonitoringServiceV1 profileMonitoringServiceV1;
     private final ProfileFacadeV1 profileFacadeV1;
@@ -39,8 +37,6 @@ public class ProfileMonitoringFacadeV1 {
 
     public UserStats getUserStats(Long id) {
         User user = userServiceV1.findById(id);
-       return userViolationServiceV1.getUserStats(user);
+       return UserStats.toResponse(user.getViolationStats());
     }
-
-
 }

@@ -38,11 +38,13 @@ public enum ErrorCode implements CodeInterFace {
     NOT_AUTHORIZED_PROFILE("부적절한 프로필로 비활성화된 회원입니다", HttpStatus.FORBIDDEN),
     PROFILE_REGISTER_FAILED("PROFILE_REGISTER_FAILED", HttpStatus.INTERNAL_SERVER_ERROR),
     PROFILE_ALREADY_EXIST("PROFILE ALREADY EXIST", HttpStatus.CONFLICT),
+    NICKNAME_ALREADY_EXISTS("이미 등록된 닉네임입니다", HttpStatus.CONFLICT),
 
     //프로필 성향
     NOT_EXIST_PRIMARY_TRAIT("대표 성향이 존재하지 않은 회원입니다", HttpStatus.NOT_FOUND),
     TRAITS_NOT_INCLUDE_PRIMARY("대표성향을 선택하지 않았습니다", HttpStatus.BAD_REQUEST),
     ROLE_MISMATCH("대표성향과 일치하지 않는 세부성향입니다", HttpStatus.BAD_REQUEST),
+    PRIMARY_TRAIT_ALREADY_EXIST("대표성향은 두 개 이상일 수 없습니다", HttpStatus.CONFLICT),
 
 
     //매칭

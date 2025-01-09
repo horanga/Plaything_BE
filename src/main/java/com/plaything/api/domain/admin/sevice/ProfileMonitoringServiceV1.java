@@ -3,10 +3,11 @@ package com.plaything.api.domain.admin.sevice;
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorCode;
 import com.plaything.api.domain.admin.model.response.ProfileRecordResponse;
+import com.plaything.api.domain.profile.constants.ProfileStatus;
 import com.plaything.api.domain.repository.entity.monitor.ProfileRecord;
 import com.plaything.api.domain.repository.entity.monitor.RejectedProfile;
-import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.entity.profile.Profile;
+import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.repo.monitor.ProfileRecordRepository;
 import com.plaything.api.domain.repository.repo.monitor.RejectedProfileRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,13 +23,18 @@ public class ProfileMonitoringServiceV1 {
 
     private final RejectedProfileRepository rejectedProfileRepository;
 
-    public void saveProfileRecord(Profile profile, User user) {
+    public void saveProfileRecord(
+            String introduction,
+            String nickname,
+            long id,
+            ProfileStatus status,
+            User user) {
         ProfileRecord record = ProfileRecord.builder()
-                .introduction(profile.getIntroduction())
-                .nickName(profile.getNickName())
+                .introduction(introduction)
+                .nickName(nickname)
                 .user(user)
-                .profileId(profile.getId())
-                .profileStatus(profile.getProfileStatus())
+                .profileId(id)
+                .profileStatus(status)
                 .build();
         profileRecordRepository.save(record);
     }

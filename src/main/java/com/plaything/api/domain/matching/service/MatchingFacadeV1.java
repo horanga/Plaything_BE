@@ -6,8 +6,8 @@ import com.plaything.api.common.validator.DuplicateRequestChecker;
 import com.plaything.api.domain.key.model.request.MatchingRequest;
 import com.plaything.api.domain.key.service.PointKeyServiceV1;
 import com.plaything.api.domain.matching.model.response.UserMatching;
-import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.profile.service.UserServiceV1;
+import com.plaything.api.domain.repository.entity.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +19,6 @@ import static com.plaything.api.domain.key.constant.RewardConstant.REQUIRED_POIN
 @RequiredArgsConstructor
 @Service
 public class MatchingFacadeV1 {
-
 
     private final PointKeyServiceV1 pointKeyServiceV1;
     private final DuplicateRequestChecker requestValidator;

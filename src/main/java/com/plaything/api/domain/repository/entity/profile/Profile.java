@@ -3,11 +3,11 @@ package com.plaything.api.domain.repository.entity.profile;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorCode;
-import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.profile.constants.Gender;
 import com.plaything.api.domain.profile.constants.PersonalityTraitConstant;
 import com.plaything.api.domain.profile.constants.PrimaryRole;
 import com.plaything.api.domain.profile.constants.ProfileStatus;
+import com.plaything.api.domain.repository.entity.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,6 +17,9 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.plaything.api.domain.profile.constants.Constants.LIMIT_OF_SIZE_PERSONALITY_TRAIT;
+import static com.plaything.api.domain.profile.constants.Constants.LIMIT_OF_SIZE_RELATIONSHIP_PREFERENCE;
 
 @Getter
 @Builder
@@ -63,12 +66,12 @@ public class Profile {
     @Column
     private boolean isDeleted;
 
-    @Column(nullable = false)
-    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL)
+    @OneToMany(cascade = {CascadeType.PERSIST}, orphanRemoval = true)
+    @JoinColumn(name = "profile_id")
     private final List<PersonalityTrait> personalityTrait = new ArrayList<>();
 
-    @Column(nullable = false)
-    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL)
+    @OneToMany(cascade = {CascadeType.PERSIST}, orphanRemoval = true)
+    @JoinColumn(name = "profile_id")
     private final List<RelationshipPreference> relationshipPreference = new ArrayList<>();
 
     @Column(nullable = false)
@@ -80,15 +83,59 @@ public class Profile {
             String introduction,
             Gender gender,
             PrimaryRole primaryRole,
-            List<PersonalityTrait> personalityTrait,
-            List<RelationshipPreference> relationshipPreference
+            List<Integer> personalityTraitToRemove,
+            List<PersonalityTrait> personalityNewTrait,
+            List<Integer> relationshipPreferenceToRemove,
+            List<RelationshipPreference> relationshipNewPreference
     ) {
+
+        this.primaryRole = primaryRole;
+
+        if (personalityTraitToRemove != null && !personalityTraitToRemove.isEmpty()) {
+            for (Integer i : personalityTraitToRemove) {
+                //Integer를 바로 넣으면 remove(Object o)가 호출되면서 객체를 인자로 받는 메서드가 사용됨
+                personalityTrait.remove(i.intValue());
+            }
+        }
+
+        if (personalityNewTrait != null && !personalityNewTrait.isEmpty()) {
+            int size = personalityNewTrait.size();
+            if (personalityTrait.size() + personalityNewTrait.size() > LIMIT_OF_SIZE_PERSONALITY_TRAIT) {
+                size = LIMIT_OF_SIZE_PERSONALITY_TRAIT - personalityTrait.size();
+            }
+            for (int i = 0; i < size; i++) {
+                personalityTrait.add(personalityNewTrait.get(i));
+            }
+        }
+
+        boolean hasPrimaryTrait = personalityTrait.stream().anyMatch(PersonalityTrait::isPrimaryTrait);
+        long countOfPrimaryTrait = personalityTrait.stream().filter(PersonalityTrait::isPrimaryTrait).count();
+
+        if (countOfPrimaryTrait > 1) {
+            throw new CustomException(ErrorCode.PRIMARY_TRAIT_ALREADY_EXIST);
+        }
+
+        if (!hasPrimaryTrait) {
+            throw new CustomException(ErrorCode.TRAITS_NOT_INCLUDE_PRIMARY);
+        }
+
+        if (relationshipPreferenceToRemove != null && !relationshipPreferenceToRemove.isEmpty()) {
+            for (Integer i : relationshipPreferenceToRemove) {
+                relationshipPreference.remove(i.intValue());
+            }
+        }
+
+        if (relationshipNewPreference != null && !relationshipNewPreference.isEmpty()) {
+            if (relationshipPreference.size() < LIMIT_OF_SIZE_RELATIONSHIP_PREFERENCE) {
+                relationshipPreference.addAll(relationshipNewPreference);
+            }
+        }
+
         this.nickName = nickName;
         this.introduction = introduction;
         this.gender = gender;
-        this.primaryRole = primaryRole;
+        this.profileStatus = ProfileStatus.UPDATED;
 
-        //TODO 교체방식으로 변경
     }
 
     public void addPersonalityTrait(List<PersonalityTrait> personalityTrait) {

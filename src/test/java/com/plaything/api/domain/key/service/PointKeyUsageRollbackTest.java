@@ -19,7 +19,9 @@ import com.plaything.api.domain.repository.repo.pay.UserRewardActivityRepository
 import com.plaything.api.domain.repository.repo.profile.ProfileImageRepository;
 import com.plaything.api.domain.repository.repo.profile.ProfileImagesRegistrationRepository;
 import com.plaything.api.domain.repository.repo.profile.ProfileRepository;
-import com.plaything.api.domain.repository.repo.user.*;
+import com.plaything.api.domain.repository.repo.user.PersonalityTraitRepository;
+import com.plaything.api.domain.repository.repo.user.RelationshipRepository;
+import com.plaything.api.domain.repository.repo.user.UserRepository;
 import com.plaything.api.util.UserGenerator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -126,7 +128,6 @@ public class PointKeyUsageRollbackTest {
         personalityTraitRepository.deleteAllInBatch();
         relationshipRepository.deleteAllInBatch();
         profileRecordRepository.deleteAllInBatch();
-        userRewardActivityRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
         profileRepository.deleteAllInBatch();
 

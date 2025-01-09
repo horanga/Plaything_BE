@@ -38,7 +38,7 @@ public record ProfileRegistration(
         @NotNull
         List<PersonalityTraitConstant> personalityTraitConstant,
 
-        @Schema(description = "상세 성향")
+        @Schema(description = "대표 상세 성향")
         @NotNull
         PersonalityTraitConstant primaryTrait,
 

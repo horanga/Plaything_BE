@@ -77,14 +77,21 @@ public class UserGenerator {
         profileFacadeV1.registerProfile(profileRegistration, loginId);
     }
 
-    public void generateWithRoles(String loginId, String password, String fckToken, String nickName, PrimaryRole primaryRole, List<PersonalityTraitConstant> personalityTraitConstant) {
+    public void generateWithRoles(
+            String loginId,
+            String password,
+            String fckToken,
+            String nickName,
+            PrimaryRole primaryRole,
+            List<PersonalityTraitConstant> personalityTraitConstant,
+            PersonalityTraitConstant primaryTrait) {
 
         CreateUserRequest request = new CreateUserRequest(loginId, password, fckToken);
         authServiceV1.creatUser(request);
 
         LocalDate now = LocalDate.now();
         ProfileRegistration profileRegistration = new ProfileRegistration(
-                nickName, "hi", M, primaryRole, personalityTraitConstant, personalityTraitConstant.get(0), List.of(RelationshipPreferenceConstant.DATE_DS), now);
+                nickName, "hi", M, primaryRole, personalityTraitConstant, primaryTrait, List.of(RelationshipPreferenceConstant.DATE_DS), now);
 
         profileFacadeV1.registerProfile(profileRegistration, loginId);
     }
