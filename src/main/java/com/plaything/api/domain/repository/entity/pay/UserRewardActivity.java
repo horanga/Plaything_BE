@@ -1,6 +1,5 @@
 package com.plaything.api.domain.repository.entity.pay;
 
-import com.plaything.api.domain.repository.entity.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,9 +30,6 @@ public class UserRewardActivity {
     @Column(columnDefinition = "TIMESTAMP(0)")
     private LocalDate lastLoginTime;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false, name = "user_id")
-    private User user;
 
     public boolean isMoreThan4HoursPassed(LocalDateTime localDateTime) {
         if (lastAdViewTime == null) {
