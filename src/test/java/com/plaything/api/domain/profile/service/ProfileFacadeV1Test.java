@@ -2,20 +2,23 @@ package com.plaything.api.domain.profile.service;
 
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
+import com.plaything.api.domain.auth.model.request.LoginRequest;
 import com.plaything.api.domain.auth.service.AuthServiceV1;
-import com.plaything.api.domain.profile.constants.*;
+import com.plaything.api.domain.key.model.request.AdRewardRequest;
+import com.plaything.api.domain.key.service.PointKeyFacadeV1;
+import com.plaything.api.domain.profile.constants.Gender;
+import com.plaything.api.domain.profile.constants.PersonalityTraitConstant;
+import com.plaything.api.domain.profile.constants.PrimaryRole;
+import com.plaything.api.domain.profile.constants.RelationshipPreferenceConstant;
 import com.plaything.api.domain.profile.model.request.ProfileRegistration;
 import com.plaything.api.domain.profile.model.request.ProfileUpdate;
-import com.plaything.api.domain.profile.model.response.ProfileResponse;
+import com.plaything.api.domain.profile.model.response.MyPageProfile;
 import com.plaything.api.domain.repository.entity.profile.PersonalityTrait;
 import com.plaything.api.domain.repository.entity.profile.Profile;
 import com.plaything.api.domain.repository.entity.profile.ProfileHidePreference;
 import com.plaything.api.domain.repository.entity.profile.RelationshipPreference;
-import com.plaything.api.domain.repository.entity.user.User;
-import com.plaything.api.domain.repository.entity.user.UserCredentials;
 import com.plaything.api.domain.repository.repo.profile.ProfileHidePreferenceRepository;
 import com.plaything.api.domain.repository.repo.profile.ProfileRepository;
-import com.plaything.api.domain.repository.repo.user.UserRepository;
 import com.plaything.api.util.UserGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,6 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -53,31 +58,20 @@ class ProfileFacadeV1Test {
     private ProfileRepository profileRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private UserGenerator userGenerator;
 
     @Autowired
     private ProfileHidePreferenceRepository profileHidePreferenceRepository;
     @Autowired
     private AuthServiceV1 authServiceV1;
+    @Autowired
+    private PointKeyFacadeV1 pointKeyFacadeV1;
+
 
     @BeforeEach
     void setUp() {
 
-        User user = User.builder()
-                .loginId("dusgh123")
-                .role(Role.ROLE_USER)
-                .fcmToken("1")
-                .build();
-        UserCredentials password = UserCredentials.builder()
-                .hashedPassword("1234")
-                .build();
-
-        user.setCredentials(password);
-
-        userRepository.save(user);
+        authServiceV1.creatUser(new CreateUserRequest("dusgh123", "1234", "dd"));
 
     }
 
@@ -207,7 +201,7 @@ class ProfileFacadeV1Test {
                 "dusgh123", "hi", gender, primaryRole, traits, primaryTrait, List.of(RelationshipPreferenceConstant.DATE_DS), LocalDate.of(1995, 3, 30));
 
         profileFacadeV1.registerProfile(profileRegistration, "dusgh123");
-        ProfileResponse profile = profileFacadeV1.getProfileByLoginId("dusgh123");
+        MyPageProfile profile = profileFacadeV1.getMyPageProfile("dusgh123");
 
         assertThat(profile.age()).isEqualTo(30);
         assertThat(profile.introduction()).isEqualTo("hi");
@@ -220,6 +214,7 @@ class ProfileFacadeV1Test {
         assertThat(profile.personalityTrait()).extracting("isPrimaryTrait").containsExactly(true, false);
         assertThat(profile.relationshipPreference()).extracting("relationshipPreference").containsExactly(RelationshipPreferenceConstant.DATE_DS);
     }
+
 
     public static Stream<Arguments> profileProvider() {
 
@@ -510,7 +505,7 @@ class ProfileFacadeV1Test {
         profileFacadeV1.registerProfile(profileRegistration, "dusgh123");
         profileFacadeV1.setProfilePrivate("dusgh123");
 
-        ProfileResponse profile = profileFacadeV1.getProfileByLoginId("dusgh123");
+        MyPageProfile profile = profileFacadeV1.getMyPageProfile("dusgh123");
         assertThat(profile.isPrivate()).isTrue();
 
     }
@@ -565,7 +560,7 @@ class ProfileFacadeV1Test {
         );
 
         profileFacadeV1.updateProfile(profileUpdate, "fnel123");
-        ProfileResponse profile2 = profileFacadeV1.getProfileByLoginId("fnel123");
+        MyPageProfile profile2 = profileFacadeV1.getMyPageProfile("fnel123");
 
         assertThat(profile2.isPrivate()).isFalse();
         assertThat(profile2.age()).isEqualTo(30);
@@ -611,7 +606,7 @@ class ProfileFacadeV1Test {
         );
 
         profileFacadeV1.updateProfile(profileUpdate, "fnel123");
-        ProfileResponse profile2 = profileFacadeV1.getProfileByLoginId("fnel123");
+        MyPageProfile profile2 = profileFacadeV1.getMyPageProfile("fnel123");
 
         assertThat(profile2.isPrivate()).isFalse();
         assertThat(profile2.age()).isEqualTo(30);
@@ -661,7 +656,7 @@ class ProfileFacadeV1Test {
         );
 
         profileFacadeV1.updateProfile(profileUpdate, "fnel123");
-        ProfileResponse profile2 = profileFacadeV1.getProfileByLoginId("fnel123");
+        MyPageProfile profile2 = profileFacadeV1.getMyPageProfile("fnel123");
 
 
         assertThat(profile2.personalityTrait()).extracting("personalityTrait").containsExactly(
@@ -686,6 +681,22 @@ class ProfileFacadeV1Test {
                 PLAYPARTNER,
                 HOM
         );
+    }
+
+    @DisplayName("MyPage 프로필에서는 보유하고 있는 Key 개수와 마지막 광고 시청 시간을 확인할 수 있다")
+    @Test
+    void test19() {
+
+
+        userGenerator.generate("fnel123", "123", "2", "알렉스");
+        authServiceV1.login(new LoginRequest("fnel123", "123"), LocalDate.now(), "dadf");
+        LocalDateTime now = LocalDateTime.now();
+
+        pointKeyFacadeV1.createPointKeyForAd("fnel123", new AdRewardRequest("dd", 3), now, "32321");
+
+        MyPageProfile profile = profileFacadeV1.getMyPageProfile("fnel123");
+        assertThat(profile.countOfKey()).isEqualTo(3);
+        assertThat(profile.lastAdViewTime().truncatedTo(ChronoUnit.SECONDS)).isEqualTo(now.truncatedTo(ChronoUnit.SECONDS));
     }
 
     private Profile getProfileFromDb(

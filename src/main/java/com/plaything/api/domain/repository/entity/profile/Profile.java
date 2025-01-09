@@ -3,11 +3,11 @@ package com.plaything.api.domain.repository.entity.profile;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorCode;
-import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.profile.constants.Gender;
 import com.plaything.api.domain.profile.constants.PersonalityTraitConstant;
 import com.plaything.api.domain.profile.constants.PrimaryRole;
 import com.plaything.api.domain.profile.constants.ProfileStatus;
+import com.plaything.api.domain.repository.entity.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -111,11 +111,11 @@ public class Profile {
         boolean hasPrimaryTrait = personalityTrait.stream().anyMatch(PersonalityTrait::isPrimaryTrait);
         long countOfPrimaryTrait = personalityTrait.stream().filter(PersonalityTrait::isPrimaryTrait).count();
 
-        if(countOfPrimaryTrait>1){
+        if (countOfPrimaryTrait > 1) {
             throw new CustomException(ErrorCode.PRIMARY_TRAIT_ALREADY_EXIST);
         }
 
-        if(!hasPrimaryTrait) {
+        if (!hasPrimaryTrait) {
             throw new CustomException(ErrorCode.TRAITS_NOT_INCLUDE_PRIMARY);
         }
 
@@ -134,6 +134,7 @@ public class Profile {
         this.nickName = nickName;
         this.introduction = introduction;
         this.gender = gender;
+        this.profileStatus = ProfileStatus.UPDATED;
 
     }
 

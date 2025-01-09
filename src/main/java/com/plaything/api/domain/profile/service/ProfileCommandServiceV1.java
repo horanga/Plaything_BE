@@ -33,7 +33,7 @@ public class ProfileCommandServiceV1 {
     private final ProfileHidePreferenceRepository profileHidePreferenceRepository;
 
 
-    public void registerProfile(ProfileRegistration registration, String loginId, User user) {
+    public void registerProfile(ProfileRegistration registration, User user) {
         //TODO 대표성향을 한개만, 상세 성향은 6개까지만, 선호하는 관계는 모든 선택 가능
         //TODO 중복 안되도록 변경
 
@@ -41,16 +41,19 @@ public class ProfileCommandServiceV1 {
             Profile profile = makesProfile(registration, user);
             user.setProfile(profile);
             profileRepository.save(profile);
-            profileMonitoringServiceV1.saveProfileRecord(profile, user);
+            profileMonitoringServiceV1.saveProfileRecord(
+                    profile.getIntroduction(),
+                    profile.getNickName(),
+                    profile.getId(),
+                    profile.getProfileStatus(),
+                    user);
         } catch (CustomException e) {
             throw new CustomException(ErrorCode.TRAITS_NOT_INCLUDE_PRIMARY);
-        } catch (Exception e) {
-            throw new CustomException(ErrorCode.PROFILE_REGISTER_FAILED);
         }
     }
 
     @Transactional
-    public void updateProfile(ProfileUpdate updateRequest, String loginId, Profile profile) {
+    public void updateProfile(ProfileUpdate updateRequest, Profile profile) {
 
         List<PersonalityTrait> personalityTraitList =
                 updateRequest.personalityTraitConstant().stream()
@@ -72,6 +75,15 @@ public class ProfileCommandServiceV1 {
                 personalityTraitList,
                 updateRequest.relationshipPreferenceConstantToRemove(),
                 relationshipPreferenceList);
+
+        profileMonitoringServiceV1.saveProfileRecord(
+                profile.getIntroduction(),
+                profile.getNickName(),
+                profile.getId(),
+                profile.getProfileStatus(),
+                profile.getUser());
+
+        //TODO 프로필 업데이트 모니터링 테스트
     }
 
     @Transactional
@@ -99,7 +111,7 @@ public class ProfileCommandServiceV1 {
         violationStats.increaseBannedProfileCount();
     }
 
-    public void hideProfile(String setterLoginId, String targetLoginId, LocalDate now ) {
+    public void hideProfile(String setterLoginId, String targetLoginId, LocalDate now) {
         User setter = userServiceV1.findByLoginId(setterLoginId);
         User targetProfile = userServiceV1.findByLoginId(targetLoginId);
         ProfileHidePreference profileHidePreference = ProfileHidePreference.builder()
