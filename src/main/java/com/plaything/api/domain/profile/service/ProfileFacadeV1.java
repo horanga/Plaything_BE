@@ -69,6 +69,10 @@ public class ProfileFacadeV1 {
 
         User user = userServiceV1.findByLoginId(name);
         Profile profile = user.getProfile();
+
+        if (profile == null) {
+            throw new CustomException(ErrorCode.NOT_EXIST_PROFILE);
+        }
         profileImageServiceV1.checkCountOfImages(files, profile.getId());
         List<SavedImage> savedImages = s3ImagesServiceV1.uploadImages(files);
 
