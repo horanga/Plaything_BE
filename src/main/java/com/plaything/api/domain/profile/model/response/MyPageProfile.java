@@ -1,14 +1,15 @@
 package com.plaything.api.domain.profile.model.response;
 
-import com.plaything.api.domain.repository.entity.profile.Profile;
 import com.plaything.api.domain.profile.constants.Gender;
 import com.plaything.api.domain.profile.constants.ProfileStatus;
+import com.plaything.api.domain.repository.entity.profile.Profile;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Schema(description = "User 프로필")
-public record ProfileResponse(
+public record MyPageProfile(
 
         @Schema(description = "프로필 id")
         Long id,
@@ -44,11 +45,21 @@ public record ProfileResponse(
         List<PersonalityTraitResponse> personalityTrait,
 
         @Schema(description = "선호 관계")
-        List<RelationshipPreferenceResponse> relationshipPreference
+        List<RelationshipPreferenceResponse> relationshipPreference,
+
+        @Schema(description = "마지막 광소 시청 시간")
+        LocalDateTime lastAdViewTime,
+
+        @Schema(description = "보유한 key 개수")
+        long countOfKey
 
 ) {
 
-    public static ProfileResponse toResponse(Profile profile, List<ProfileImageResponse> profileImages) {
+    public static MyPageProfile toResponse(
+            Profile profile,
+            List<ProfileImageResponse> profileImages,
+            LocalDateTime lastAdViewTime,
+            long countOfKey) {
 
 
         List<PersonalityTraitResponse> personalityTraitList
@@ -62,7 +73,7 @@ public record ProfileResponse(
 
         String primaryRole = profile.getPrimaryRoleAsString();
 
-        return new ProfileResponse(
+        return new MyPageProfile(
                 profile.getId(),
                 profile.isPrivate(),
                 profile.isBaned(),
@@ -74,7 +85,9 @@ public record ProfileResponse(
                 primaryRole,
                 profile.calculateAge(),
                 personalityTraitList,
-                relationshipPreferenceList);
+                relationshipPreferenceList,
+                lastAdViewTime,
+                countOfKey);
     }
 }
 

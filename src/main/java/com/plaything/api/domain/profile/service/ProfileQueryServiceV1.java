@@ -6,13 +6,15 @@ import com.plaything.api.domain.profile.constants.PersonalityTraitConstant;
 import com.plaything.api.domain.profile.constants.PrimaryRole;
 import com.plaything.api.domain.profile.model.request.ProfileRegistration;
 import com.plaything.api.domain.profile.model.request.ProfileUpdate;
+import com.plaything.api.domain.profile.model.response.MyPageProfile;
 import com.plaything.api.domain.profile.model.response.ProfileImageResponse;
-import com.plaything.api.domain.profile.model.response.ProfileResponse;
 import com.plaything.api.domain.profile.util.ImageUrlGenerator;
+import com.plaything.api.domain.repository.entity.pay.UserRewardActivity;
 import com.plaything.api.domain.repository.entity.profile.PersonalityTrait;
 import com.plaything.api.domain.repository.entity.profile.Profile;
 import com.plaything.api.domain.repository.entity.profile.ProfileHidePreference;
 import com.plaything.api.domain.repository.entity.user.User;
+import com.plaything.api.domain.repository.repo.pay.PointKeyRepository;
 import com.plaything.api.domain.repository.repo.profile.ProfileHidePreferenceRepository;
 import com.plaything.api.domain.repository.repo.profile.ProfileRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +35,7 @@ public class ProfileQueryServiceV1 {
     private final UserServiceV1 userServiceV1;
     private final ImageUrlGenerator imageUrlGenerator;
     private final ProfileHidePreferenceRepository profileHidePreferenceRepository;
+    private final PointKeyRepository pointKeyRepository;
 
     public void validateRegistration(ProfileRegistration registration, User user) {
         if (user.getProfile() != null) {
@@ -58,7 +61,7 @@ public class ProfileQueryServiceV1 {
         }
     }
 
-    public ProfileResponse getProfileByLoginId(String loginId) {
+    public MyPageProfile getProfileForMyPage(String loginId) {
         User user = userServiceV1.findByLoginId(loginId);
         Profile profile = user.getProfile();
 
@@ -70,10 +73,20 @@ public class ProfileQueryServiceV1 {
             throw new CustomException(ErrorCode.NOT_AUTHORIZED_PROFILE);
         }
 
-        List<ProfileImageResponse> profileImageResponseList = profile.getProfileImages().stream().map(i -> new ProfileImageResponse(imageUrlGenerator.getImageUrl(i.getFileName()),
-                i.isMainPhoto())).toList();
+        List<ProfileImageResponse> profileImageResponseList = profile.getProfileImages().stream()
+                .map(i -> new ProfileImageResponse(imageUrlGenerator.getImageUrl(i.getFileName()),
+                        i.isMainPhoto()))
+                .toList();
 
-        return ProfileResponse.toResponse(profile, profileImageResponseList);
+        UserRewardActivity userRewardActivity = user.getUserRewardActivity();
+        long count = pointKeyRepository.countAvailablePointKey(loginId);
+
+
+        return MyPageProfile.toResponse(
+                profile,
+                profileImageResponseList,
+                userRewardActivity.getLastAdViewTime(),
+                count);
     }
 
     public List<String> getHideList(String loginId) {

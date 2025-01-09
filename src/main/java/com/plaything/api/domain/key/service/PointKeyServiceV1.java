@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 import static com.plaything.api.domain.key.constant.KeySource.ADVERTISEMENT_REWARD;
 import static com.plaything.api.domain.key.constant.KeySource.LOGIN_REWARD;
@@ -73,17 +72,8 @@ public class PointKeyServiceV1 {
     }
 
     private boolean canGetDailyReward(User user, LocalDate now) {
-        Optional<UserRewardActivity> adActivity = userRewardActivityRepository.findByUser_loginId(user.getLoginId());
 
-        if (adActivity.isEmpty()) {
-            UserRewardActivity userRewardActivity = UserRewardActivity.builder()
-                    .user(user)
-                    .lastLoginTime(now)
-                    .build();
-            userRewardActivityRepository.save(userRewardActivity);
-            return true;
-        }
-        UserRewardActivity userRewardActivity = adActivity.get();
+        UserRewardActivity userRewardActivity = user.getUserRewardActivity();
         if (userRewardActivity.canReceiveDailyReward(now)) {
             userRewardActivity.updateLastLoginTime(now);
             return true;
@@ -91,7 +81,7 @@ public class PointKeyServiceV1 {
         return false;
     }
 
-    public Long getAvailablePointKey(String loginId) {
+    public long getAvailablePointKey(String loginId) {
         return pointKeyRepository.countAvailablePointKey(loginId);
     }
 
@@ -107,15 +97,7 @@ public class PointKeyServiceV1 {
     }
 
     private UserRewardActivity validateForAd(User user, LocalDateTime now) {
-        Optional<UserRewardActivity> adActivity = userRewardActivityRepository.findByUser_loginId(user.getLoginId());
-        if (adActivity.isEmpty()) {
-            UserRewardActivity userRewardActivity = UserRewardActivity.builder()
-                    .user(user)
-                    .build();
-            return userRewardActivityRepository.save(userRewardActivity);
-        }
-
-        UserRewardActivity userRewardActivity = adActivity.get();
+        UserRewardActivity userRewardActivity = user.getUserRewardActivity();
         if (!userRewardActivity.isMoreThan4HoursPassed(now)) {
             throw new CustomException(ErrorCode.AD_VIEW_TIME_NOT_EXPIRED);
         }
