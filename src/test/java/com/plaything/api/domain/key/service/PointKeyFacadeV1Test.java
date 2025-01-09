@@ -9,7 +9,7 @@ import com.plaything.api.domain.key.model.response.AdViewLogResponse;
 import com.plaything.api.domain.key.model.response.AvailablePointKey;
 import com.plaything.api.domain.key.model.response.PointKeyLog;
 import com.plaything.api.domain.repository.entity.pay.UserRewardActivity;
-import com.plaything.api.domain.repository.repo.pay.UserRewardActivityRepository;
+import com.plaything.api.domain.repository.repo.user.UserRepository;
 import com.plaything.api.util.UserGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -44,7 +44,7 @@ class PointKeyFacadeV1Test {
     private AuthServiceV1 authServiceV1;
 
     @Autowired
-    private UserRewardActivityRepository userRewardActivityRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private AdLogServiceV1 adLogServiceV1;
@@ -105,11 +105,11 @@ class PointKeyFacadeV1Test {
         LocalDate now = LocalDate.now().minusDays(1);
         LoginRequest request = new LoginRequest("dusgh1234", "1234");
         authServiceV1.login(request, now, "1");
-        UserRewardActivity activity = userRewardActivityRepository.findByUser_loginId("dusgh1234").get();
+        UserRewardActivity activity = userRepository.findByLoginId("dusgh1234").get().getUserRewardActivity();
         assertThat(activity.getLastLoginTime()).isEqualTo(now);
 
         authServiceV1.login(request, now.plusDays(2), "2");
-        UserRewardActivity activity2 = userRewardActivityRepository.findByUser_loginId("dusgh1234").get();
+        UserRewardActivity activity2 = userRepository.findByLoginId("dusgh1234").get().getUserRewardActivity();
         assertThat(activity2.getLastLoginTime()).isEqualTo(now.plusDays(2));
     }
 
