@@ -1,4 +1,4 @@
-package com.plaything.api.domain.profile.service;
+package com.plaything.api.domain.profile.service.profile;
 
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorCode;
@@ -6,6 +6,7 @@ import com.plaything.api.domain.admin.sevice.ProfileMonitoringServiceV1;
 import com.plaything.api.domain.profile.constants.ProfileStatus;
 import com.plaything.api.domain.profile.model.request.ProfileRegistration;
 import com.plaything.api.domain.profile.model.request.ProfileUpdate;
+import com.plaything.api.domain.profile.service.UserServiceV1;
 import com.plaything.api.domain.repository.entity.profile.PersonalityTrait;
 import com.plaything.api.domain.repository.entity.profile.Profile;
 import com.plaything.api.domain.repository.entity.profile.ProfileHidePreference;
