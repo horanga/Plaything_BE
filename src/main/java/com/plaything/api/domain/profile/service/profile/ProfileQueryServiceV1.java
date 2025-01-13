@@ -1,4 +1,4 @@
-package com.plaything.api.domain.profile.service;
+package com.plaything.api.domain.profile.service.profile;
 
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorCode;
@@ -8,6 +8,7 @@ import com.plaything.api.domain.profile.model.request.ProfileRegistration;
 import com.plaything.api.domain.profile.model.request.ProfileUpdate;
 import com.plaything.api.domain.profile.model.response.MyPageProfile;
 import com.plaything.api.domain.profile.model.response.ProfileImageResponse;
+import com.plaything.api.domain.profile.service.UserServiceV1;
 import com.plaything.api.domain.profile.util.ImageUrlGenerator;
 import com.plaything.api.domain.repository.entity.pay.UserRewardActivity;
 import com.plaything.api.domain.repository.entity.profile.PersonalityTrait;

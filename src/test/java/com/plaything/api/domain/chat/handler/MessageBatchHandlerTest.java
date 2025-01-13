@@ -5,17 +5,17 @@ import com.plaything.api.domain.auth.service.AuthServiceV1;
 import com.plaything.api.domain.chat.model.reqeust.ChatRequest;
 import com.plaything.api.domain.chat.model.response.ChatProfile;
 import com.plaything.api.domain.notification.service.FcmServiceV1;
+import com.plaything.api.domain.profile.constants.PersonalityTraitConstant;
+import com.plaything.api.domain.profile.constants.PrimaryRole;
+import com.plaything.api.domain.profile.constants.RelationshipPreferenceConstant;
+import com.plaything.api.domain.profile.model.request.ProfileRegistration;
+import com.plaything.api.domain.profile.service.ProfileFacadeV1;
 import com.plaything.api.domain.repository.entity.profile.Profile;
 import com.plaything.api.domain.repository.entity.profile.ProfileImage;
 import com.plaything.api.domain.repository.repo.monitor.ProfileRecordRepository;
 import com.plaything.api.domain.repository.repo.profile.ProfileImageRepository;
 import com.plaything.api.domain.repository.repo.profile.ProfileRepository;
 import com.plaything.api.domain.repository.repo.user.UserRepository;
-import com.plaything.api.domain.profile.constants.PersonalityTraitConstant;
-import com.plaything.api.domain.profile.constants.PrimaryRole;
-import com.plaything.api.domain.profile.constants.RelationshipPreferenceConstant;
-import com.plaything.api.domain.profile.model.request.ProfileRegistration;
-import com.plaything.api.domain.profile.service.ProfileFacadeV1;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -78,7 +78,7 @@ public class MessageBatchHandlerTest {
         profileFacadeV1.registerProfile(profileRegistration, "dusgh1234");
 
         Profile profile1 = profileRepository.findByNickName("알렉1");
-        ProfileImage image1 = ProfileImage.builder().profile(profile1).fileName("abc").isMainPhoto(true).build();
+        ProfileImage image1 = ProfileImage.builder().fileName("abc").isMainPhoto(true).build();
         profile1.addProfileImages(List.of(image1));
 
         TestTransaction.flagForCommit();
