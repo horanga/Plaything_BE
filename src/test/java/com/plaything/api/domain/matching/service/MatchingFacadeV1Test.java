@@ -1,11 +1,11 @@
 package com.plaything.api.domain.matching.service;
 
 import com.plaything.api.domain.matching.model.response.UserMatching;
+import com.plaything.api.domain.profile.constants.PersonalityTraitConstant;
+import com.plaything.api.domain.profile.constants.PrimaryRole;
 import com.plaything.api.domain.profile.service.ProfileFacadeV1;
 import com.plaything.api.domain.repository.entity.profile.Profile;
 import com.plaything.api.domain.repository.repo.profile.ProfileRepository;
-import com.plaything.api.domain.profile.constants.PersonalityTraitConstant;
-import com.plaything.api.domain.profile.constants.PrimaryRole;
 import com.plaything.api.util.UserGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -51,13 +51,13 @@ class MatchingFacadeV1Test {
             redisTemplate.delete(keys);
         }
         userGenerator.generateWithRole("fnel1", "1234", "11", "연호1", PrimaryRole.TOP, PersonalityTraitConstant.BOSS);
-        userGenerator.addImages("연호1", "abc");
+        userGenerator.addImages("연호1", "abc", true);
         userGenerator.generateWithRole("fnel2", "1234", "11", "연호2", PrimaryRole.BOTTOM, SERVANT);
-        userGenerator.addImages("연호2", "abc");
+        userGenerator.addImages("연호2", "abc", true);
         userGenerator.generateWithRole("fnel3", "1234", "11", "연호3", PrimaryRole.BOTTOM, SERVANT);
-        userGenerator.addImages("연호3", "abc");
+        userGenerator.addImages("연호3", "abc", true);
         userGenerator.generateWithRole("fnel4", "1234", "11", "연호4", PrimaryRole.BOTTOM, SERVANT);
-        userGenerator.addImages("연호4", "abc");
+        userGenerator.addImages("연호4", "abc", true);
 
         userGenerator.createPointKey("fnel1", 10);
     }
@@ -75,7 +75,7 @@ class MatchingFacadeV1Test {
     @Test
     void test2() {
         userGenerator.generateWithRole("fnel5", "1234", "11", "연호5", PrimaryRole.BOTTOM, DEGRADEE);
-        userGenerator.addImages("연호5", "abc");
+        userGenerator.addImages("연호5", "abc", true);
 
         List<Profile> profiles = profileRepository.findByLoginId(List.of("fnel2", "fnel3", "fnel4", "fnel5"));
         matchingFacadeV1.updateLastViewedProfile("fnel5", profiles.get(3).getId(), 1, 1, TimeUnit.HOURS);
@@ -90,7 +90,7 @@ class MatchingFacadeV1Test {
         userGenerator.createMatching("fnel1", "1234", "fnel2", "1234");
         userGenerator.requestMatching("fnel1", "1234", "fnel3");
         userGenerator.generateWithRole("fnel5", "1234", "11", "연호5", PrimaryRole.BOTTOM, SERVANT);
-        userGenerator.addImages("연호5", "abc");
+        userGenerator.addImages("연호5", "abc", true);
 
         List<UserMatching> list = matchingFacadeV1.findMatchingCandidates("fnel1", 1, TimeUnit.HOURS);
         assertThat(list).extracting("loginId").containsExactly("fnel4", "fnel5");
@@ -102,10 +102,10 @@ class MatchingFacadeV1Test {
         profileFacadeV1.hideProfile("fnel1", "fnel2", LocalDate.now());
         profileFacadeV1.hideProfile("fnel1", "fnel3", LocalDate.now());
         userGenerator.generateWithRole("fnel5", "1234", "11", "연호5", PrimaryRole.BOTTOM, SERVANT);
-        userGenerator.addImages("연호5", "abc");
+        userGenerator.addImages("연호5", "abc", true);
 
         List<UserMatching> list = matchingFacadeV1.findMatchingCandidates("fnel1", 1, TimeUnit.HOURS);
-        assertThat(list).extracting("loginId").containsExactly( "fnel4", "fnel5");
+        assertThat(list).extracting("loginId").containsExactly("fnel4", "fnel5");
     }
 
     @DisplayName("프로필 숨기기를 한 경우 일주일간만 매칭 리스트에 포함되지 않는다.")
@@ -114,19 +114,18 @@ class MatchingFacadeV1Test {
         profileFacadeV1.hideProfile("fnel1", "fnel2", LocalDate.now().minusDays(8));
         profileFacadeV1.hideProfile("fnel1", "fnel3", LocalDate.now().minusDays(7));
         userGenerator.generateWithRole("fnel5", "1234", "11", "연호5", PrimaryRole.BOTTOM, SERVANT);
-        userGenerator.addImages("연호5", "abc");
+        userGenerator.addImages("연호5", "abc", true);
 
         List<UserMatching> list = matchingFacadeV1.findMatchingCandidates("fnel1", 1, TimeUnit.HOURS);
-        assertThat(list).extracting("loginId").containsExactly("fnel2","fnel4", "fnel5");
+        assertThat(list).extracting("loginId").containsExactly("fnel2", "fnel4", "fnel5");
     }
-
 
 
     @DisplayName("존재하는 프로필 이상으로 저장된 profileId가 넘어서면, 프로필 처음부터 조회한다")
     @Test
     void test6() {
         userGenerator.generateWithRole("fnel5", "1234", "11", "연호5", PrimaryRole.BOTTOM, SERVANT);
-        userGenerator.addImages("연호5", "abc");
+        userGenerator.addImages("연호5", "abc", true);
         userGenerator.createMatching("fnel1", "1234", "fnel2", "1234");
 
         List<Profile> profiles = profileRepository.findByLoginId(List.of("fnel2", "fnel3", "fnel4", "fnel5"));
@@ -144,7 +143,7 @@ class MatchingFacadeV1Test {
     @Test
     void test7() {
         userGenerator.generateWithRole("fnel5", "1234", "11", "연호5", PrimaryRole.BOTTOM, SERVANT);
-        userGenerator.addImages("연호5", "abc");
+        userGenerator.addImages("연호5", "abc", true);
         userGenerator.createMatching("fnel1", "1234", "fnel2", "1234");
 
         List<Profile> profiles = profileRepository.findByLoginId(List.of("fnel2", "fnel3", "fnel4", "fnel5"));
@@ -170,7 +169,7 @@ class MatchingFacadeV1Test {
     void test8() {
 
         userGenerator.generateWithRole("fnel5", "1234", "11", "연호5", PrimaryRole.BOTTOM, SERVANT);
-        userGenerator.addImages("연호5", "abc");
+        userGenerator.addImages("연호5", "abc", true);
         userGenerator.requestMatching("fnel1", "1234", "fnel2");
         List<Profile> profiles = profileRepository.findByLoginId(List.of("fnel2", "fnel3", "fnel4", "fnel5"));
         for (int i = 0; i < 51; i++) {
@@ -187,19 +186,19 @@ class MatchingFacadeV1Test {
     void test9() throws InterruptedException {
 
         userGenerator.generateWithRole("fnel5", "1234", "11", "연호5", PrimaryRole.BOTTOM, SERVANT);
-        userGenerator.addImages("연호5", "abc");
+        userGenerator.addImages("연호5", "abc", true);
         userGenerator.generateWithRole("fnel6", "1234", "11", "연호6", PrimaryRole.BOTTOM, SERVANT);
-        userGenerator.addImages("연호6", "abc");
+        userGenerator.addImages("연호6", "abc", true);
         userGenerator.generateWithRole("fnel7", "1234", "11", "연호7", PrimaryRole.BOTTOM, SERVANT);
-        userGenerator.addImages("연호7", "abc");
+        userGenerator.addImages("연호7", "abc", true);
         userGenerator.generateWithRole("fnel8", "1234", "11", "연호8", PrimaryRole.BOTTOM, SERVANT);
-        userGenerator.addImages("연호8", "abc");
+        userGenerator.addImages("연호8", "abc", true);
         userGenerator.generateWithRole("fnel9", "1234", "11", "연호9", PrimaryRole.BOTTOM, SERVANT);
-        userGenerator.addImages("연호9", "abc");
+        userGenerator.addImages("연호9", "abc", true);
 
         for (int i = 10; i < 150; i++) {
             userGenerator.generateWithRole("fnel" + i, "1234", "11", "연호" + i, PrimaryRole.BOTTOM, SERVANT);
-            userGenerator.addImages("연호" + i, "abc");
+            userGenerator.addImages("연호" + i, "abc", true);
         }
 
         for (int i = 2; i <= 6; i++) {

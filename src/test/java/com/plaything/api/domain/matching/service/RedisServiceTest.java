@@ -41,13 +41,13 @@ class RedisServiceTest {
         }
 
         userGenerator.generateWithRole("fnel1", "1234", "11", "연호1", PrimaryRole.TOP, PersonalityTraitConstant.BOSS);
-        userGenerator.addImages("연호1", "abc");
+        userGenerator.addImages("연호1", "abc", true);
         userGenerator.generateWithRole("fnel2", "1234", "11", "연호2", PrimaryRole.BOTTOM, SERVANT);
-        userGenerator.addImages("연호2", "abc");
+        userGenerator.addImages("연호2", "abc", true);
         userGenerator.generateWithRole("fnel3", "1234", "11", "연호3", PrimaryRole.BOTTOM, SERVANT);
-        userGenerator.addImages("연호3", "abc");
+        userGenerator.addImages("연호3", "abc", true);
         userGenerator.generateWithRole("fnel4", "1234", "11", "연호4", PrimaryRole.BOTTOM, SERVANT);
-        userGenerator.addImages("연호4", "abc");
+        userGenerator.addImages("연호4", "abc", true);
 
         userGenerator.createPointKey("fnel1", 10);
     }
@@ -140,13 +140,13 @@ class RedisServiceTest {
     void test5() {
 
         userGenerator.generateWithRole("fnel5", "1234", "11", "연호5", PrimaryRole.BOTTOM, SERVANT);
-        userGenerator.addImages("연호5", "abc");
+        userGenerator.addImages("연호5", "abc", true);
         userGenerator.generateWithRole("fnel6", "1234", "11", "연호6", PrimaryRole.BOTTOM, SERVANT);
-        userGenerator.addImages("연호6", "abc");
+        userGenerator.addImages("연호6", "abc", true);
         userGenerator.generateWithRole("fnel7", "1234", "11", "연호7", PrimaryRole.BOTTOM, SERVANT);
-        userGenerator.addImages("연호7", "abc");
+        userGenerator.addImages("연호7", "abc", true);
         userGenerator.generateWithRole("fnel8", "1234", "11", "연호8", PrimaryRole.BOTTOM, SERVANT);
-        userGenerator.addImages("연호8", "abc");
+        userGenerator.addImages("연호8", "abc", true);
 
         userGenerator.requestMatching("fnel1", "1234", "fnel2");
         userGenerator.requestMatching("fnel1", "1234", "fnel3");

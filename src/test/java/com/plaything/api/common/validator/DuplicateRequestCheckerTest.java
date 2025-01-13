@@ -71,10 +71,10 @@ class DuplicateRequestCheckerTest {
 
 
         userGenerator.generate("dusgh1234", "1234", "1", "연호");
-        userGenerator.addImages("연호", "ㅇㅇ");
+        userGenerator.addImages("연호", "ㅇㅇ", true);
 
         userGenerator.generate("dusgh12345", "1234", "1", "연호2");
-        userGenerator.addImages("연호2", "ㅇㅇ");
+        userGenerator.addImages("연호2", "ㅇㅇ", true);
     }
 
 

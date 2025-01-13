@@ -11,13 +11,13 @@ import com.plaything.api.domain.index.service.IndexServiceV1;
 import com.plaything.api.domain.key.constant.PointStatus;
 import com.plaything.api.domain.key.model.request.AdRewardRequest;
 import com.plaything.api.domain.key.service.PointKeyFacadeV1;
+import com.plaything.api.domain.profile.service.UserServiceV1;
+import com.plaything.api.domain.profile.util.ImageUrlGenerator;
 import com.plaything.api.domain.repository.entity.chat.ChatRoom;
 import com.plaything.api.domain.repository.entity.pay.PointKey;
 import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.repo.chat.ChatRoomRepository;
 import com.plaything.api.domain.repository.repo.pay.PointKeyRepository;
-import com.plaything.api.domain.profile.service.UserServiceV1;
-import com.plaything.api.domain.profile.util.ImageUrlGenerator;
 import com.plaything.api.util.UserGenerator;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
@@ -102,10 +102,10 @@ class ChatRoomServiceV1Test {
         userGenerator.generate("dusgh12", "1234", "2", "연1");
         userGenerator.generate("dusgh123", "1234", "2", "연2");
 
-        userGenerator.addImages("알렉1", "abc");
-        userGenerator.addImages("알렉2", "abcd");
-        userGenerator.addImages("연1", "dd");
-        userGenerator.addImages("연2", "dd");
+        userGenerator.addImages("알렉1", "abc", true);
+        userGenerator.addImages("알렉2", "abcd", true);
+        userGenerator.addImages("연1", "dd", true);
+        userGenerator.addImages("연2", "dd", true);
 
         userGenerator.createMatching("dusgh1234", "1234", "dusgh12345", "1234");
 
@@ -191,7 +191,7 @@ class ChatRoomServiceV1Test {
         for (int i = 30; i <= 60; i++) {
 
             userGenerator.generate("dusgh" + i, "1234", "2", "연" + i);
-            userGenerator.addImages("연" + i, "abc" + i);
+            userGenerator.addImages("연" + i, "abc" + i, true);
             userGenerator.createMatching("dusgh1234", "1234", "dusgh" + i, "1234");
 
             sendMessage("dusgh1234", "dusgh" + i, String.valueOf(i));

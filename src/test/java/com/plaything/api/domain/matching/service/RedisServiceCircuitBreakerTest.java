@@ -54,19 +54,19 @@ public class RedisServiceCircuitBreakerTest {
         // 각 테스트 전에 CircuitBreaker 상태 초기화
         circuitBreakerRegistry.circuitBreaker(SIMPLE_CIRCUIT_BREAKER_CONIFG).reset();
         userGenerator.generateWithRole("fnel123", "123", "1", "연호1", PrimaryRole.TOP, PersonalityTraitConstant.HUNTER);
-        userGenerator.addImages("연호1", "dd");
+        userGenerator.addImages("연호1", "dd", true);
 
         userGenerator.generateWithRole("fnel1234", "123", "1", "연호2", PrimaryRole.BOTTOM, PREY);
-        userGenerator.addImages("연호2", "dd");
+        userGenerator.addImages("연호2", "dd", true);
 
         userGenerator.generateWithRole("fnel12345", "123", "1", "연호3", PrimaryRole.BOTTOM, PREY);
-        userGenerator.addImages("연호3", "dd");
+        userGenerator.addImages("연호3", "dd", true);
 
         userGenerator.generateWithRole("fnel123456", "123", "1", "연호4", PrimaryRole.BOTTOM, PREY);
-        userGenerator.addImages("연호4", "dd");
+        userGenerator.addImages("연호4", "dd", true);
 
         userGenerator.generateWithRole("fnel1234567", "123", "1", "연호5", PrimaryRole.BOTTOM, PREY);
-        userGenerator.addImages("연호5", "dd");
+        userGenerator.addImages("연호5", "dd", true);
 
 
     }

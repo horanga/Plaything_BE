@@ -99,7 +99,7 @@ public class StompTest {
                 "alex",
                 TOP,
                 PersonalityTraitConstant.BOSS);
-        userGenerator.addImages("alex", "a");
+        userGenerator.addImages("alex", "a", true);
 
         userGenerator.generateWithRole(
                 "dusgh12345",
@@ -108,7 +108,7 @@ public class StompTest {
                 "alex2",
                 BOTTOM,
                 PersonalityTraitConstant.SERVANT);
-        userGenerator.addImages("alex2", "a");
+        userGenerator.addImages("alex2", "a", true);
 
         userGenerator.createMatching("dusgh1234", "123", "dusgh12345", "123");
 
