@@ -32,7 +32,7 @@ public record ProfileUpdate(
         @NotNull
         PrimaryRole primaryRole,
 
-        @Schema(description = "제거할 상세 성향의 id")
+        @Schema(description = "제거할 상세 성향의 List 인덱스")
         @NotNull
         List<Integer> personalityTraitsToRemove,
 
@@ -43,11 +43,12 @@ public record ProfileUpdate(
         @Schema(description = "대표 상세 성향")
         PersonalityTraitConstant primaryTrait,
 
-        @Schema(description = "제거할 선호 관계의 id")
+        @Schema(description = "제거할 선호 관계의 List 인덱스")
         @NotNull
         List<Integer> relationshipPreferenceConstantToRemove,
 
         @Schema(description = "선호하는 관계")
         @NotNull
         List<RelationshipPreferenceConstant> relationshipPreferenceConstant
-) {}
+) {
+}
