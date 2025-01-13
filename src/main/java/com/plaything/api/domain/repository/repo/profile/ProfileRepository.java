@@ -21,4 +21,6 @@ public interface ProfileRepository extends JpaRepository<Profile, Long> {
     Profile findByNickName(String name);
 
     boolean existsByNickName(String nickName);
+
+    Profile findByUser_LoginId(String loginId);
 }
