@@ -9,6 +9,7 @@ import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorCode;
 import com.plaything.api.common.generator.IdGenerator;
 import com.plaything.api.domain.image.service.model.SavedImage;
+import com.plaything.api.domain.profile.model.request.ProfileImageRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
@@ -20,6 +21,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.plaything.api.common.constants.Constants.IMAGE_MIME_TYPE;
@@ -29,7 +31,7 @@ import static com.plaything.api.common.constants.Constants.MAX_FILE_SIZE;
 @RequiredArgsConstructor
 @Service
 public class S3ImagesServiceV1 {
-
+    private final List<String> imagesToRemove = new ArrayList<>();
     private final AmazonS3 s3Client;
     private final IdGenerator idGenerator;
 
@@ -42,16 +44,18 @@ public class S3ImagesServiceV1 {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    public List<SavedImage> uploadImages(List<MultipartFile> multipartFiles) {
-        return multipartFiles.stream()
-                .map(this::uploadImage)
-                .toList();
+    public List<SavedImage> uploadImages(List<ProfileImageRequest> images) {
+        return images.stream()
+                .map(this::uploadImage).toList();
     }
 
-    public SavedImage uploadImage(MultipartFile multipartFile) {
-        validateImage(multipartFile);
-        String filename = saveImageToS3(multipartFile);
-        return new SavedImage(s3Client.getUrl(bucket, filename).toString(), filename);
+    public SavedImage uploadImage(ProfileImageRequest request) {
+        String filename = saveImageToS3(request);
+        return new SavedImage(filename, request.isMainPhoto());
+    }
+
+    public void deleteImage(List<String> fileNames) {
+        imagesToRemove.addAll(fileNames);
     }
 
     public void rollbackS3Images(List<SavedImage> list) {
@@ -69,7 +73,8 @@ public class S3ImagesServiceV1 {
     }
 
 
-    private String saveImageToS3(MultipartFile multipartFile) {
+    private String saveImageToS3(ProfileImageRequest request) {
+        MultipartFile multipartFile = request.file();
         validateImage(multipartFile);
         String filename = createUniqueFilename(multipartFile.getOriginalFilename());
 
