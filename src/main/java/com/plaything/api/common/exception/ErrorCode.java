@@ -29,7 +29,11 @@ public enum ErrorCode implements CodeInterFace {
     IMAGE_COUNT_EXCEEDED("프로필 사진은 최대 3개까지만 등록 가능합니다", HttpStatus.BAD_REQUEST),
     IMAGE_SAVED_FAILED("IMAGE_SAVED_FAILED", HttpStatus.INTERNAL_SERVER_ERROR),
     IMAGE_REQUIRED("프로필 사진을 필수로 등록해야 합니다", HttpStatus.BAD_REQUEST),
+    MAIN_IMAGE_REQUIRED("프로필 사진 중에 메인 사진을 골라야 합니다", HttpStatus.BAD_REQUEST),
+    MAIN_IMAGE_COUNT_EXCEEDED("메인 사진은 하나만 골라야 합니다", HttpStatus.BAD_REQUEST),
     NOT_EXIST_MAIN_PHOTO("요청자의 메인 프로필 사진이 없어 매칭이 불가능합니다", HttpStatus.UNPROCESSABLE_ENTITY),
+    INVALID_IMAGE_UPDATE_REQUEST("변경할 이미지 정보가 없습니다", HttpStatus.BAD_REQUEST),
+
 
     //프로필 조회 or 등록
     NOT_EXIST_PROFILE("프로필이 존재하지 않는 회원입니다", HttpStatus.NOT_FOUND),
@@ -87,7 +91,10 @@ public enum ErrorCode implements CodeInterFace {
     CONNECTION_ALREADY_EXIST("이미 웹소켓 연결이 된 상태입니다", HttpStatus.CONFLICT),
 
     //메시지 검사
-    BAD_WORDS_FILTER("금지된 단어가 포함됐습니다", HttpStatus.BAD_REQUEST);
+    BAD_WORDS_FILTER("금지된 단어가 포함됐습니다", HttpStatus.BAD_REQUEST),
+
+    //중복 요청
+    DUPLICATE_TRANSACTION_REQUEST("중복된 요청입니다", HttpStatus.CONFLICT);
 
     private final String message;
     private final HttpStatus httpStatus;
