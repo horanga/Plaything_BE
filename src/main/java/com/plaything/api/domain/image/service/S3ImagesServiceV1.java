@@ -55,7 +55,9 @@ public class S3ImagesServiceV1 {
     }
 
     public void deleteImage(List<String> fileNames) {
-        imagesToRemove.addAll(fileNames);
+
+        fileNames.stream().forEach(fileName -> s3Client.deleteObject(bucket, fileName));
+//        imagesToRemove.addAll(fileNames);
     }
 
     public void rollbackS3Images(List<SavedImage> list) {
