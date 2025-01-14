@@ -50,7 +50,7 @@ public class DuplicateRequestChecker {
         log.error("Redis check failed, using DB fallback. Exception type: {}, Message: {}",
                 ex.getClass().getName(), ex.getMessage());
 
-        if (!imageRequestMap.containsKey(userId)) {
+        if (!imageRequestMap.containsKey(userId + transactionId)) {
             imageRequestMap.put(userId, transactionId);
             return true;
         } else {
