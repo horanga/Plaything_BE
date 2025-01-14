@@ -40,7 +40,7 @@ public class MatchingFacadeV1 {
     }
 
     public void sendMatchingRequest(String requesterLoginId, MatchingRequest matchingRequest, String transactionId) {
-        validateMatchingRequest(requesterLoginId, transactionId);
+//        validateMatchingRequest(requesterLoginId, transactionId);
         User requester = userServiceV1.findByLoginId(requesterLoginId);
         User partner = userServiceV1.findByLoginId(matchingRequest.partnerLoginId());
         //TODO fcm 토큰 검증
@@ -48,7 +48,7 @@ public class MatchingFacadeV1 {
     }
 
     public void acceptMatchingRequest(String requesterLoginId, MatchingRequest matchingRequest, String transactionId) {
-        validateMatchingRequest(requesterLoginId, transactionId);
+//        validateMatchingRequest(requesterLoginId, transactionId);
         User matchingReceiver = userServiceV1.findByLoginId(requesterLoginId);
         User matchingSender = userServiceV1.findByLoginId(matchingRequest.partnerLoginId());
         //TODO fcm 토큰 검증
