@@ -184,7 +184,7 @@ public class ProfileControllerV1 {
                 = IntStream.range(0, files.size())
                 .mapToObj(i -> new ProfileImageRequest(files.get(i), indexOfMainImage == i))
                 .toList();
-        profileFacadeV1.registerImages(images, user, transactionId);
+        profileFacadeV1.registerImages(images, transactionId, user);
     }
 
     @Operation(
