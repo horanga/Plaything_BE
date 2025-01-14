@@ -20,11 +20,9 @@ import com.plaything.api.domain.profile.constants.PrimaryRole;
 import com.plaything.api.domain.profile.constants.RelationshipPreferenceConstant;
 import com.plaything.api.domain.profile.model.request.ProfileRegistration;
 import com.plaything.api.domain.profile.service.ProfileFacadeV1;
-import com.plaything.api.domain.profile.service.ProfileImageServiceV1;
+import com.plaything.api.domain.profile.service.profileImage.ProfileImageServiceV1;
 import com.plaything.api.domain.repository.entity.chat.ChatRoom;
 import com.plaything.api.domain.repository.entity.matching.Matching;
-import com.plaything.api.domain.repository.entity.profile.Profile;
-import com.plaything.api.domain.repository.entity.profile.ProfileImage;
 import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.repo.chat.ChatRoomRepository;
 import com.plaything.api.domain.repository.repo.matching.MatchingRepository;
@@ -143,10 +141,10 @@ class MatchingServiceV1Test {
         userGenerator.generateWithRoles("fnel3", "123", "1", "알렉3", BOTTOM, traits2, primary2);
         userGenerator.generateWithRoles("fnel4", "123", "1", "알렉4", BOTTOM, traits2, primary2);
 
-        userGenerator.addImages("알렉1", "a");
-        userGenerator.addImages("알렉2", "a");
-        userGenerator.addImages("알렉3", "a");
-        userGenerator.addImages("알렉4", "a");
+        userGenerator.addImages("알렉1", "a", true);
+        userGenerator.addImages("알렉2", "a", true);
+        userGenerator.addImages("알렉3", "a", true);
+        userGenerator.addImages("알렉4", "a", true);
 
         List<UserMatching> list = matchingServiceV1.searchPartner("fnel1", Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), 0L);
         assertThat(list).hasSize(3);
@@ -229,10 +227,10 @@ class MatchingServiceV1Test {
         userGenerator.generateWithRoles("fnel3", "123", "1", "알렉3", ETC, List.of(DEGRADER, SADIST), DEGRADER);
         userGenerator.generateWithRoles("fnel4", "123", "1", "알렉4", ETC, List.of(SADIST), SADIST);
 
-        userGenerator.addImages("알렉1", "a");
-        userGenerator.addImages("알렉2", "a");
-        userGenerator.addImages("알렉3", "a");
-        userGenerator.addImages("알렉4", "a");
+        userGenerator.addImages("알렉1", "a", true);
+        userGenerator.addImages("알렉2", "a", true);
+        userGenerator.addImages("알렉3", "a", true);
+        userGenerator.addImages("알렉4", "a", true);
 
         List<UserMatching> list1 = matchingServiceV1.searchPartner("fnel1", Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), 0l);
         assertThat(list1).extracting("primaryRole").containsExactly(SWITCH);
@@ -257,9 +255,9 @@ class MatchingServiceV1Test {
         userGenerator.generateWithRoles("fnel12344", "123", "1", "알렉3", BOTTOM, List.of(MASOCHIST, PREY), PREY);
 
 
-        userGenerator.addImages("알렉1", "a");
-        userGenerator.addImages("알렉2", "a");
-        userGenerator.addImages("알렉3", "a");
+        userGenerator.addImages("알렉1", "a", true);
+        userGenerator.addImages("알렉2", "a", true);
+        userGenerator.addImages("알렉3", "a", true);
 
         List<UserMatching> matched1 = matchingServiceV1.searchPartner("fnel123", Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), 0L);
         List<UserMatching> matched2 = matchingServiceV1.searchPartner("fnel1234", Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), 0L);
@@ -277,9 +275,9 @@ class MatchingServiceV1Test {
         userGenerator.generateWithRoles("fnel12344", "123", "1", "알렉3", BOTTOM, List.of(MASOCHIST, PREY), MASOCHIST);
 
 
-        userGenerator.addImages("알렉1", "a");
-        userGenerator.addImages("알렉2", "a");
-        userGenerator.addImages("알렉3", "a");
+        userGenerator.addImages("알렉1", "a", true);
+        userGenerator.addImages("알렉2", "a", true);
+        userGenerator.addImages("알렉3", "a", true);
 
 
         List<ProfileRecordResponse> records = profileMonitoringFacadeV1.getRecords();
@@ -306,8 +304,8 @@ class MatchingServiceV1Test {
         userGenerator.generateWithRoles("fnel12344", "123", "1", "알렉124", BOTTOM, List.of(MASOCHIST, DEGRADEE), MASOCHIST);
 
 
-        userGenerator.addImages("알렉1", "a");
-        userGenerator.addImages("알렉124", "a");
+        userGenerator.addImages("알렉1", "a", true);
+        userGenerator.addImages("알렉124", "a", true);
 
 
         List<UserMatching> matched = matchingFacadeV1.findMatchingCandidates("fnel123", 1, TimeUnit.DAYS);
@@ -324,8 +322,8 @@ class MatchingServiceV1Test {
         userGenerator.generateWithRoles("fnel123", "123", "1", "알렉1", TOP, List.of(DEGRADER, SADIST), SADIST);
         userGenerator.generateWithRoles("fnel1234", "123", "1", "알렉12", BOTTOM, List.of(MASOCHIST, DEGRADEE), MASOCHIST);
 
-        userGenerator.addImages("알렉1", "a");
-        userGenerator.addImages("알렉12", "a");
+        userGenerator.addImages("알렉1", "a", true);
+        userGenerator.addImages("알렉12", "a", true);
 
         profileFacadeV1.setProfilePrivate("fnel1234");
 
@@ -349,7 +347,7 @@ class MatchingServiceV1Test {
         userGenerator.generateWithRoles("fnel1234", "123", "1", "알렉12", BOTTOM, List.of(MASOCHIST, DEGRADEE), MASOCHIST);
 
 
-        userGenerator.addImages("알렉1", "a");
+        userGenerator.addImages("알렉1", "a", true);
 
         List<UserMatching> matched = matchingFacadeV1.findMatchingCandidates("fnel123", 1, TimeUnit.DAYS);
         assertThat(matched).isEmpty();
@@ -384,12 +382,12 @@ class MatchingServiceV1Test {
         userGenerator.generateWithRoles("fnel6", "123", "1", "알렉4", TOP, List.of(HUNTER), HUNTER);
         userGenerator.generateWithRoles("fnel7", "123", "1", "알렉5", BOTTOM, List.of(PREY), PREY);
 
-        userGenerator.addImages("알렉1", "a");
-        userGenerator.addImages("알렉12", "a");
-        userGenerator.addImages("알렉124", "a");
-        userGenerator.addImages("알렉13", "a");
-        userGenerator.addImages("알렉4", "a");
-        userGenerator.addImages("알렉5", "a");
+        userGenerator.addImages("알렉1", "a", true);
+        userGenerator.addImages("알렉12", "a", true);
+        userGenerator.addImages("알렉124", "a", true);
+        userGenerator.addImages("알렉13", "a", true);
+        userGenerator.addImages("알렉4", "a", true);
+        userGenerator.addImages("알렉5", "a", true);
 
         List<UserMatching> matched = matchingFacadeV1.findMatchingCandidates("fnel123", 1, TimeUnit.DAYS);
         assertThat(matched).hasSize(1);
@@ -413,11 +411,9 @@ class MatchingServiceV1Test {
         pointKeyFacadeV1.createPointKeyForAd("dusgh1234", request, LocalDateTime.now(), "adafddb");
         AvailablePointKey availablePointKey1 = pointKeyFacadeV1.getAvailablePointKey("dusgh1234");
         assertThat(availablePointKey1.availablePointKey()).isEqualTo(2L);
-        User user = userRepository.findByLoginId("dusgh1234").get();
-        Profile profile = user.getProfile();
-        List<SavedImage> savedImages = List.of(new SavedImage("a", "abc"));
+        List<SavedImage> savedImages = List.of(new SavedImage("abc", true));
 
-        profileImageServiceV1.saveImages(savedImages, profile, 0L);
+        profileImageServiceV1.saveImages(savedImages, "dusgh1234");
 
         ProfileRegistration profileRegistration2 = new ProfileRegistration("연호", "안녕", M, TOP, List.of(HUNTER), HUNTER, List.of(RelationshipPreferenceConstant.MARRIAGE_DS), LocalDate.now());
         profileFacadeV1.registerProfile(profileRegistration2, "dusgh12345");
@@ -446,10 +442,8 @@ class MatchingServiceV1Test {
         registerProfile("dusgh1234", "연호1", "잘부탁", TOP, List.of(SADIST, DEGRADER), SADIST, List.of(MARRIAGE_DS));
 
         pointKeyFacadeV1.createPointKeyForAd("dusgh1234", request, LocalDateTime.now(), "122s");
-        User user = userRepository.findByLoginId("dusgh1234").get();
-        Profile profile = user.getProfile();
-        List<SavedImage> savedImages = List.of(new SavedImage("a", "b"));
-        profileImageServiceV1.saveImages(savedImages, profile, 0L);
+        List<SavedImage> savedImages = List.of(new SavedImage("b", true));
+        profileImageServiceV1.saveImages(savedImages, "dusgh1234");
 
         ProfileRegistration profileRegistration2 = new ProfileRegistration("연호", "안녕", M, TOP, List.of(HUNTER), HUNTER, List.of(RelationshipPreferenceConstant.MARRIAGE_DS), LocalDate.now());
         profileFacadeV1.registerProfile(profileRegistration2, "dusgh12345");
@@ -472,11 +466,9 @@ class MatchingServiceV1Test {
         AvailablePointKey availablePointKey1 = pointKeyFacadeV1.getAvailablePointKey("dusgh1234");
         assertThat(availablePointKey1.availablePointKey()).isEqualTo(2L);
 
-        User user = userRepository.findByLoginId("dusgh1234").get();
-        Profile profile = user.getProfile();
-        List<SavedImage> savedImages = List.of(new SavedImage("a", "b"));
+        List<SavedImage> savedImages = List.of(new SavedImage("b", true));
 
-        profileImageServiceV1.saveImages(savedImages, profile, 0L);
+        profileImageServiceV1.saveImages(savedImages, "dusgh1234");
 
         ProfileRegistration profileRegistration2 = new ProfileRegistration("연호", "안녕", M, TOP, List.of(HUNTER), HUNTER, List.of(RelationshipPreferenceConstant.MARRIAGE_DS), LocalDate.now());
         profileFacadeV1.registerProfile(profileRegistration2, "dusgh12345");
@@ -512,17 +504,13 @@ class MatchingServiceV1Test {
         AdRewardRequest request2 = new AdRewardRequest("광고1", 2);
         pointKeyFacadeV1.createPointKeyForAd("dusgh12345", request2, LocalDateTime.now(), "135");
 
-        User user = userRepository.findByLoginId("dusgh1234").get();
-        Profile profile = user.getProfile();
-        List<SavedImage> savedImages = List.of(new SavedImage("a", "b"));
+        List<SavedImage> savedImages = List.of(new SavedImage("b", true));
 
-        profileImageServiceV1.saveImages(savedImages, profile, 0L);
+        profileImageServiceV1.saveImages(savedImages, "dusgh1234");
 
-        User user2 = userRepository.findByLoginId("dusgh1234").get();
-        Profile profile2 = user2.getProfile();
-        List<SavedImage> savedImages2 = List.of(new SavedImage("a", "b"));
+        List<SavedImage> savedImages2 = List.of(new SavedImage("b", true));
 
-        profileImageServiceV1.saveImages(savedImages2, profile2, 0L);
+        profileImageServiceV1.saveImages(savedImages2, "dusgh12345");
 
         MatchingRequest matchingRequest = new MatchingRequest("dusgh12345");
 
@@ -552,14 +540,6 @@ class MatchingServiceV1Test {
     }
 
     //이미지가 없거나, 유저다 밴당하면 매칭에 x
-
-    private void addImage(User user) {
-        ProfileImage image = ProfileImage.builder().fileName("aa").profile(user.getProfile()).build();
-
-        profileImageRepository.save(image);
-
-        user.getProfile().addProfileImages(List.of(image));
-    }
 
 
 }

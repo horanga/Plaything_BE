@@ -7,6 +7,7 @@ import com.plaything.api.domain.profile.constants.Gender;
 import com.plaything.api.domain.profile.constants.PersonalityTraitConstant;
 import com.plaything.api.domain.profile.constants.PrimaryRole;
 import com.plaything.api.domain.profile.constants.ProfileStatus;
+import com.plaything.api.domain.profile.model.request.ProfileImageRequest;
 import com.plaything.api.domain.repository.entity.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -66,16 +67,16 @@ public class Profile {
     @Column
     private boolean isDeleted;
 
-    @OneToMany(cascade = {CascadeType.PERSIST}, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)
     @JoinColumn(name = "profile_id")
     private final List<PersonalityTrait> personalityTrait = new ArrayList<>();
 
-    @OneToMany(cascade = {CascadeType.PERSIST}, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)
     @JoinColumn(name = "profile_id")
     private final List<RelationshipPreference> relationshipPreference = new ArrayList<>();
 
-    @Column(nullable = false)
-    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @JoinColumn(name = "profile_id")
     private final List<ProfileImage> profileImages = new ArrayList<>();
 
     public void update(
@@ -138,6 +139,69 @@ public class Profile {
 
     }
 
+    public List<ProfileImage> updateProfilePictures(List<String> picturesToRemove, List<ProfileImage> newProfileImages, Integer mainPhotoIndex, boolean shouldCancelMainPhoto) {
+
+        if (picturesToRemove != null && !picturesToRemove.isEmpty()) {
+            for (String name : picturesToRemove) {
+                this.profileImages.removeIf(images ->
+                        images.getFileName().equals(name));
+            }
+        }
+
+        if (shouldCancelMainPhoto) {
+            this.profileImages.stream().filter(ProfileImage::isMainPhoto).forEach(ProfileImage::cancelMainPhoto);
+        }
+
+        this.profileImages.addAll(newProfileImages);
+        if (mainPhotoIndex != null && shouldCancelMainPhoto) {
+
+            this.profileImages.stream()
+                    .filter(ProfileImage::isMainPhoto)
+                    .forEach(ProfileImage::cancelMainPhoto);
+            this.profileImages.get(mainPhotoIndex).setMainPhoto();
+        }
+        return this.profileImages;
+    }
+
+    public void validateUpdateRequest(
+            List<String> picturesToRemove,
+            List<ProfileImageRequest> newProfileImages,
+            boolean shouldCancelMainPhoto) {
+
+
+        long countOfMainImagesOfNewImages = newProfileImages.stream()
+                .filter(ProfileImageRequest::isMainPhoto)
+                .count();
+
+        if (countOfMainImagesOfNewImages > 1) {
+            throw new CustomException(ErrorCode.MAIN_IMAGE_COUNT_EXCEEDED);
+        }
+
+
+        int newImagesSize = (newProfileImages != null) ? newProfileImages.size() : 0;
+        int removeSize = (picturesToRemove != null) ? picturesToRemove.size() : 0;
+        int size = this.profileImages.size() + newImagesSize - removeSize;
+
+        if (size < 1) {
+            throw new CustomException(ErrorCode.IMAGE_REQUIRED);
+        }
+        if (size > 3) {
+            throw new CustomException(ErrorCode.IMAGE_COUNT_EXCEEDED);
+        }
+
+        boolean hasMainPhoto =
+                newProfileImages.stream()
+                        .anyMatch(ProfileImageRequest::isMainPhoto);
+
+        if (!hasMainPhoto && shouldCancelMainPhoto) {
+            throw new CustomException(ErrorCode.MAIN_IMAGE_REQUIRED);
+        }
+
+        if (hasMainPhoto && !shouldCancelMainPhoto) {
+            throw new CustomException(ErrorCode.MAIN_IMAGE_COUNT_EXCEEDED);
+        }
+    }
+
     public void addPersonalityTrait(List<PersonalityTrait> personalityTrait) {
         this.personalityTrait.addAll(personalityTrait);
     }
@@ -146,8 +210,13 @@ public class Profile {
         this.relationshipPreference.addAll(relationshipPreference);
     }
 
-    public void addProfileImages(List<ProfileImage> profileImages) {
+    public List<ProfileImage> addProfileImages(List<ProfileImage> profileImages) {
         this.profileImages.addAll(profileImages);
+        return profileImages;
+    }
+
+    public void addProfileImage(ProfileImage profileImage) {
+        this.profileImages.add(profileImage);
     }
 
     public String getLoginId() {
@@ -213,5 +282,11 @@ public class Profile {
 
     public void delete() {
         this.isDeleted = true;
+    }
+
+    public void updateMainPhoto(Integer indexOfMainImage) {
+        this.profileImages.stream().filter(ProfileImage::isMainPhoto).forEach(ProfileImage::cancelMainPhoto);
+        this.profileImages.get(indexOfMainImage).setMainPhoto();
+
     }
 }

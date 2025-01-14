@@ -6,18 +6,18 @@ import com.plaything.api.domain.auth.service.AuthServiceV1;
 import com.plaything.api.domain.key.constant.PointStatus;
 import com.plaything.api.domain.key.model.request.MatchingRequest;
 import com.plaything.api.domain.matching.service.MatchingFacadeV1;
-import com.plaything.api.domain.repository.entity.pay.PointKey;
-import com.plaything.api.domain.repository.entity.user.User;
-import com.plaything.api.domain.repository.entity.profile.Profile;
-import com.plaything.api.domain.repository.entity.profile.ProfileImage;
-import com.plaything.api.domain.repository.repo.pay.PointKeyRepository;
-import com.plaything.api.domain.repository.repo.profile.ProfileRepository;
-import com.plaything.api.domain.repository.repo.user.UserRepository;
 import com.plaything.api.domain.profile.constants.PersonalityTraitConstant;
 import com.plaything.api.domain.profile.constants.PrimaryRole;
 import com.plaything.api.domain.profile.constants.RelationshipPreferenceConstant;
 import com.plaything.api.domain.profile.model.request.ProfileRegistration;
 import com.plaything.api.domain.profile.service.ProfileFacadeV1;
+import com.plaything.api.domain.repository.entity.pay.PointKey;
+import com.plaything.api.domain.repository.entity.profile.Profile;
+import com.plaything.api.domain.repository.entity.profile.ProfileImage;
+import com.plaything.api.domain.repository.entity.user.User;
+import com.plaything.api.domain.repository.repo.pay.PointKeyRepository;
+import com.plaything.api.domain.repository.repo.profile.ProfileRepository;
+import com.plaything.api.domain.repository.repo.user.UserRepository;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -96,9 +96,9 @@ public class UserGenerator {
         profileFacadeV1.registerProfile(profileRegistration, loginId);
     }
 
-    public void addImages(String nickName, String fileName) {
+    public void addImages(String nickName, String fileName, boolean isMain) {
         Profile byNickName = profileRepository.findByNickName(nickName);
-        byNickName.addProfileImages(List.of(ProfileImage.builder().profile(byNickName).fileName(fileName).isMainPhoto(true).build()));
+        byNickName.addProfileImages(List.of(ProfileImage.builder().fileName(fileName).isMainPhoto(isMain).build()));
     }
 
     public void requestMatching(String loginId, String password, String partnerLoginId) {

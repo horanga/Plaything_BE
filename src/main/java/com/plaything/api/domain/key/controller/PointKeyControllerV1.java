@@ -26,7 +26,13 @@ public class PointKeyControllerV1 {
 
     @Operation(
             summary = "광고 보상 포인트 키 생성",
-            description = "광고 시청 완료 후 포인트 키를 생성하고 지급합니다"
+            description = """
+                    광고 시청 완료 후 포인트 키를 생성하고 지급합니다
+                    
+                    ## 주의
+                    요청을 보낼 땐 중복 요청을 필터링하기 위해서
+                    클라이언트에서 요청의 트랜잭션 ID를 난수로 생성해서 보내주어야 합니다.
+                    """
     )
     @SecurityRequirement(name = "Authorization")
     @PostMapping("/create-key")

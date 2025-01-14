@@ -1,14 +1,18 @@
 package com.plaything.api.domain.repository.entity.monitor;
 
-import com.plaything.api.domain.repository.entity.profile.ProfileImage;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
 @Entity
 public class ProfileImageRegistration {
 
@@ -16,7 +20,7 @@ public class ProfileImageRegistration {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false, name = "profile_image_id")
-    private ProfileImage profileImage;
+    private String fileName;
+
+    private long profileImageId;
 }

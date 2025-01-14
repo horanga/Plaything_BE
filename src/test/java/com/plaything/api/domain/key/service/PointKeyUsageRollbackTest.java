@@ -12,12 +12,12 @@ import com.plaything.api.domain.repository.entity.log.KeyLog;
 import com.plaything.api.domain.repository.entity.notification.Notification;
 import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.repo.log.KeyLogRepository;
+import com.plaything.api.domain.repository.repo.monitor.ProfileImagesRegistrationRepository;
 import com.plaything.api.domain.repository.repo.monitor.ProfileRecordRepository;
 import com.plaything.api.domain.repository.repo.notification.NotificationRepository;
 import com.plaything.api.domain.repository.repo.pay.PointKeyRepository;
 import com.plaything.api.domain.repository.repo.pay.UserRewardActivityRepository;
 import com.plaything.api.domain.repository.repo.profile.ProfileImageRepository;
-import com.plaything.api.domain.repository.repo.profile.ProfileImagesRegistrationRepository;
 import com.plaything.api.domain.repository.repo.profile.ProfileRepository;
 import com.plaything.api.domain.repository.repo.user.PersonalityTraitRepository;
 import com.plaything.api.domain.repository.repo.user.RelationshipRepository;
@@ -108,10 +108,10 @@ public class PointKeyUsageRollbackTest {
         }
 
         userGenerator.generate("dusgh1234", "1234", "1", "알렉1");
-        userGenerator.addImages("알렉1", "abc");
+        userGenerator.addImages("알렉1", "abc", true);
 
         userGenerator.generate("dusgh12345", "1234", "1", "알렉2");
-        userGenerator.addImages("알렉2", "abc");
+        userGenerator.addImages("알렉2", "abc", true);
 
     }
 

@@ -46,10 +46,10 @@ public class ChatServiceTest {
     @BeforeEach
     void setUp() {
         userGenerator.generate("dusgh1234", "1234", "1", "알렉1");
-        userGenerator.addImages("알렉1", "abc");
+        userGenerator.addImages("알렉1", "abc", true);
 
         userGenerator.generate("dusgh12345", "1234", "1", "알렉2");
-        userGenerator.addImages("알렉2", "abcd");
+        userGenerator.addImages("알렉2", "abcd", true);
 
         userGenerator.createMatching("dusgh1234", "1234", "dusgh12345", "1234");
     }

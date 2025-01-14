@@ -1,5 +1,6 @@
 package com.plaything.api.domain.repository.entity.profile;
 
+import com.plaything.api.domain.repository.entity.monitor.ProfileImageRegistration;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,7 +22,19 @@ public class ProfileImage {
 
     private boolean isMainPhoto;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "profile_id", nullable = false)
-    private Profile profile;
+    @OneToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JoinColumn(name = "profile_image_registration_id")
+    private ProfileImageRegistration profileImageRegistration;
+
+    public void setProfileImageRegistration(ProfileImageRegistration profileImageRegistration) {
+        this.profileImageRegistration = profileImageRegistration;
+    }
+
+    public void cancelMainPhoto() {
+        this.isMainPhoto = false;
+    }
+
+    public void setMainPhoto() {
+        this.isMainPhoto = true;
+    }
 }
