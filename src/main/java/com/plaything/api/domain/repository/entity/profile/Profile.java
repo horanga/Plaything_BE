@@ -148,6 +148,10 @@ public class Profile {
             }
         }
 
+        if (shouldCancelMainPhoto) {
+            this.profileImages.stream().filter(ProfileImage::isMainPhoto).forEach(ProfileImage::cancelMainPhoto);
+        }
+
         this.profileImages.addAll(newProfileImages);
         if (mainPhotoIndex != null && shouldCancelMainPhoto) {
 
