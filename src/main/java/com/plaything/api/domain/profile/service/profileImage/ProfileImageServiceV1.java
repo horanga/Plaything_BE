@@ -56,6 +56,8 @@ public class ProfileImageServiceV1 {
                 indexOfMainImage,
                 shouldCancelMainPhoto);
 
+        profileRepository.flush();
+        
         profileImages.stream()
                 .filter(i -> i.getProfileImageRegistration() == null)
                 .forEach(i -> {
