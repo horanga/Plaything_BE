@@ -3,6 +3,7 @@ package com.plaything.api.domain.profile.controller;
 import com.plaything.api.domain.profile.model.request.ProfileImageRequest;
 import com.plaything.api.domain.profile.model.request.ProfileRegistration;
 import com.plaything.api.domain.profile.model.request.ProfileUpdate;
+import com.plaything.api.domain.profile.model.request.ProfileUpdateRequest;
 import com.plaything.api.domain.profile.model.response.MyPageProfile;
 import com.plaything.api.domain.profile.service.ProfileFacadeV1;
 import com.plaything.api.security.JWTProvider;
@@ -14,8 +15,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Tag(name = "프로필 API", description = "V1 프로필 API")
 @RestController
@@ -170,12 +173,17 @@ public class ProfileControllerV1 {
     @SecurityRequirement(name = "Authorization")
     @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void uploadImage(
-            @RequestPart(value = "images") List<ProfileImageRequest> images,
+            @RequestPart(value = "images") List<MultipartFile> files,
+            @RequestPart(value = "indexOfMainImage") Integer indexOfMainImage,
             @RequestHeader("Transaction-ID") String transactionId,
             @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString
     ) {
         String token = JWTProvider.extractToken(authString);
         String user = JWTProvider.getUserFromToken(token);
+        List<ProfileImageRequest> images
+                = IntStream.range(0, files.size())
+                .mapToObj(i -> new ProfileImageRequest(files.get(i), indexOfMainImage == i))
+                .toList();
         profileFacadeV1.registerImages(images, user, transactionId);
     }
 
@@ -208,22 +216,27 @@ public class ProfileControllerV1 {
     @SecurityRequirement(name = "Authorization")
     @PostMapping(value = "/update-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void updateImage(
-            @RequestPart(value = "newImages") List<ProfileImageRequest> ProfileImageRequests,
-            @RequestPart(value = "indexOfMainImage") Integer indexOfMainImage,
-            @RequestPart(value = "imagesToRemove") List<String> imagesToRemove,
-            @RequestPart(value = "shouldRemoveMainPhoto") boolean shouldCancelMainPhoto,
+            @RequestPart(value = "newImages", required = false) List<MultipartFile> files,
+            @RequestPart(value = "profileUpdateRequest") ProfileUpdateRequest profileUpdateRequest,
             @RequestHeader("Transaction-ID") String transactionId,
             @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString
     ) {
         String token = JWTProvider.extractToken(authString);
         String user = JWTProvider.getUserFromToken(token);
+
+
+        List<ProfileImageRequest> ProfileImageRequests
+                = IntStream.range(0, files == null ? 0 : files.size())
+                .mapToObj(i -> new ProfileImageRequest(files.get(i), profileUpdateRequest.isMainPhoto().get(i)))
+                .toList();
+
         profileFacadeV1.updateImages(
                 user,
                 ProfileImageRequests,
                 transactionId,
-                imagesToRemove,
-                indexOfMainImage,
-                shouldCancelMainPhoto
+                profileUpdateRequest.imagesToRemove(),
+                profileUpdateRequest.indexOfMainImage(),
+                profileUpdateRequest.shouldCancelMainPhoto()
         );
     }
 
