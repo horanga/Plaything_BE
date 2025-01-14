@@ -122,6 +122,7 @@ public class ProfileFacadeV1 {
 
         } catch (Exception e) {
             s3ImagesServiceV1.rollbackS3Images(savedImages);
+            throw e;
         }
     }
 
