@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.plaything.api.domain.profile.constants.Constants.LIMIT_OF_COUNT_OF_PROFILE_IMAGES;
+
 @RequiredArgsConstructor
 @Service
 public class ProfileImageQueryServiceV1 {
@@ -44,7 +46,7 @@ public class ProfileImageQueryServiceV1 {
             throw new CustomException(ErrorCode.NOT_EXIST_PROFILE);
         }
 
-        if (images.size() > 3) {
+        if (images.size() > LIMIT_OF_COUNT_OF_PROFILE_IMAGES) {
             throw new CustomException(ErrorCode.IMAGE_COUNT_EXCEEDED);
         }
     }

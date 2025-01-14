@@ -19,8 +19,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.plaything.api.domain.profile.constants.Constants.LIMIT_OF_SIZE_PERSONALITY_TRAIT;
-import static com.plaything.api.domain.profile.constants.Constants.LIMIT_OF_SIZE_RELATIONSHIP_PREFERENCE;
+import static com.plaything.api.domain.profile.constants.Constants.*;
 
 @Getter
 @Builder
@@ -153,6 +152,11 @@ public class Profile {
         }
 
         this.profileImages.addAll(newProfileImages);
+
+        if (profileImages.size() > LIMIT_OF_COUNT_OF_PROFILE_IMAGES) {
+            throw new CustomException(ErrorCode.IMAGE_COUNT_EXCEEDED);
+        }
+
         if (mainPhotoIndex != null && shouldCancelMainPhoto) {
 
             this.profileImages.stream()
