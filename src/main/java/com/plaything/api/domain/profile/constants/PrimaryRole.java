@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public enum PrimaryRole {
     TOP("FT", "MT", "TOP"),
-    BOTTOM("FS", "MS", "BTM"),
+    BOTTOM("FB", "MB", "BTM"),
     SWITCH("FSW", "MSW", "SW"),
     ETC("F_ETC", "M_ETC", "ETC");
 
