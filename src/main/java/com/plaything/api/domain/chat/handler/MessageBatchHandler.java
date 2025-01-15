@@ -3,9 +3,9 @@ package com.plaything.api.domain.chat.handler;
 import com.plaything.api.domain.chat.model.reqeust.ChatRequest;
 import com.plaything.api.domain.chat.model.response.ChatProfile;
 import com.plaything.api.domain.notification.service.FcmServiceV1;
+import com.plaything.api.domain.profile.util.ImageUrlGenerator;
 import com.plaything.api.domain.repository.entity.profile.Profile;
 import com.plaything.api.domain.repository.repo.profile.ProfileRepository;
-import com.plaything.api.domain.profile.util.ImageUrlGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,7 +76,7 @@ public class MessageBatchHandler {
             String msg = makeMessage(messages);
 
             // FCM으로만 전송
-            fcmService.sendMessageTo(chatProfile, "새로운 메시지가 도착했습니다", msg, fcmToken);
+//            fcmService.sendMessageTo(chatProfile, "새로운 메시지가 도착했습니다", msg, fcmToken);
 
         } catch (Exception e) {
             log.error("FCM 전송 중 에러 발생", e);

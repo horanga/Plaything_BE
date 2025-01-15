@@ -6,8 +6,8 @@ import com.plaything.api.domain.chat.handler.MessageBatchHandler;
 import com.plaything.api.domain.chat.model.reqeust.ChatRequest;
 import com.plaything.api.domain.matching.model.response.MatchingResponse;
 import com.plaything.api.domain.matching.service.MatchingServiceV1;
-import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.profile.service.UserServiceV1;
+import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.security.JWTProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,9 +54,9 @@ public class SessionValidator {
 
         String partnerLoginId = extractLoginIdFromDestination(destination);
 
-        if (!sessionUserMap.containsKey(partnerLoginId)) {
-            messageBatchHandler.queueMessage(requesterLonginId, chatRequest, fcmTokenMap.get(partnerLoginId));
-        }
+//        if (!sessionUserMap.containsKey(partnerLoginId)) {
+//            messageBatchHandler.queueMessage(requesterLonginId, chatRequest, fcmTokenMap.get(partnerLoginId));
+//        }
 
     }
 
@@ -99,8 +99,7 @@ public class SessionValidator {
 
     private boolean isMatchingPartner(String loginId, String destination) {
         List<String> matchingList = matchingMap.get(loginId);
-        return matchingList.stream()
-                .anyMatch(partner -> partner.equals(extractLoginIdFromDestination(destination)));
+        return matchingList.stream().anyMatch(partner -> partner.equals(extractLoginIdFromDestination(destination)));
     }
 
     private String extractLoginIdFromDestination(String destination) {
@@ -127,13 +126,14 @@ public class SessionValidator {
             throw new CustomException(ErrorCode.NOT_EXIST_MATCHING_PARTNER);
         }
 
-        MatchingResponse matchingResponse = matchingResponses.get(0);
 
-        if (matchingResponse.senderLoginId().equals(loginId)) {
-            return matchingResponses.stream().map(MatchingResponse::receiverLoginId).toList();
-        }
-
-        return matchingResponses.stream().map(MatchingResponse::senderLoginId).toList();
+        return matchingResponses.stream().map(i -> {
+            if (i.receiverLoginId().equals(loginId)) {
+                return i.senderLoginId();
+            } else {
+                return i.receiverLoginId();
+            }
+        }).toList();
     }
 
     private User getLoginId(String authHeader) {
