@@ -149,6 +149,9 @@ public class Profile {
 
         if (shouldCancelMainPhoto) {
             this.profileImages.stream().filter(ProfileImage::isMainPhoto).forEach(ProfileImage::cancelMainPhoto);
+            if (mainPhotoIndex != null) {
+                this.profileImages.get(mainPhotoIndex).setMainPhoto();
+            }
         }
 
         this.profileImages.addAll(newProfileImages);
@@ -157,13 +160,12 @@ public class Profile {
             throw new CustomException(ErrorCode.IMAGE_COUNT_EXCEEDED);
         }
 
-        if (mainPhotoIndex != null && shouldCancelMainPhoto) {
+        boolean hasMainPhoto = this.profileImages.stream().anyMatch(ProfileImage::isMainPhoto);
 
-            this.profileImages.stream()
-                    .filter(ProfileImage::isMainPhoto)
-                    .forEach(ProfileImage::cancelMainPhoto);
-            this.profileImages.get(mainPhotoIndex).setMainPhoto();
+        if (!hasMainPhoto) {
+            throw new CustomException(ErrorCode.MAIN_IMAGE_REQUIRED);
         }
+
         return this.profileImages;
     }
 
