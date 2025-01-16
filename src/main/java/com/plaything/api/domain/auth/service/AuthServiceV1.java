@@ -14,6 +14,7 @@ import com.plaything.api.security.Hasher;
 import com.plaything.api.security.JWTProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +31,7 @@ public class AuthServiceV1 {
     private final UserRepository userRepository;
     private final Hasher hasher;
     private final PointKeyFacadeV1 pointKeyFacadeV1;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public String getUserFromToken(String token) {
         return JWTProvider.getUserFromToken(token);
@@ -106,7 +108,7 @@ public class AuthServiceV1 {
     }
 
     private UserCredentials newUserCredentials(String password, User user) {
-        String hashingValue = hasher.getHashingValue(password);
+        String hashingValue = bCryptPasswordEncoder.encode(password);
 
         return UserCredentials.builder()
                 .hashedPassword(hashingValue)
