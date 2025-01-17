@@ -2,13 +2,12 @@ package com.plaything.api.domain.index.controller;
 
 import com.plaything.api.domain.index.model.response.IndexResponse;
 import com.plaything.api.domain.index.service.IndexServiceV1;
-import com.plaything.api.security.JWTProvider;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -24,12 +23,11 @@ public class IndexController {
     @SecurityRequirement(name = "Authorization")
     @GetMapping
     public IndexResponse refreshIndex(
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
 
         //TODO 웹소켓 연결 끊겼을 때로 변경
-        String token = JWTProvider.extractToken(authString);
-        String user = JWTProvider.getUserFromToken(token);
+        String user = userDetails.getUsername();
         return indexServiceV1.refreshIndex(user);
     }
 }

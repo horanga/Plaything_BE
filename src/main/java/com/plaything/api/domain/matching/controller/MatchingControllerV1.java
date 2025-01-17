@@ -5,12 +5,12 @@ import com.plaything.api.domain.key.model.request.MatchingRequest;
 import com.plaything.api.domain.matching.model.response.UserMatching;
 import com.plaything.api.domain.matching.service.MatchingFacadeV1;
 import com.plaything.api.domain.profile.service.ProfileFacadeV1;
-import com.plaything.api.security.JWTProvider;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -59,12 +59,11 @@ public class MatchingControllerV1 {
     @SecurityRequirement(name = "Authorization")
     @PostMapping("/create-matching")
     public void createMatching(
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString,
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody MatchingRequest matchingRequest,
             @RequestHeader("Transaction-ID") String transactionId
     ) {
-        String token = JWTProvider.extractToken(authString);
-        String user = JWTProvider.getUserFromToken(token);
+        String user = userDetails.getUsername();
         matchingFacadeV1.sendMatchingRequest(user, matchingRequest, transactionId);
     }
 
@@ -103,12 +102,11 @@ public class MatchingControllerV1 {
     @SecurityRequirement(name = "Authorization")
     @PostMapping("/accpet-matching")
     public void acceptMatching(
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString,
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody MatchingRequest matchingRequest,
             @RequestHeader("Transaction-ID") String transactionId
     ) {
-        String token = JWTProvider.extractToken(authString);
-        String user = JWTProvider.getUserFromToken(token);
+        String user = userDetails.getUsername();
         matchingFacadeV1.acceptMatchingRequest(user, matchingRequest, transactionId);
     }
 
@@ -132,10 +130,9 @@ public class MatchingControllerV1 {
     @SecurityRequirement(name = "Authorization")
     @GetMapping
     public List<UserMatching> matching(
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
-        String token = JWTProvider.extractToken(authString);
-        String user = JWTProvider.getUserFromToken(token);
+        String user = userDetails.getUsername();
         return matchingFacadeV1.findMatchingCandidates(user, CACHE_DURATION_DAY, CACHE_DURATION_UNIT_DAYS);
     }
 
@@ -154,11 +151,10 @@ public class MatchingControllerV1 {
     @SecurityRequirement(name = "Authorization")
     @GetMapping("/profile-skip")
     public void recordProfileSkip(
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString
+            @AuthenticationPrincipal UserDetails userDetails
             , @RequestParam(value = "lastProfileId") long lastProfileId
     ) {
-        String token = JWTProvider.extractToken(authString);
-        String user = JWTProvider.getUserFromToken(token);
+        String user = userDetails.getUsername();
         matchingFacadeV1.updateLastViewedProfile(
                 user,
                 lastProfileId,
@@ -177,10 +173,9 @@ public class MatchingControllerV1 {
     @SecurityRequirement(name = "Authorization")
     @PostMapping(value = "/hide-profile/{loginId}")
     public void hideProfile(
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString,
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam(value = "loginId") String loginId) {
-        String token = JWTProvider.extractToken(authString);
-        String user = JWTProvider.getUserFromToken(token);
+        String user = userDetails.getUsername();
         profileFacadeV1.hideProfile(user, loginId, LocalDate.now());
     }
 }

@@ -6,14 +6,14 @@ import com.plaything.api.domain.profile.model.request.ProfileUpdate;
 import com.plaything.api.domain.profile.model.request.ProfileUpdateRequest;
 import com.plaything.api.domain.profile.model.response.MyPageProfile;
 import com.plaything.api.domain.profile.service.ProfileFacadeV1;
-import com.plaything.api.security.JWTProvider;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -49,10 +49,9 @@ public class ProfileControllerV1 {
     @PostMapping("/register-profile")
     public void registerProfile(
             @Valid @RequestBody ProfileRegistration registration,
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
-        String token = JWTProvider.extractToken(authString);
-        String user = JWTProvider.getUserFromToken(token);
+        String user = userDetails.getUsername();
         profileFacadeV1.registerProfile(registration, user);
     }
 
@@ -82,10 +81,9 @@ public class ProfileControllerV1 {
     @PutMapping("/update-profile")
     public void updateProfile(
             @Valid @RequestBody ProfileUpdate update,
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
-        String token = JWTProvider.extractToken(authString);
-        String user = JWTProvider.getUserFromToken(token);
+        String user = userDetails.getUsername();
         profileFacadeV1.updateProfile(update, user);
     }
 
@@ -109,10 +107,9 @@ public class ProfileControllerV1 {
     @SecurityRequirement(name = "Authorization")
     @GetMapping("/get-profile")
     public MyPageProfile getProfile(
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
-        String token = JWTProvider.extractToken(authString);
-        String user = JWTProvider.getUserFromToken(token);
+        String user = userDetails.getUsername();
         return profileFacadeV1.getMyPageProfile(user);
     }
 
@@ -125,10 +122,9 @@ public class ProfileControllerV1 {
     @SecurityRequirement(name = "Authorization")
     @PatchMapping("/set-private")
     public void setProfilePrivate(
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
-        String token = JWTProvider.extractToken(authString);
-        String user = JWTProvider.getUserFromToken(token);
+        String user = userDetails.getUsername();
         profileFacadeV1.setProfilePrivate(user);
     }
 
@@ -141,10 +137,9 @@ public class ProfileControllerV1 {
     @SecurityRequirement(name = "Authorization")
     @PatchMapping("/set-public")
     public void setProfilePublic(
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
-        String token = JWTProvider.extractToken(authString);
-        String user = JWTProvider.getUserFromToken(token);
+        String user = userDetails.getUsername();
         profileFacadeV1.setProfilePublic(user);
     }
 
@@ -176,10 +171,8 @@ public class ProfileControllerV1 {
             @RequestPart(value = "images") List<MultipartFile> files,
             @RequestPart(value = "indexOfMainImage") Integer indexOfMainImage,
             @RequestHeader("Transaction-ID") String transactionId,
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString
-    ) {
-        String token = JWTProvider.extractToken(authString);
-        String user = JWTProvider.getUserFromToken(token);
+            @AuthenticationPrincipal UserDetails userDetails) {
+        String user = userDetails.getUsername();
         List<ProfileImageRequest> images
                 = IntStream.range(0, files.size())
                 .mapToObj(i -> new ProfileImageRequest(files.get(i), indexOfMainImage == i))
@@ -219,10 +212,9 @@ public class ProfileControllerV1 {
             @RequestPart(value = "newImages", required = false) List<MultipartFile> files,
             @RequestPart(value = "profileUpdateRequest") ProfileUpdateRequest profileUpdateRequest,
             @RequestHeader("Transaction-ID") String transactionId,
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
-        String token = JWTProvider.extractToken(authString);
-        String user = JWTProvider.getUserFromToken(token);
+        String user = userDetails.getUsername();
 
 
         List<ProfileImageRequest> ProfileImageRequests
@@ -242,10 +234,9 @@ public class ProfileControllerV1 {
 
     @DeleteMapping("{id}")
     public void deleteUser(
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
-        String token = JWTProvider.extractToken(authString);
-        String user = JWTProvider.getUserFromToken(token);
+        String user = userDetails.getUsername();
         profileFacadeV1.delete(user);
     }
 

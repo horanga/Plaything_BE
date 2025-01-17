@@ -4,13 +4,13 @@ import com.plaything.api.domain.key.model.request.AdRewardRequest;
 import com.plaything.api.domain.key.model.response.AvailablePointKey;
 import com.plaything.api.domain.key.model.response.PointKeyLog;
 import com.plaything.api.domain.key.service.PointKeyFacadeV1;
-import com.plaything.api.security.JWTProvider;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -37,12 +37,11 @@ public class PointKeyControllerV1 {
     @SecurityRequirement(name = "Authorization")
     @PostMapping("/create-key")
     public void createPointKey(
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString,
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestHeader("Transaction-ID") String transactionId,
             @Valid @RequestBody AdRewardRequest request
     ) {
-        String token = JWTProvider.extractToken(authString);
-        String user = JWTProvider.getUserFromToken(token);
+        String user = userDetails.getUsername();
         pointKeyFacadeV1.createPointKeyForAd(user, request, LocalDateTime.now(), transactionId);
     }
 
@@ -53,10 +52,10 @@ public class PointKeyControllerV1 {
     @SecurityRequirement(name = "Authorization")
     @GetMapping("/get-keylog")
     public List<PointKeyLog> getPointKeyLog(
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
-        String token = JWTProvider.extractToken(authString);
-        String user = JWTProvider.getUserFromToken(token);
+
+        String user = userDetails.getUsername();
         return pointKeyFacadeV1.getPointKeyLog(user);
     }
 
@@ -68,10 +67,9 @@ public class PointKeyControllerV1 {
     @SecurityRequirement(name = "Authorization")
     @GetMapping("/get-key")
     public AvailablePointKey getPointKey(
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
-        String token = JWTProvider.extractToken(authString);
-        String user = JWTProvider.getUserFromToken(token);
+        String user = userDetails.getUsername();
         return pointKeyFacadeV1.getAvailablePointKey(user);
     }
 

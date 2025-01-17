@@ -3,11 +3,12 @@ package com.plaything.api.domain.chat.controller;
 import com.plaything.api.domain.chat.model.response.ChatList;
 import com.plaything.api.domain.chat.model.response.ChatRoomResponse;
 import com.plaything.api.domain.chat.service.ChatFacadeV1;
-import com.plaything.api.security.JWTProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,13 +31,11 @@ public class ChatControllerV1 {
     )
     @GetMapping("/chat-rooms")
     public List<ChatRoomResponse> chatRoom(
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString,
+            @Parameter(hidden = true) @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam(value = "lastId", required = false) Long lastChatRoomId
 
     ) {
-        String token = JWTProvider.extractToken(authString);
-        String user = JWTProvider.getUserFromToken(token);
-        return chatFacadeV1.getChatRooms(user, lastChatRoomId);
+        return chatFacadeV1.getChatRooms(userDetails.getUsername(), lastChatRoomId);
     }
 
     @Operation(
@@ -54,14 +53,12 @@ public class ChatControllerV1 {
     )
     @GetMapping("/chat-list/{chatRoomId}")
     public ChatList chatList(
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString,
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable("chatRoomId") Long chatRoomId,
             @RequestParam(value = "lastChatId", required = false) Long lastChatId
 
     ) {
-        String token = JWTProvider.extractToken(authString);
-        String user = JWTProvider.getUserFromToken(token);
-        return chatFacadeV1.getChatList(user, chatRoomId, lastChatId);
+        return chatFacadeV1.getChatList(userDetails.getUsername(), chatRoomId, lastChatId);
     }
 
     @Operation(
@@ -73,12 +70,12 @@ public class ChatControllerV1 {
     )
     @PutMapping("/leave-chatroom/{id}")
     public void leaveChatRoom(
-            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authString,
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable("id") Long id
 
     ) {
-        String token = JWTProvider.extractToken(authString);
-        String user = JWTProvider.getUserFromToken(token);
+
+        String user = userDetails.getUsername();
         chatFacadeV1.leaveChatRoom(id, user);
     }
 }
