@@ -8,8 +8,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public record LoginResponse(
         @Schema(description = "error code")
         ErrorCode description,
-        @Schema(description = "jwt token")
-        String token,
         @Schema(description = "프로필 유무")
         boolean invalidProfile,
         @Schema(description = "일일 포인트 키 지급 여부")

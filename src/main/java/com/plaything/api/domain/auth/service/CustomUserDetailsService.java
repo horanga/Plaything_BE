@@ -20,7 +20,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        User userData = userRepository.findByLoginId(username).orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
+        User userData = userRepository.findByLoginIdWithCredentials(username).orElseThrow(() ->
+                new CustomException(ErrorCode.NOT_EXIST_USER));
 
         //DTO에 넣어서 전달, 이 DTO는 UserDetails를 구현한 DTO로 직접 만들어야 함
         return new CustomUserDetails(userData);

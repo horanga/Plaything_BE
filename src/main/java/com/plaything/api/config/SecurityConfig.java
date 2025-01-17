@@ -1,6 +1,13 @@
 package com.plaything.api.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.plaything.api.domain.auth.service.LoginSuccessHandler;
+import com.plaything.api.security.JWTFilter;
+import com.plaything.api.security.JWTProvider;
 import com.plaything.api.security.LoginFilter;
+import com.plaything.api.security.SecurityConstants;
+import com.plaything.api.security.exception.CustomAccessDeniedHandler;
+import com.plaything.api.security.exception.CustomAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,10 +26,20 @@ public class SecurityConfig {
 
     //AuthenticationManager가 인자로 받을 AuthenticationConfiguraion 객체 생성자 주입
     private final AuthenticationConfiguration authenticationConfiguration;
+    private final JWTProvider jwtProvider;
+    private final ObjectMapper objectMapper;
+    private final LoginSuccessHandler loginSuccessHandler;
 
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration) {
+    public SecurityConfig(
+            AuthenticationConfiguration authenticationConfiguration,
+            JWTProvider jwtProvider,
+            ObjectMapper objectMapper,
+            LoginSuccessHandler loginSuccessHandler) {
 
         this.authenticationConfiguration = authenticationConfiguration;
+        this.jwtProvider = jwtProvider;
+        this.objectMapper = objectMapper;
+        this.loginSuccessHandler = loginSuccessHandler;
     }
 
 
@@ -37,6 +54,12 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http.csrf(AbstractHttpConfigurer::disable);
+        LoginFilter loginFilter = new LoginFilter(
+                authenticationManager(authenticationConfiguration),
+                loginSuccessHandler,
+                jwtProvider,
+                objectMapper);
+        loginFilter.setFilterProcessesUrl("/api/v1/auth/login");
 
         //Form 로그인 disable
         http.formLogin(AbstractHttpConfigurer::disable);
@@ -44,13 +67,19 @@ public class SecurityConfig {
         //Http basic 인증방식 disable
         http.httpBasic(AbstractHttpConfigurer::disable);
         http
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                        .accessDeniedHandler(new CustomAccessDeniedHandler())
+                )
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/api/v1/auth/create-user", "/api/v1/auth/login").permitAll()
+                        auth.requestMatchers(SecurityConstants.getAuthWhitelist()).permitAll()
                                 .requestMatchers("/admin").hasRole("ADMIN")
+                                .requestMatchers("/error").permitAll()
                                 .anyRequest().authenticated()
                 );
 
-        http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration)), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new JWTFilter(jwtProvider), LoginFilter.class);
+        http.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
 
 
         //세션 설정
