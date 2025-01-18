@@ -87,8 +87,8 @@ class MatchingFacadeV1Test {
     @DisplayName("기존 매칭정보를 제외하고 매칭 가능 프로필이 뜬다.")
     @Test
     void test3() {
-        userGenerator.createMatching("fnel1", "1234", "fnel2", "1234");
-        userGenerator.requestMatching("fnel1", "1234", "fnel3");
+        userGenerator.createMatching("fnel1", "fnel2");
+        userGenerator.requestMatching("fnel1", "fnel3");
         userGenerator.generateWithRole("fnel5", "1234", "11", "연호5", PrimaryRole.BOTTOM, SERVANT);
         userGenerator.addImages("연호5", "abc", true);
 
@@ -126,7 +126,7 @@ class MatchingFacadeV1Test {
     void test6() {
         userGenerator.generateWithRole("fnel5", "1234", "11", "연호5", PrimaryRole.BOTTOM, SERVANT);
         userGenerator.addImages("연호5", "abc", true);
-        userGenerator.createMatching("fnel1", "1234", "fnel2", "1234");
+        userGenerator.createMatching("fnel1", "fnel2");
 
         List<Profile> profiles = profileRepository.findByLoginId(List.of("fnel2", "fnel3", "fnel4", "fnel5"));
 
@@ -144,7 +144,7 @@ class MatchingFacadeV1Test {
     void test7() {
         userGenerator.generateWithRole("fnel5", "1234", "11", "연호5", PrimaryRole.BOTTOM, SERVANT);
         userGenerator.addImages("연호5", "abc", true);
-        userGenerator.createMatching("fnel1", "1234", "fnel2", "1234");
+        userGenerator.createMatching("fnel1", "fnel2");
 
         List<Profile> profiles = profileRepository.findByLoginId(List.of("fnel2", "fnel3", "fnel4", "fnel5"));
 
@@ -170,7 +170,7 @@ class MatchingFacadeV1Test {
 
         userGenerator.generateWithRole("fnel5", "1234", "11", "연호5", PrimaryRole.BOTTOM, SERVANT);
         userGenerator.addImages("연호5", "abc", true);
-        userGenerator.requestMatching("fnel1", "1234", "fnel2");
+        userGenerator.requestMatching("fnel1", "fnel2");
         List<Profile> profiles = profileRepository.findByLoginId(List.of("fnel2", "fnel3", "fnel4", "fnel5"));
         for (int i = 0; i < 51; i++) {
             matchingFacadeV1.updateLastViewedProfile("fnel1", profiles.get(i % 4).getId(), 1, 1, TimeUnit.HOURS);
@@ -202,8 +202,8 @@ class MatchingFacadeV1Test {
         }
 
         for (int i = 2; i <= 6; i++) {
-            userGenerator.requestMatching("fnel1", "1234", "fnel" + i);
-            userGenerator.createMatching("fnel1", "1234", "fnel" + (i + 10), "1234");
+            userGenerator.requestMatching("fnel1", "fnel" + i);
+            userGenerator.createMatching("fnel1", "fnel" + (i + 10));
         }
 
         List<UserMatching> list1 = matchingFacadeV1.findMatchingCandidates("fnel1", 2, TimeUnit.SECONDS);

@@ -89,6 +89,9 @@ public class StompTest {
     @Autowired
     private NotificationRepository notificationRepository;
 
+    @Autowired
+    private JWTProvider jwtProvider;
+
     @BeforeEach
     void setup() {
 
@@ -110,7 +113,7 @@ public class StompTest {
                 PersonalityTraitConstant.SERVANT);
         userGenerator.addImages("alex2", "a", true);
 
-        userGenerator.createMatching("dusgh1234", "123", "dusgh12345", "123");
+        userGenerator.createMatching("dusgh1234", "dusgh12345");
 
         TestTransaction.flagForCommit();
         TestTransaction.end();
@@ -153,7 +156,7 @@ public class StompTest {
     void test1() throws ExecutionException, InterruptedException, TimeoutException {
 
         StompHeaders connectHeaders = new StompHeaders();
-        String token = JWTProvider.createToken("dusgh1234");
+        String token = jwtProvider.createToken("dusgh1234", "ROLE_USER", 60 * 60 * 1000L);
         connectHeaders.add("Authorization", "Bearer " + token);
 
         StompSession receiverSession = stompClient.connect(
@@ -183,7 +186,7 @@ public class StompTest {
         });
 
         StompHeaders connectHeaders2 = new StompHeaders();
-        String token2 = JWTProvider.createToken("dusgh12345");
+        String token2 = jwtProvider.createToken("dusgh1234", "ROLE_USER", 60 * 60 * 1000L);
         connectHeaders2.add("Authorization", "Bearer " + token2);
         // 두 번째 세션 (수신자)
         StompSession senderSession = stompClient.connect(
@@ -215,7 +218,7 @@ public class StompTest {
     void test2() throws ExecutionException, InterruptedException, TimeoutException {
 
         StompHeaders connectHeaders = new StompHeaders();
-        String token = JWTProvider.createToken("dusgh1234");
+        String token = jwtProvider.createToken("dusgh1234", "ROLE_USER", 60 * 60 * 1000L);
         connectHeaders.add("Authorization", "Bearer " + token);
 
         StompSession senderSession = stompClient.connect(
@@ -227,7 +230,7 @@ public class StompTest {
         ).get(10, TimeUnit.SECONDS);
 
         StompHeaders connectHeaders2 = new StompHeaders();
-        String token2 = JWTProvider.createToken("dusgh12345");
+        String token2 = jwtProvider.createToken("dusgh1234", "ROLE_USER", 60 * 60 * 1000L);
         connectHeaders2.add("Authorization", "Bearer " + token2);
         // 두 번째 세션 (수신자)
         StompSession receiverSession = stompClient.connect(
