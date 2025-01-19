@@ -140,17 +140,17 @@ public class Profile {
 
     public List<ProfileImage> updateProfilePictures(List<String> picturesToRemove, List<ProfileImage> newProfileImages, Integer mainPhotoIndex, boolean shouldCancelMainPhoto) {
 
-        if (picturesToRemove != null && !picturesToRemove.isEmpty()) {
-            for (String name : picturesToRemove) {
-                this.profileImages.removeIf(images ->
-                        images.getFileName().equals(name));
-            }
-        }
-
         if (shouldCancelMainPhoto) {
             this.profileImages.stream().filter(ProfileImage::isMainPhoto).forEach(ProfileImage::cancelMainPhoto);
             if (mainPhotoIndex != null) {
                 this.profileImages.get(mainPhotoIndex).setMainPhoto();
+            }
+        }
+
+        if (picturesToRemove != null && !picturesToRemove.isEmpty()) {
+            for (String name : picturesToRemove) {
+                this.profileImages.removeIf(images ->
+                        images.getFileName().equals(name));
             }
         }
 
@@ -172,7 +172,7 @@ public class Profile {
     public void validateUpdateRequest(
             List<String> picturesToRemove,
             List<ProfileImageRequest> newProfileImages,
-            boolean shouldCancelMainPhoto) {
+            boolean shouldCancelMainPhoto, Integer indexOfMainImage) {
 
 
         long countOfMainImagesOfNewImages = newProfileImages.stream()
@@ -204,6 +204,10 @@ public class Profile {
         }
 
         if (hasMainPhoto && !shouldCancelMainPhoto) {
+            throw new CustomException(ErrorCode.MAIN_IMAGE_COUNT_EXCEEDED);
+        }
+
+        if (hasMainPhoto && indexOfMainImage >= 0) {
             throw new CustomException(ErrorCode.MAIN_IMAGE_COUNT_EXCEEDED);
         }
     }

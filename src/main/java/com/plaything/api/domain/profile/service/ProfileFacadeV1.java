@@ -109,7 +109,8 @@ public class ProfileFacadeV1 {
         profile.validateUpdateRequest(
                 imagesToRemove,
                 newImages,
-                shouldCancelMainPhoto);
+                shouldCancelMainPhoto,
+                indexOfMainImage);
 
         List<SavedImage> savedImages = new ArrayList<>();
         if (!newImages.isEmpty()) {
