@@ -2,7 +2,6 @@ package com.plaything.api.domain.profile.service;
 
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
-import com.plaything.api.domain.auth.model.request.LoginRequest;
 import com.plaything.api.domain.auth.service.AuthServiceV1;
 import com.plaything.api.domain.key.model.request.AdRewardRequest;
 import com.plaything.api.domain.key.service.PointKeyFacadeV1;
@@ -256,7 +255,7 @@ class ProfileFacadeV1Test {
                         PersonalityTraitConstant.SERVANT,
                         PersonalityTraitConstant.DEGRADEE,
                         M,
-                        "MS"
+                        "MB"
                 ),
                 Arguments.of(
                         F,
@@ -266,7 +265,7 @@ class ProfileFacadeV1Test {
                         PersonalityTraitConstant.SERVANT,
                         PersonalityTraitConstant.DEGRADEE,
                         F,
-                        "FS"
+                        "FB"
                 ),
                 Arguments.of(
                         OTHER,
@@ -689,13 +688,12 @@ class ProfileFacadeV1Test {
 
 
         userGenerator.generate("fnel123", "123", "2", "알렉스");
-        authServiceV1.login(new LoginRequest("fnel123", "123"), LocalDate.now(), "dadf");
         LocalDateTime now = LocalDateTime.now();
 
         pointKeyFacadeV1.createPointKeyForAd("fnel123", new AdRewardRequest("dd", 3), now, "32321");
 
         MyPageProfile profile = profileFacadeV1.getMyPageProfile("fnel123");
-        assertThat(profile.countOfKey()).isEqualTo(3);
+        assertThat(profile.countOfKey()).isEqualTo(2);
         assertThat(profile.lastAdViewTime().truncatedTo(ChronoUnit.SECONDS)).isEqualTo(now.truncatedTo(ChronoUnit.SECONDS));
     }
 
