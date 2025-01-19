@@ -71,9 +71,20 @@ public class JWTFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
 
         } catch (SignatureException | MalformedJwtException | ExpiredJwtException e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            handleAuthenticationException(response, e);
         } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            handleUnexpectedException(response, e);
         }
     }
+
+    private void handleAuthenticationException(HttpServletResponse response, Exception e) {
+        SecurityContextHolder.clearContext();
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    }
+
+    private void handleUnexpectedException(HttpServletResponse response, Exception e) {
+        SecurityContextHolder.clearContext();
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
+
 }
