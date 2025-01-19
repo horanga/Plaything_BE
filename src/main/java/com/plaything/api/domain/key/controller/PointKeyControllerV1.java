@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Tag(name = "Point Key API", description = "V1 PointKey API")
+@Tag(name = "Points", description = "V1 PointKey API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/point")
