@@ -18,7 +18,7 @@ import java.util.List;
 
 import static com.plaything.api.domain.matching.constants.MatchingConstants.*;
 
-@Tag(name = "매칭 API", description = "V1 매칭 API")
+@Tag(name = "Matchings", description = "V1 매칭 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/matching")

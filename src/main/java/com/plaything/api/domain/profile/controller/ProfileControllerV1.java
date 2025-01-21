@@ -20,7 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.stream.IntStream;
 
-@Tag(name = "프로필 API", description = "V1 프로필 API")
+@Tag(name = "Profiles", description = "V1 프로필 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/user")
