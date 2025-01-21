@@ -25,7 +25,6 @@ public class LoginSuccessHandler {
             throw new CustomException(ErrorCode.TRANSACTION_ID_REQUIRED);
         }
 
-
         User user = userRepository.findByLoginId(userName).get();
 
         //이용자가 프로필을 설정했는지 안했는지 확인

@@ -7,7 +7,9 @@ public class SecurityConstants {
             "/api/v1/auth/login",
             "/swagger-ui/**",
             "/v3/**",
-            "/swagger-resources/**"
+            "/swagger-resources/**",
+            "/api/v1/auth/google",
+            "/api/v1/auth/google/login"
     };
 
     public static String[] getAuthWhitelist() {

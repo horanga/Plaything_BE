@@ -75,6 +75,10 @@ public class User extends BaseEntity {
         return this.profile.getNickName();
     }
 
+    public void updateFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
+    }
+
     public void delete() {
         this.isDeleted = true;
         profile.delete();

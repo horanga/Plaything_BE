@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.plaything.api.domain.auth.service.LoginSuccessHandler;
 import com.plaything.api.security.JWTFilter;
 import com.plaything.api.security.JWTProvider;
-import com.plaything.api.security.LoginFilter;
 import com.plaything.api.security.SecurityConstants;
 import com.plaything.api.security.exception.CustomAccessDeniedHandler;
 import com.plaything.api.security.exception.CustomAuthenticationEntryPoint;
@@ -54,18 +53,17 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http.csrf(AbstractHttpConfigurer::disable);
-        LoginFilter loginFilter = new LoginFilter(
-                authenticationManager(authenticationConfiguration),
-                loginSuccessHandler,
-                jwtProvider,
-                objectMapper);
-        loginFilter.setFilterProcessesUrl("/api/v1/auth/login");
 
         //Form 로그인 disable
         http.formLogin(AbstractHttpConfigurer::disable);
 
         //Http basic 인증방식 disable
         http.httpBasic(AbstractHttpConfigurer::disable);
+
+        http.addFilterBefore(
+                new JWTFilter(jwtProvider),
+                UsernamePasswordAuthenticationFilter.class
+        );
         http
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
@@ -77,9 +75,6 @@ public class SecurityConfig {
                                 .requestMatchers("/error").permitAll()
                                 .anyRequest().authenticated()
                 );
-
-        http.addFilterBefore(new JWTFilter(jwtProvider), LoginFilter.class);
-        http.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
 
 
         //세션 설정
