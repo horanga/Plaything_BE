@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")
 public class AuthControllerV1 {
-
     private final AuthServiceV1 authServiceV1;
     private final GoogleApiClient googleApiClient;
 
