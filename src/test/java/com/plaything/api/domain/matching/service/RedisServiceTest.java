@@ -56,7 +56,7 @@ class RedisServiceTest {
     @Test
     void test1() {
 
-        userGenerator.requestMatching("fnel1", "1234", "fnel2");
+        userGenerator.requestMatching("fnel1", "fnel2");
 
         List<UserMatching> matchingCandidate2 = matchingFacadeV1.findMatchingCandidates("fnel1", CACHE_DURATION_DAY, CACHE_DURATION_UNIT_DAYS);
         assertThat(matchingCandidate2).extracting("loginId").containsExactly("fnel3", "fnel4");
@@ -77,7 +77,7 @@ class RedisServiceTest {
     @Test
     void test2() {
 
-        userGenerator.createMatching("fnel1", "1234", "fnel2", "1234");
+        userGenerator.createMatching("fnel1", "fnel2");
         List<UserMatching> list = matchingFacadeV1.findMatchingCandidates("fnel1", CACHE_DURATION_DAY, CACHE_DURATION_UNIT_DAYS);
         assertThat(list).extracting("loginId").containsExactly("fnel3", "fnel4");
 
@@ -118,8 +118,8 @@ class RedisServiceTest {
     @Test
     void test4() throws InterruptedException {
 
-        userGenerator.requestMatching("fnel1", "1234", "fnel2");
-        userGenerator.requestMatching("fnel1", "1234", "fnel3");
+        userGenerator.requestMatching("fnel1", "fnel2");
+        userGenerator.requestMatching("fnel1", "fnel3");
 
 
         List<UserMatching> matchingCandidate2 = matchingFacadeV1.findMatchingCandidates("fnel1", CACHE_DURATION_DAY, TimeUnit.SECONDS);
@@ -148,10 +148,10 @@ class RedisServiceTest {
         userGenerator.generateWithRole("fnel8", "1234", "11", "연호8", PrimaryRole.BOTTOM, SERVANT);
         userGenerator.addImages("연호8", "abc", true);
 
-        userGenerator.requestMatching("fnel1", "1234", "fnel2");
-        userGenerator.requestMatching("fnel1", "1234", "fnel3");
-        userGenerator.createMatching("fnel1", "1234", "fnel4", "1234");
-        userGenerator.createMatching("fnel1", "1234", "fnel5", "1234");
+        userGenerator.requestMatching("fnel1", "fnel2");
+        userGenerator.requestMatching("fnel1", "fnel3");
+        userGenerator.createMatching("fnel1", "fnel4");
+        userGenerator.createMatching("fnel1", "fnel5");
 
 
         List<UserMatching> matchingCandidate2 = matchingFacadeV1.findMatchingCandidates("fnel1", CACHE_DURATION_DAY, CACHE_DURATION_UNIT_DAYS);

@@ -8,8 +8,6 @@ import com.plaything.api.domain.repository.entity.profile.Profile;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Getter
 @Builder
@@ -49,21 +47,6 @@ public class User extends BaseEntity {
     @JoinColumn(name = "user_reward_activity_id", referencedColumnName = "id")
     private UserRewardActivity userRewardActivity;
 
-    public static void createUser(User newUser, UserCredentials credentials) {
-
-        UserViolationStats userViolation = UserViolationStats.builder()
-                .bannedImageCount(0)
-                .bannedProfileCount(0)
-                .reportViolationCount(0).build();
-
-        UserRewardActivity userReward = UserRewardActivity.builder()
-                .lastAdViewTime(LocalDateTime.now().minusHours(5)).build();
-        newUser.setCredentials(credentials);
-        newUser.setViolationStats(userViolation);
-        newUser.setUserRewardActivity(userReward);
-    }
-
-
     public void setProfile(Profile profile) {
         this.profile = profile;
     }
@@ -90,6 +73,10 @@ public class User extends BaseEntity {
 
     public String getNickname() {
         return this.profile.getNickName();
+    }
+
+    public void updateFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
     }
 
     public void delete() {

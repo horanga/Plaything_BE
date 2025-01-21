@@ -74,7 +74,7 @@ public enum ErrorCode implements CodeInterFace {
 
     //요청
     TRANSACTION_ALREADY_PROCESSED("이미 처리된 요청입니다", HttpStatus.CONFLICT),
-
+    TRANSACTION_ID_REQUIRED("요청 식별값을 보내야합니다", HttpStatus.BAD_REQUEST),
 
     //채팅방
     NOT_EXIST_CHATROOM("채팅방이 존재하지 않습니다", HttpStatus.NOT_FOUND),

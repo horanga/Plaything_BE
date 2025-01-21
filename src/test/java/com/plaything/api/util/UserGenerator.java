@@ -1,7 +1,6 @@
 package com.plaything.api.util;
 
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
-import com.plaything.api.domain.auth.model.request.LoginRequest;
 import com.plaything.api.domain.auth.service.AuthServiceV1;
 import com.plaything.api.domain.key.constant.PointStatus;
 import com.plaything.api.domain.key.model.request.MatchingRequest;
@@ -101,21 +100,16 @@ public class UserGenerator {
         byNickName.addProfileImages(List.of(ProfileImage.builder().fileName(fileName).isMainPhoto(isMain).build()));
     }
 
-    public void requestMatching(String loginId, String password, String partnerLoginId) {
-        LocalDate now = LocalDate.now();
-        LoginRequest loginRequest = new LoginRequest(loginId, password);
-        authServiceV1.login(loginRequest, now, String.valueOf(UUID.randomUUID()));
+    public void requestMatching(String loginId, String partnerLoginId) {
+        createPointKey(loginId, 1);
+        createPointKey(partnerLoginId, 1);
         MatchingRequest matchingRequest = new MatchingRequest(partnerLoginId);
         matchingFacadeV1.sendMatchingRequest(loginId, matchingRequest, String.valueOf(UUID.randomUUID()));
     }
 
-    public void createMatching(String loginId, String password, String loginId2, String password2) {
-        LocalDate now = LocalDate.now();
-        LoginRequest loginRequest = new LoginRequest(loginId, password);
-        authServiceV1.login(loginRequest, now, String.valueOf(UUID.randomUUID()));
-
-        LoginRequest loginRequest2 = new LoginRequest(loginId2, password2);
-        authServiceV1.login(loginRequest2, now, String.valueOf(UUID.randomUUID()));
+    public void createMatching(String loginId, String loginId2) {
+        createPointKey(loginId, 1);
+        createPointKey(loginId2, 1);
         MatchingRequest matchingRequest = new MatchingRequest(loginId2);
         matchingFacadeV1.sendMatchingRequest(loginId, matchingRequest, String.valueOf(UUID.randomUUID()));
         matchingFacadeV1.acceptMatchingRequest(loginId2, new MatchingRequest(loginId), String.valueOf(UUID.randomUUID()));

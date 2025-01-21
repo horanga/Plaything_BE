@@ -1,25 +1,16 @@
 package com.plaything.api.domain.auth.service;
 
-import com.plaything.api.domain.auth.model.request.CreateUserRequest;
-import com.plaything.api.domain.auth.model.request.LoginRequest;
-import com.plaything.api.domain.auth.model.response.LoginResponse;
-import org.junit.jupiter.api.BeforeEach;
+import com.plaything.api.domain.auth.model.response.LoginResult;
+import com.plaything.api.domain.repository.entity.user.User;
+import com.plaything.api.domain.repository.repo.user.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.util.Objects;
-import java.util.Set;
-
-import static com.plaything.api.common.exception.ErrorCode.SUCCESS;
 import static org.assertj.core.api.Assertions.assertThat;
+
 @Transactional
 @SpringBootTest
 class AuthServiceV1Test {
@@ -28,36 +19,34 @@ class AuthServiceV1Test {
     private AuthServiceV1 authServiceV1;
 
     @Autowired
-    protected RedisTemplate redisTemplate;
+    private UserRepository userRepository;
 
-    @BeforeEach
-    void setUp() {
-        Set<String> keys = redisTemplate.keys("*"); // 모든 키 조회
-        if (keys != null && !keys.isEmpty()) {  // null과 빈 set 체크
-            redisTemplate.delete(keys);
-        }
-
-        RedisConnectionFactory connectionFactory = redisTemplate.getConnectionFactory();
-        if (connectionFactory != null) {
-            RedisConnection connection = connectionFactory.getConnection();
-            connection.serverCommands().flushAll(); // 모든 데이터를 초기화
-        }
-        CreateUserRequest request = new CreateUserRequest("fnel123", "1234", "1");
-        authServiceV1.creatUser(request);
-
-        CreateUserRequest request2 = new CreateUserRequest("fnel1234", "1234", "1");
-        authServiceV1.creatUser(request2);
-    }
-
-    @DisplayName("첫 로그인을 하면 Point key 1개를 받는다.")
+    @DisplayName("구글 로그인 시 회원이 없으면 회원가입후 jwt 토큰을 반환한다")
     @Test
     void test1() {
-        LoginRequest request = new LoginRequest("fnel123", "1234");
-        LoginResponse login = authServiceV1.login(request, LocalDate.now(), "1");
 
-        assertThat(login.dailyRewardProvided()).isTrue();
-        assertThat(login.invalidProfile()).isTrue();
-        assertThat(login.description()).isEqualTo(SUCCESS);
+        LoginResult login = authServiceV1.login("GOOGLE", "123", "DADFAS", "ABC");
+        assertThat(login.token()).isNotNull();
+        assertThat(login.loginResponse().dailyRewardProvided()).isTrue();
+        assertThat(login.loginResponse().invalidProfile()).isTrue();
 
+        User user = userRepository.findByLoginId("GOOGLE123").orElse(null);
+        assertThat(user).isNotNull();
+        assertThat(user.getLoginId()).isEqualTo("GOOGLE123");
     }
+
+    @DisplayName("구글 로그인 시 회원이 있으면 로그인을 할 수 있다")
+    @Test
+    void test2() {
+
+        LoginResult login = authServiceV1.login("GOOGLE", "123", "DADFAS", "ABC");
+        LoginResult login2 = authServiceV1.login("GOOGLE", "123", "DADFASAD", "DDD");
+
+        assertThat(login.token()).isNotNull();
+        assertThat(login2.loginResponse().dailyRewardProvided()).isFalse();
+        User user = userRepository.findByLoginId("GOOGLE123").orElse(null);
+        assertThat(user).isNotNull();
+        assertThat(user.getFcmToken()).isEqualTo("DDD");
+    }
+
 }

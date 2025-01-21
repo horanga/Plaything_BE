@@ -397,7 +397,7 @@ public class ProfileImageTest {
         profileImageServiceV1.updateImages(
                 "fnel1234",
                 List.of("사진1"),
-                List.of(new SavedImage("사진3", true)),
+                List.of(new SavedImage("사진3", false)),
                 1,
                 true);
 
@@ -405,7 +405,7 @@ public class ProfileImageTest {
         List<ProfileImage> profileImages = profile1.getProfileImages();
         assertThat(profileImages).hasSize(2);
         assertThat(profileImages).extracting("fileName").containsExactly("사진2", "사진3");
-        assertThat(profileImages).extracting("isMainPhoto").containsExactly(false, true);
+        assertThat(profileImages).extracting("isMainPhoto").containsExactly(true, false);
 
     }
 
@@ -690,5 +690,27 @@ public class ProfileImageTest {
         assertThat(all).hasSize(3);
         assertThat(all).extracting("fileName").containsExactly("사진2", "사진3", "사진4");
         assertThat(profileImages).extracting("profileImageRegistration.fileName").containsExactly("사진2", "사진3", "사진4");
+    }
+
+    @DisplayName("프로필 업데이트 시 메인사진은 하나여야 한다")
+    @Test
+    void test29() {
+
+
+        userGenerator.generate("fnel1234", "123", "1", "연호2");
+
+        profileImageServiceV1.saveImages(
+                List.of(new SavedImage("사진1", true),
+                        new SavedImage("사진2", false)),
+                "fnel1234");
+
+        assertThatThrownBy(() -> profileFacadeV1.updateImages(
+                "fnel1234",
+                List.of(new ProfileImageRequest(null, true)),
+                "dfasDDSAd",
+                List.of("사진1"),
+                1,
+                true))
+                .isInstanceOf(CustomException.class).hasMessage("메인 사진은 하나만 골라야 합니다");
     }
 }

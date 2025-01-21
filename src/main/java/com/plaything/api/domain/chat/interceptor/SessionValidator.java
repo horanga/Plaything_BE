@@ -29,6 +29,7 @@ public class SessionValidator {
     private final MatchingServiceV1 matchingServiceV1;
     private final UserServiceV1 userServiceV1;
     private final MessageBatchHandler messageBatchHandler;
+    private final JWTProvider jwtProvider;
 
     public void validateSend(String authHeader, String sessionId, String destination, ChatRequest chatRequest) {
 
@@ -138,8 +139,8 @@ public class SessionValidator {
 
     private User getLoginId(String authHeader) {
 
-        String token = JWTProvider.extractToken(authHeader);
-        String user = JWTProvider.getUserFromToken(token);
+        String token = jwtProvider.extractToken(authHeader);
+        String user = jwtProvider.getUsername(token);
 
         return userServiceV1.findByLoginId(user);
     }

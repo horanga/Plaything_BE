@@ -109,10 +109,11 @@ public class ProfileFacadeV1 {
         profile.validateUpdateRequest(
                 imagesToRemove,
                 newImages,
-                shouldCancelMainPhoto);
+                shouldCancelMainPhoto,
+                indexOfMainImage);
 
         List<SavedImage> savedImages = new ArrayList<>();
-        if (newImages != null && !newImages.isEmpty()) {
+        if (!newImages.isEmpty()) {
             savedImages.addAll(s3ImagesServiceV1.uploadImages(newImages));
         }
 

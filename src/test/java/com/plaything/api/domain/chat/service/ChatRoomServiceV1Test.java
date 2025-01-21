@@ -107,13 +107,13 @@ class ChatRoomServiceV1Test {
         userGenerator.addImages("연1", "dd", true);
         userGenerator.addImages("연2", "dd", true);
 
-        userGenerator.createMatching("dusgh1234", "1234", "dusgh12345", "1234");
+        userGenerator.createMatching("dusgh1234", "dusgh12345");
 
         AdRewardRequest request = new AdRewardRequest("광고1", 2);
         pointKeyFacadeV1.createPointKeyForAd("dusgh1234", request, LocalDateTime.now(), "1");
 
-        userGenerator.createMatching("dusgh1234", "1234", "dusgh12", "1234");
-        userGenerator.createMatching("dusgh1234", "1234", "dusgh123", "1234");
+        userGenerator.createMatching("dusgh1234", "dusgh12");
+        userGenerator.createMatching("dusgh1234", "dusgh123");
 
 
     }
@@ -192,7 +192,7 @@ class ChatRoomServiceV1Test {
 
             userGenerator.generate("dusgh" + i, "1234", "2", "연" + i);
             userGenerator.addImages("연" + i, "abc" + i, true);
-            userGenerator.createMatching("dusgh1234", "1234", "dusgh" + i, "1234");
+            userGenerator.createMatching("dusgh1234", "dusgh" + i);
 
             sendMessage("dusgh1234", "dusgh" + i, String.valueOf(i));
             Thread.sleep(300);

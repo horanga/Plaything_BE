@@ -1,8 +1,8 @@
 package com.plaything.api.domain.key.service;
 
 import com.plaything.api.common.exception.CustomException;
+import com.plaything.api.domain.auth.client.google.dto.request.LoginRequest;
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
-import com.plaything.api.domain.auth.model.request.LoginRequest;
 import com.plaything.api.domain.auth.service.AuthServiceV1;
 import com.plaything.api.domain.key.model.request.AdRewardRequest;
 import com.plaything.api.domain.key.model.response.AvailablePointKey;
@@ -17,7 +17,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -29,7 +28,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 import static com.plaything.api.domain.key.constant.KeySource.LOGIN_REWARD;
@@ -80,7 +78,7 @@ public class AdPointKeyRollbackTest {
 
     }
 
-        @AfterEach
+    @AfterEach
     void cleanup() {
         keyLogRepository.deleteAll();
         pointKeyRepository.deleteAll();
@@ -98,7 +96,6 @@ public class AdPointKeyRollbackTest {
         authServiceV1.creatUser(request);
         LocalDate now = LocalDate.now();
         LoginRequest loginRequest = new LoginRequest("dusgh1234", "1234");
-        authServiceV1.login(loginRequest, now, "1");
 
         // 첫 번째 트랜잭션 커밋
         TestTransaction.flagForCommit();
@@ -140,7 +137,6 @@ public class AdPointKeyRollbackTest {
         authServiceV1.creatUser(request);
         LocalDate now = LocalDate.now();
         LoginRequest loginRequest = new LoginRequest("dusgh1234", "1234");
-        authServiceV1.login(loginRequest, now, "1");
 
         TestTransaction.flagForCommit();
         TestTransaction.end();

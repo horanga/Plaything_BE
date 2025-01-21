@@ -108,14 +108,6 @@ class MatchingServiceV1Test {
     @Autowired
     private UserGenerator userGenerator;
 
-    User user;
-
-    User user2;
-
-    User user3;
-
-    User user4;
-
 
     @BeforeEach
     void setUp() {
@@ -151,6 +143,7 @@ class MatchingServiceV1Test {
         assertThat(list).extracting("primaryRole").containsExactly(BOTTOM, BOTTOM, BOTTOM);
         assertThat(list).extracting("nickName").containsExactly("알렉2", "알렉3", "알렉4");
         assertThat(list).extracting("introduction").containsExactly("hi", "hi", "hi");
+
         assertThat(list.get(0).personalityTraitList()).extracting("personalityTrait").containsExactly(primary2);
         assertThat(list.get(0).personalityTraitList()).extracting("isPrimaryTrait").containsExactly(true);
         assertThat(list.get(1).personalityTraitList()).extracting("personalityTrait").containsExactly(primary2);
@@ -273,7 +266,6 @@ class MatchingServiceV1Test {
         userGenerator.generateWithRoles("fnel123", "123", "1", "알렉1", TOP, List.of(DEGRADER, SADIST), SADIST);
         userGenerator.generateWithRoles("fnel1234", "123", "1", "알렉2", BOTTOM, List.of(MASOCHIST, DEGRADEE), MASOCHIST);
         userGenerator.generateWithRoles("fnel12344", "123", "1", "알렉3", BOTTOM, List.of(MASOCHIST, PREY), MASOCHIST);
-
 
         userGenerator.addImages("알렉1", "a", true);
         userGenerator.addImages("알렉2", "a", true);

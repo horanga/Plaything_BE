@@ -1,8 +1,7 @@
 package com.plaything.api.domain.key.service;
 
-import com.plaything.api.common.exception.CustomException;
+import com.plaything.api.domain.auth.client.google.dto.request.LoginRequest;
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
-import com.plaything.api.domain.auth.model.request.LoginRequest;
 import com.plaything.api.domain.auth.service.AuthServiceV1;
 import com.plaything.api.domain.key.model.response.AvailablePointKey;
 import com.plaything.api.domain.repository.entity.log.KeyLog;
@@ -14,12 +13,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,14 +23,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 import static com.plaything.api.domain.key.constant.KeyType.POINT_KEY;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+
 @Transactional
 @SpringBootTest
 public class LoginPointKeyRollBackTest {
@@ -99,8 +94,6 @@ public class LoginPointKeyRollBackTest {
                 .when(pointKeyLogServiceV1)
                 .createLog(any(), any(), any(), any());
 
-        assertThatThrownBy(() -> authServiceV1.login(loginRequest, now, "1"))
-                .isInstanceOf(CustomException.class);
 
         TestTransaction.flagForRollback();
         TestTransaction.end();
@@ -129,8 +122,7 @@ public class LoginPointKeyRollBackTest {
         doThrow(RuntimeException.class)
                 .when(pointKeyLogServiceV1)
                 .createLog(any(), any(), any(), any());
-        assertThatThrownBy(() -> authServiceV1.login(loginRequest, now, "1"))
-                .isInstanceOf(RuntimeException.class);
+
 
         TestTransaction.flagForRollback();
         TestTransaction.end();

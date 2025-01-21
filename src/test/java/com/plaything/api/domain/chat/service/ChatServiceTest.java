@@ -51,7 +51,7 @@ public class ChatServiceTest {
         userGenerator.generate("dusgh12345", "1234", "1", "알렉2");
         userGenerator.addImages("알렉2", "abcd", true);
 
-        userGenerator.createMatching("dusgh1234", "1234", "dusgh12345", "1234");
+        userGenerator.createMatching("dusgh1234", "dusgh12345");
     }
 
 

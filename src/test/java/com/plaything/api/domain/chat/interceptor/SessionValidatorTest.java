@@ -48,6 +48,9 @@ class SessionValidatorTest {
     @Autowired
     private UserServiceV1 userServiceV1;
 
+    @Autowired
+    private JWTProvider jwtProvider;
+
 
     @BeforeEach
     void setup() {
@@ -87,7 +90,7 @@ class SessionValidatorTest {
     void test1() {
 
         String loginId = "dusgh1234";
-        String token = JWTProvider.createToken(loginId);
+        String token = jwtProvider.createToken(loginId, "ROLE_USER", 60 * 60 * 1000L);
         String sessionId = "session";
 
         sessionValidator.validateConnect("Bearer " + token, sessionId);
@@ -98,7 +101,7 @@ class SessionValidatorTest {
     void test2() {
 
         String loginId = "dusghd";
-        String token = JWTProvider.createToken(loginId);
+        String token = jwtProvider.createToken(loginId, "ROLE_USER", 60 * 60 * 1000L);
         String sessionId = "session";
         assertThatThrownBy(() -> sessionValidator.validateConnect("Bearer " + token, sessionId))
                 .isInstanceOf(CustomException.class).hasMessage("존재하지 않는 회원입니다");
@@ -109,7 +112,7 @@ class SessionValidatorTest {
     void test3() {
 
         String loginId = "dusgh12346";
-        String token = JWTProvider.createToken(loginId);
+        String token = jwtProvider.createToken(loginId, "ROLE_USER", 60 * 60 * 1000L);
         String sessionId = "session";
         assertThatThrownBy(() -> sessionValidator.validateConnect("Bearer " + token, sessionId))
                 .isInstanceOf(CustomException.class).hasMessage("프로필이 존재하지 않는 회원입니다");
@@ -120,7 +123,7 @@ class SessionValidatorTest {
     void test4() {
 
         String loginId = "dusgh1234";
-        String token = JWTProvider.createToken(loginId);
+        String token = jwtProvider.createToken(loginId, "ROLE_USER", 60 * 60 * 1000L);
         String sessionId = "session";
 
         MyPageProfile profileByLoginId = profileFacadeV1.getMyPageProfile("dusgh1234");
@@ -137,7 +140,7 @@ class SessionValidatorTest {
     void test5() {
 
         String loginId = "dusgh1234";
-        String token = JWTProvider.createToken(loginId);
+        String token = jwtProvider.createToken(loginId, "ROLE_USER", 60 * 60 * 1000L);
         String sessionId = "session";
         String destination = "/user/dusgh1234/chat";
 
@@ -150,7 +153,7 @@ class SessionValidatorTest {
     void test6() {
 
         String loginId = "dusgh1234";
-        String token = JWTProvider.createToken(loginId);
+        String token = jwtProvider.createToken(loginId, "ROLE_USER", 60 * 60 * 1000L);
         String sessionId = "session";
         String destination2 = "/user/alex2/chat";
         String destination3 = "/user/chat";
@@ -186,13 +189,13 @@ class SessionValidatorTest {
     void test7() {
 
         String loginId = "dusgh1234";
-        String token = JWTProvider.createToken(loginId);
+        String token = jwtProvider.createToken(loginId, "ROLE_USER", 60 * 60 * 1000L);
         String sessionId = "session";
 
         sessionValidator.validateConnect("Bearer " + token, sessionId);
 
         String loginId2 = "dusgh12345";
-        String token2 = JWTProvider.createToken(loginId2);
+        String token2 = jwtProvider.createToken(loginId2, "ROLE_USER", 60 * 60 * 1000L);
         String sessionId2 = "session2";
 
         sessionValidator.validateConnect("Bearer " + token2, sessionId2);
@@ -210,13 +213,13 @@ class SessionValidatorTest {
     void test8() {
 
         String loginId = "dusgh1234";
-        String alex = JWTProvider.createToken(loginId);
+        String alex = jwtProvider.createToken(loginId, "ROLE_USER", 60 * 60 * 1000L);
         String sessionId = "session";
 
         sessionValidator.validateConnect("Bearer " + alex, sessionId);
 
         String loginId2 = "dusgh12345";
-        String alex2 = JWTProvider.createToken(loginId2);
+        String alex2 = jwtProvider.createToken(loginId2, "ROLE_USER", 60 * 60 * 1000L);
         String sessionId2 = "session2";
 
         sessionValidator.validateConnect("Bearer " + alex2, sessionId2);
@@ -235,13 +238,13 @@ class SessionValidatorTest {
     void test9() {
 
         String loginId = "dusgh1234";
-        String alex = JWTProvider.createToken(loginId);
+        String alex = jwtProvider.createToken(loginId, "ROLE_USER", 60 * 60 * 1000L);
         String sessionId = "session";
 
         sessionValidator.validateConnect("Bearer " + alex, sessionId);
 
         String loginId2 = "dusgh12346";
-        String alex2 = JWTProvider.createToken(loginId2);
+        String alex2 = jwtProvider.createToken(loginId2, "ROLE_USER", 60 * 60 * 1000L);
         String sessionId2 = "session2";
         ProfileRegistration profileRegistration2 = new ProfileRegistration(
                 "alex3", "hi", M, PrimaryRole.TOP, List.of(PersonalityTraitConstant.BOSS), PersonalityTraitConstant.BOSS, List.of(RelationshipPreferenceConstant.DATE_DS), LocalDate.now());
@@ -273,13 +276,13 @@ class SessionValidatorTest {
     void test10() {
 
         String loginId = "dusgh1234";
-        String alex = JWTProvider.createToken(loginId);
+        String alex = jwtProvider.createToken(loginId, "ROLE_USER", 60 * 60 * 1000L);
         String sessionId = "session";
 
         sessionValidator.validateConnect("Bearer " + alex, sessionId);
 
         String loginId2 = "dusgh12346";
-        String alex2 = JWTProvider.createToken(loginId2);
+        String alex2 = jwtProvider.createToken(loginId2, "ROLE_USER", 60 * 60 * 1000L);
         ProfileRegistration profileRegistration2 = new ProfileRegistration(
                 "alex3", "hi", M, PrimaryRole.TOP, List.of(PersonalityTraitConstant.BOSS), PersonalityTraitConstant.BOSS, List.of(RelationshipPreferenceConstant.DATE_DS), LocalDate.now());
 
@@ -294,7 +297,7 @@ class SessionValidatorTest {
     void test11() {
 
         String loginId = "dusgh1234";
-        String alex = JWTProvider.createToken(loginId);
+        String alex = jwtProvider.createToken(loginId, "ROLE_USER", 60 * 60 * 1000L);
         String sessionId = "session";
 
         sessionValidator.validateConnect("Bearer " + alex, sessionId);
@@ -306,7 +309,7 @@ class SessionValidatorTest {
     void test14() {
 
         String loginId = "dusgh1234";
-        String alex = JWTProvider.createToken(loginId);
+        String alex = jwtProvider.createToken(loginId, "ROLE_USER", 60 * 60 * 1000L);
         String sessionId = "session";
 
         sessionValidator.validateConnect("Bearer " + alex, sessionId);
@@ -326,7 +329,7 @@ class SessionValidatorTest {
     void test12() {
 
         String loginId = "dusgh1234";
-        String alex = JWTProvider.createToken(loginId);
+        String alex = jwtProvider.createToken(loginId, "ROLE_USER", 60 * 60 * 1000L);
         String sessionId = "session";
         String destination = "/pub/chat/chat/alex2";
         assertThatThrownBy(() -> sessionValidator.validateSend("Bearer " + alex, sessionId, destination, new ChatRequest(0, "dusgh1234", "dusgh12345", "하이")))
@@ -338,7 +341,7 @@ class SessionValidatorTest {
     void test13() {
 
         String loginId = "dusgh1234";
-        String alex = JWTProvider.createToken(loginId);
+        String alex = jwtProvider.createToken(loginId, "ROLE_USER", 60 * 60 * 1000L);
         String sessionId = "session";
         String destination = "/user/alex/chat";
         assertThatThrownBy(() -> sessionValidator.validateSubscribe(sessionId, destination))

@@ -38,7 +38,6 @@ class ProfileMonitoringFacadeV1Test {
     @Autowired
     private ProfileMonitoringFacadeV1 profileMonitoringFacadeV1;
 
-
     @Autowired
     private UserRepository userRepository;
 

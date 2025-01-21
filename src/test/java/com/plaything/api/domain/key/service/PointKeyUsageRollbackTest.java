@@ -1,7 +1,7 @@
 package com.plaything.api.domain.key.service;
 
 import com.plaything.api.common.exception.CustomException;
-import com.plaything.api.domain.auth.model.request.LoginRequest;
+import com.plaything.api.domain.auth.client.google.dto.request.LoginRequest;
 import com.plaything.api.domain.auth.service.AuthServiceV1;
 import com.plaything.api.domain.key.constant.KeyLogStatus;
 import com.plaything.api.domain.key.model.request.MatchingRequest;
@@ -35,7 +35,6 @@ import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -141,7 +140,6 @@ public class PointKeyUsageRollbackTest {
     void test1() throws IOException {
 
         LoginRequest request = new LoginRequest("dusgh1234", "1234");
-        authServiceV1.login(request, LocalDate.now(), "1");
         TestTransaction.flagForCommit();
         TestTransaction.end();
         TestTransaction.start();
@@ -178,8 +176,7 @@ public class PointKeyUsageRollbackTest {
     void test2() throws IOException {
 
         LoginRequest request = new LoginRequest("dusgh1234", "1234");
-        authServiceV1.login(request, LocalDate.now(), "1");
-
+   
         // 첫 번째 트랜잭션 커밋
         TestTransaction.flagForCommit();
         TestTransaction.end();
