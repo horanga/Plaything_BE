@@ -15,6 +15,7 @@ public enum ErrorCode implements CodeInterFace {
     USER_SAVED_FAILED("회원가입에 실패했습니다", HttpStatus.INTERNAL_SERVER_ERROR),
     NOT_EXIST_USER("존재하지 않는 회원입니다", HttpStatus.NOT_FOUND),
     MIS_MATCH_PASSWORD("잘못된 비밀번호입니다", HttpStatus.UNAUTHORIZED),
+    AUTHORIZATION_FAIL("인증에 실패했습니다", HttpStatus.UNAUTHORIZED),
 
     //JWT 토큰
     TOKEN_IS_INVALID("유효하지 않은 토큰입니다", HttpStatus.UNAUTHORIZED),

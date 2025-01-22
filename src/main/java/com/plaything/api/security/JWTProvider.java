@@ -1,9 +1,13 @@
 package com.plaything.api.security;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorCode;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -11,12 +15,17 @@ import org.springframework.util.StringUtils;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.security.PublicKey;
+import java.util.Base64;
 import java.util.Date;
+import java.util.Map;
 
+@RequiredArgsConstructor
 @Component
 public class JWTProvider {
 
     private static SecretKey secretKey;
+    private final ObjectMapper objectMapper;
     private static String refreshSecretKey;
     private static long tokenTimeForMinutes;
     private static long refreshTokenTimeForMinutes;
@@ -87,6 +96,27 @@ public class JWTProvider {
         } catch (JwtException e) {
             return true;
         }
+    }
+
+    public Map<String, String> parseHeaders(String token) throws JsonProcessingException {
+        // JWT의 첫 번째 부분(헤더)을 가져옴
+        String header = token.split("\\.")[0];
+
+        // Base64 디코딩 후 JSON을 Map으로 변환
+        return objectMapper.readValue(decodeHeader(header), Map.class);
+    }
+
+    public String decodeHeader(String token) {
+        return new String(Base64.getDecoder().decode(token), StandardCharsets.UTF_8);
+    }
+
+
+    public Claims getTokenClaims(String token, PublicKey publicKey) {
+        return Jwts.parser()
+                .verifyWith(publicKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
 //    public String createRefreshToken(String name) {

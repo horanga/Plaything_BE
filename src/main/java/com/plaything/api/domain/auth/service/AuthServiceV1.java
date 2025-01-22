@@ -1,5 +1,8 @@
 package com.plaything.api.domain.auth.service;
 
+import com.plaything.api.common.exception.CustomException;
+import com.plaything.api.common.exception.ErrorCode;
+import com.plaything.api.domain.auth.client.constants.OAuth2Provider;
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
 import com.plaything.api.domain.auth.model.response.LoginResponse;
 import com.plaything.api.domain.auth.model.response.LoginResult;
@@ -9,26 +12,19 @@ import com.plaything.api.domain.repository.entity.user.UserCredentials;
 import com.plaything.api.domain.repository.entity.user.UserViolationStats;
 import com.plaything.api.domain.repository.repo.user.UserRepository;
 import com.plaything.api.security.JWTProvider;
+import io.jsonwebtoken.Claims;
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 
+import static com.plaything.api.domain.auth.client.constants.OAuth2Constants.APPLE_ISSUER;
 import static com.plaything.api.domain.profile.constants.Role.ROLE_USER;
 
 @Slf4j
@@ -36,28 +32,21 @@ import static com.plaything.api.domain.profile.constants.Role.ROLE_USER;
 @Service
 public class AuthServiceV1 {
 
-    private String googleAuthUrl = "https://oauth2.googleapis.com/token";
-
-    @Value("${spring.security.oauth2.client.registration.google.client-id}")
-    private String clientId;
-
-    @Value("${spring.security.oauth2.client.registration.google.client-secret}")
-    private String clientSecret;
-
-    @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
-    private String redirectUri;
-
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JWTProvider jwtProvider;
     private final LoginSuccessHandler loginSuccessHandler;
 
     @Transactional
-    public LoginResult login(String provider, String providerId, String transactionId, String fcmToken) {
-        String loginId = provider + providerId;
+    public LoginResult login(OAuth2Provider provider, String providerId, String transactionId, String fcmToken) {
+        if (providerId == null || providerId.isBlank()) {
+            throw new CustomException(ErrorCode.AUTHORIZATION_FAIL);
+        }
+
+        String loginId = provider.name() + providerId;
         User user = userRepository.findByLoginId(loginId).orElse(null);
         if (user == null) {
-            user = creatUser(new CreateUserRequest(loginId, provider, fcmToken));
+            user = creatUser(new CreateUserRequest(loginId, provider.name(), fcmToken));
         } else {
             boolean isFckTokenSame = user.getFcmToken().equals(fcmToken);
             if (!isFckTokenSame) {
@@ -67,6 +56,25 @@ public class AuthServiceV1 {
         String token = jwtProvider.createToken(user.getLoginId(), user.getRole().toString(), 60 * 60 * 1000L);
         LoginResponse loginResponse = loginSuccessHandler.handleSuccessFulLogin(user.getLoginId(), transactionId, LocalDate.now());
         return new LoginResult(token, loginResponse);
+    }
+
+    public void validateAppleLogin(Claims claims) {
+        // Claims 검증
+        String subject = claims.getSubject();
+        if (StringUtils.isBlank(subject)) {
+            throw new CustomException(ErrorCode.AUTHORIZATION_FAIL);
+        }
+
+        // 토큰 만료 검증
+        if (claims.getExpiration().before(new Date())) {
+            throw new CustomException(ErrorCode.AUTHORIZATION_FAIL);
+        }
+
+        // 발급자 검증
+        if (!APPLE_ISSUER.equals(claims.getIssuer())) {
+            throw new CustomException(ErrorCode.AUTHORIZATION_FAIL);
+        }
+
     }
 
     @Transactional
@@ -119,28 +127,6 @@ public class AuthServiceV1 {
         return UserCredentials.builder()
                 .hashedPassword(hashingValue)
                 .build();
-    }
-
-    public String getAccessToken(String authorizationCode) throws UnsupportedEncodingException {
-
-        String decodedCode = URLDecoder.decode(authorizationCode, StandardCharsets.UTF_8.name());
-        RestTemplate restTemplate = new RestTemplate();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("grant_type", "authorization_code");
-        params.add("client_id", clientId);
-        params.add("client_secret", clientSecret);
-        params.add("code", decodedCode);
-        params.add("redirect_uri", redirectUri);
-
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
-
-        ResponseEntity<String> response = restTemplate.postForEntity(googleAuthUrl, request, String.class);
-
-        return response.getBody();
     }
 }
 
