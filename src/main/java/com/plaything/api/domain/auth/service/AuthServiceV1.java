@@ -11,10 +11,21 @@ import com.plaything.api.domain.repository.repo.user.UserRepository;
 import com.plaything.api.security.JWTProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -25,16 +36,16 @@ import static com.plaything.api.domain.profile.constants.Role.ROLE_USER;
 @Service
 public class AuthServiceV1 {
 
-//    private String googleAuthUrl = "https://oauth2.googleapis.com/token";
-//
-//    @Value("${spring.security.oauth2.client.registration.google.client-id}")
-//    private String clientId;
-//
-//    @Value("${spring.security.oauth2.client.registration.google.client-secret}")
-//    private String clientSecret;
-//
-//    @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
-//    private String redirectUri;
+    private String googleAuthUrl = "https://oauth2.googleapis.com/token";
+
+    @Value("${spring.security.oauth2.client.registration.google.client-id}")
+    private String clientId;
+
+    @Value("${spring.security.oauth2.client.registration.google.client-secret}")
+    private String clientSecret;
+
+    @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
+    private String redirectUri;
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -109,27 +120,27 @@ public class AuthServiceV1 {
                 .hashedPassword(hashingValue)
                 .build();
     }
-//
-//    public String getAccessToken(String authorizationCode) throws UnsupportedEncodingException {
-//
-//        String decodedCode = URLDecoder.decode(authorizationCode, StandardCharsets.UTF_8.name());
-//        RestTemplate restTemplate = new RestTemplate();
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-//
-//        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-//        params.add("grant_type", "authorization_code");
-//        params.add("client_id", clientId);
-//        params.add("client_secret", clientSecret);
-//        params.add("code", decodedCode);
-//        params.add("redirect_uri", redirectUri);
-//
-//        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
-//
-//        ResponseEntity<String> response = restTemplate.postForEntity(googleAuthUrl, request, String.class);
-//
-//        return response.getBody();
-//    }
+
+    public String getAccessToken(String authorizationCode) throws UnsupportedEncodingException {
+
+        String decodedCode = URLDecoder.decode(authorizationCode, StandardCharsets.UTF_8.name());
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "authorization_code");
+        params.add("client_id", clientId);
+        params.add("client_secret", clientSecret);
+        params.add("code", decodedCode);
+        params.add("redirect_uri", redirectUri);
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+
+        ResponseEntity<String> response = restTemplate.postForEntity(googleAuthUrl, request, String.class);
+
+        return response.getBody();
+    }
 }
 
