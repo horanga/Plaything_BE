@@ -1,7 +1,7 @@
 package com.plaything.api.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.plaything.api.domain.auth.client.google.dto.request.LoginRequest;
+import com.plaything.api.domain.auth.client.dto.request.LoginRequest;
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
 import com.plaything.api.domain.auth.model.response.LoginResponse;
 import com.plaything.api.domain.auth.service.AuthServiceV1;

@@ -1,7 +1,7 @@
 package com.plaything.api.domain.key.service;
 
 import com.plaything.api.common.exception.CustomException;
-import com.plaything.api.domain.auth.client.google.dto.request.LoginRequest;
+import com.plaything.api.domain.auth.client.dto.request.LoginRequest;
 import com.plaything.api.domain.auth.service.AuthServiceV1;
 import com.plaything.api.domain.key.constant.KeyLogStatus;
 import com.plaything.api.domain.key.model.request.MatchingRequest;
@@ -176,7 +176,7 @@ public class PointKeyUsageRollbackTest {
     void test2() throws IOException {
 
         LoginRequest request = new LoginRequest("dusgh1234", "1234");
-   
+
         // 첫 번째 트랜잭션 커밋
         TestTransaction.flagForCommit();
         TestTransaction.end();

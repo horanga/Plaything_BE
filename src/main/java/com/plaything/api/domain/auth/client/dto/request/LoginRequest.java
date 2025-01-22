@@ -1,4 +1,4 @@
-package com.plaything.api.domain.auth.client.google.dto.request;
+package com.plaything.api.domain.auth.client.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
