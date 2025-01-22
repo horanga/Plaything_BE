@@ -1,7 +1,7 @@
 package com.plaything.api.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.plaything.api.domain.auth.client.dto.request.LoginRequest;
+import com.plaything.api.domain.auth.client.dto.request.GoogleLoginRequest;
 import com.plaything.api.util.UserGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -123,13 +123,13 @@ class JWTTest {
         // 실제로 만료된 토큰 생성
 
         userGenerator.generate("fnel123", "123", "dd", "연호");
-        LoginRequest loginRequest = new LoginRequest("fnel123", "123");
+        GoogleLoginRequest googleLoginRequest = new GoogleLoginRequest("fnel123", "123");
 
-        System.out.println(objectMapper.writeValueAsString(loginRequest));
+        System.out.println(objectMapper.writeValueAsString(googleLoginRequest));
         mockMvc.perform(post("/api/v1/auth/login")
                         .header("Transaction-ID", "dadgasgdsa")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
+                        .content(objectMapper.writeValueAsString(googleLoginRequest)))
                 .andExpect(status().isOk());
     }
 

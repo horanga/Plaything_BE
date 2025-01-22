@@ -1,6 +1,6 @@
 package com.plaything.api.domain.key.service;
 
-import com.plaything.api.domain.auth.client.dto.request.LoginRequest;
+import com.plaything.api.domain.auth.client.dto.request.GoogleLoginRequest;
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
 import com.plaything.api.domain.auth.service.AuthServiceV1;
 import com.plaything.api.domain.key.model.response.AvailablePointKey;
@@ -84,7 +84,7 @@ public class LoginPointKeyRollBackTest {
         CreateUserRequest request = new CreateUserRequest("dusgh1234", "1234", "1");
         authServiceV1.creatUser(request);
         LocalDate now = LocalDate.now();
-        LoginRequest loginRequest = new LoginRequest("dusgh1234", "1234");
+        GoogleLoginRequest googleLoginRequest = new GoogleLoginRequest("dusgh1234", "1234");
 
         TestTransaction.flagForCommit();
         TestTransaction.end();
@@ -113,7 +113,7 @@ public class LoginPointKeyRollBackTest {
         CreateUserRequest request = new CreateUserRequest("dusgh1234", "1234", "1");
         authServiceV1.creatUser(request);
         LocalDate now = LocalDate.now();
-        LoginRequest loginRequest = new LoginRequest("dusgh1234", "1234");
+        GoogleLoginRequest googleLoginRequest = new GoogleLoginRequest("dusgh1234", "1234");
 
         TestTransaction.flagForCommit();
         TestTransaction.end();

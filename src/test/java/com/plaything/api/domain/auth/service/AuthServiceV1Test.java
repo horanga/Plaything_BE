@@ -1,5 +1,6 @@
 package com.plaything.api.domain.auth.service;
 
+import com.plaything.api.domain.auth.client.constants.OAuth2Provider;
 import com.plaything.api.domain.auth.model.response.LoginResult;
 import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.repo.user.UserRepository;
@@ -25,7 +26,7 @@ class AuthServiceV1Test {
     @Test
     void test1() {
 
-        LoginResult login = authServiceV1.login("GOOGLE", "123", "DADFAS", "ABC");
+        LoginResult login = authServiceV1.login(OAuth2Provider.GOOGLE, "123", "DADFAS", "ABC");
         assertThat(login.token()).isNotNull();
         assertThat(login.loginResponse().dailyRewardProvided()).isTrue();
         assertThat(login.loginResponse().invalidProfile()).isTrue();
@@ -39,8 +40,8 @@ class AuthServiceV1Test {
     @Test
     void test2() {
 
-        LoginResult login = authServiceV1.login("GOOGLE", "123", "DADFAS", "ABC");
-        LoginResult login2 = authServiceV1.login("GOOGLE", "123", "DADFASAD", "DDD");
+        LoginResult login = authServiceV1.login(OAuth2Provider.GOOGLE, "123", "DADFAS", "ABC");
+        LoginResult login2 = authServiceV1.login(OAuth2Provider.GOOGLE, "123", "DADFASAD", "DDD");
 
         assertThat(login.token()).isNotNull();
         assertThat(login2.loginResponse().dailyRewardProvided()).isFalse();

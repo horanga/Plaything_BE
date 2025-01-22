@@ -1,7 +1,7 @@
 package com.plaything.api.domain.key.service;
 
 import com.plaything.api.common.exception.CustomException;
-import com.plaything.api.domain.auth.client.dto.request.LoginRequest;
+import com.plaything.api.domain.auth.client.dto.request.GoogleLoginRequest;
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
 import com.plaything.api.domain.auth.service.AuthServiceV1;
 import com.plaything.api.domain.key.model.request.AdRewardRequest;
@@ -95,7 +95,7 @@ public class AdPointKeyRollbackTest {
         CreateUserRequest request = new CreateUserRequest("dusgh1234", "1234", "1");
         authServiceV1.creatUser(request);
         LocalDate now = LocalDate.now();
-        LoginRequest loginRequest = new LoginRequest("dusgh1234", "1234");
+        GoogleLoginRequest googleLoginRequest = new GoogleLoginRequest("dusgh1234", "1234");
 
         // 첫 번째 트랜잭션 커밋
         TestTransaction.flagForCommit();
@@ -136,7 +136,7 @@ public class AdPointKeyRollbackTest {
         CreateUserRequest request = new CreateUserRequest("dusgh1234", "1234", "1");
         authServiceV1.creatUser(request);
         LocalDate now = LocalDate.now();
-        LoginRequest loginRequest = new LoginRequest("dusgh1234", "1234");
+        GoogleLoginRequest googleLoginRequest = new GoogleLoginRequest("dusgh1234", "1234");
 
         TestTransaction.flagForCommit();
         TestTransaction.end();
