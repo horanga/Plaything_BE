@@ -1,6 +1,6 @@
-package com.plaything.api.domain.auth.client.google;
+package com.plaything.api.domain.auth.client;
 
-import com.plaything.api.domain.auth.client.google.dto.GoogleUserInfo;
+import com.plaything.api.domain.auth.client.dto.response.GoogleUserInfo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;

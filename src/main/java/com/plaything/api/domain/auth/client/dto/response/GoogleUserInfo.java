@@ -1,4 +1,4 @@
-package com.plaything.api.domain.auth.client.google.dto;
+package com.plaything.api.domain.auth.client.dto.response;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

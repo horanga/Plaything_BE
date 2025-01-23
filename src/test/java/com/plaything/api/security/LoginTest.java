@@ -1,7 +1,7 @@
 package com.plaything.api.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.plaything.api.domain.auth.client.google.dto.request.LoginRequest;
+import com.plaything.api.domain.auth.client.dto.request.GoogleLoginRequest;
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
 import com.plaything.api.domain.auth.model.response.LoginResponse;
 import com.plaything.api.domain.auth.service.AuthServiceV1;
@@ -72,13 +72,13 @@ public class LoginTest {
     void test1() throws Exception {
         // given
         userGenerator.generate("fnel123", "123", "dd", "연호");
-        LoginRequest loginRequest = new LoginRequest("fnel123", "123");
+        GoogleLoginRequest googleLoginRequest = new GoogleLoginRequest("fnel123", "123");
 
         // when & then
         MvcResult result = mockMvc.perform(post("/api/v1/auth/login")
                         .header("Transaction-ID", "ASDAFSFASSSDSs")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
+                        .content(objectMapper.writeValueAsString(googleLoginRequest)))
                 .andExpect(status().isOk())
                 .andReturn();  // 결과를 받아옵니다
 
@@ -102,13 +102,13 @@ public class LoginTest {
     void test2() throws Exception {
         // given
         userGenerator.generate("fnel123", "123", "dd", "연호");
-        LoginRequest loginRequest = new LoginRequest("fnel123", "123");
+        GoogleLoginRequest googleLoginRequest = new GoogleLoginRequest("fnel123", "123");
 
         // when & then
         MvcResult result = mockMvc.perform(post("/api/v1/auth/login")
                         .header("Transaction-ID", "ASDAFSFASSSDSs")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
+                        .content(objectMapper.writeValueAsString(googleLoginRequest)))
                 .andExpect(status().isOk())
                 .andReturn();  // 결과를 받아옵니다
 
@@ -130,7 +130,7 @@ public class LoginTest {
         MvcResult result2 = mockMvc.perform(post("/api/v1/auth/login")
                         .header("Transaction-ID", "ASDAFSFASSSDSsasd")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
+                        .content(objectMapper.writeValueAsString(googleLoginRequest)))
                 .andExpect(status().isOk())
                 .andReturn();  // 결과를 받아옵니다
 
@@ -152,13 +152,13 @@ public class LoginTest {
     void test3() throws Exception {
 
         authService.creatUser(new CreateUserRequest("fnel123", "123", "dd"));
-        LoginRequest loginRequest = new LoginRequest("fnel123", "123");
+        GoogleLoginRequest googleLoginRequest = new GoogleLoginRequest("fnel123", "123");
 
         // when & then
         MvcResult result = mockMvc.perform(post("/api/v1/auth/login")
                         .header("Transaction-ID", "ASDAFSFASSSxsDSs")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
+                        .content(objectMapper.writeValueAsString(googleLoginRequest)))
                 .andExpect(status().isOk())
                 .andReturn();  // 결과를 받아옵니다
 
@@ -181,13 +181,13 @@ public class LoginTest {
     void test4() throws Exception {
 
         userGenerator.generate("fnel123", "123", "dd", "연호");
-        LoginRequest loginRequest = new LoginRequest("fnel123", "123");
+        GoogleLoginRequest googleLoginRequest = new GoogleLoginRequest("fnel123", "123");
 
         // when & then
         MvcResult result = mockMvc.perform(post("/api/v1/auth/login")
                         .header("Transaction-ID", "ASDAFSFASSSDSs")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
+                        .content(objectMapper.writeValueAsString(googleLoginRequest)))
                 .andExpect(status().isOk())
                 .andReturn();  // 결과를 받아옵니다
 
