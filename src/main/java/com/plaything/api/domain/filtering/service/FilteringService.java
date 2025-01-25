@@ -2,36 +2,35 @@ package com.plaything.api.domain.filtering.service;
 
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorCode;
+import com.plaything.api.domain.filtering.model.response.TopFilteredWords;
 import com.plaything.api.domain.repository.entity.filter.FilterWords;
+import com.plaything.api.domain.repository.entity.filter.FilteredWordStat;
 import com.plaything.api.domain.repository.repo.filter.FilterWordsRepository;
+import com.plaything.api.domain.repository.repo.filter.FilteredWordsRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.ahocorasick.trie.Emit;
 import org.ahocorasick.trie.Trie;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.regex.Pattern;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static com.plaything.api.domain.filtering.constants.PATTERN.*;
 
 @RequiredArgsConstructor
 @Service
 public class FilteringService {
 
     private final FilterWordsRepository filterWordsRepository;
+    private final FilteredWordsRepository filteredWordsRepository;
+    private final FilteringBatchService filteringBatchService;
 
     public Trie filter;
 
-    private static final Pattern WHITE_SPACE = Pattern.compile("\\s");
-
-    private static final Pattern FILTER_ALL_PATTERN = Pattern.compile(
-            // 1) 한글 사이의 모든 문자(자음/모음/영문자/특수문자/숫자) 제거
-            "(?<=[가-힣a-zA-Zㄱ-ㅎㅏ-ㅣ])[^가-힣a-zA-Z]+(?=[가-힣a-zA-Zㄱ-ㅎㅏ-ㅣ])|" +
-                    // 2) 단어 앞뒤의 특수문자/숫자 제거 (자음/모음은 유지)
-                    "^[^가-힣a-zA-Zㄱ-ㅎㅏ-ㅣ]+|[^가-힣a-zA-Zㄱ-ㅎㅏ-ㅣ]+$|" +
-                    "\\s"
-    );
-
-    private static final Pattern KEEP_ONLY_PATTERN = Pattern.compile("[^ㄱ-ㅎ]");
+    private final Map<String, Integer> filteredWords = new ConcurrentHashMap<>();
 
     @PostConstruct
     public void initFilter() {
@@ -44,13 +43,27 @@ public class FilteringService {
 
     public void filterWords(String words) {
 
+        boolean hasConsecutiveNumber = CONSECUTIVE_NUMBER.matcher(words).find();
+        boolean hasPhoneNumber = PHONE_NUMBER.matcher(words).find();
+
+        if (hasConsecutiveNumber || hasPhoneNumber) {
+            throw new CustomException(ErrorCode.CONSECUTIVE_NUMBERS_NOT_ALLOWED);
+        }
+
         String temp = WHITE_SPACE.matcher(words).replaceAll("");
         String finalResult1 = KEEP_ONLY_PATTERN.matcher(words).replaceAll("");
         String finalResult2 = FILTER_ALL_PATTERN.matcher(temp).replaceAll("");
 
+
         Emit emit1 = filter.firstMatch(finalResult1);
         Emit emit2 = filter.firstMatch(finalResult2);
-        if (emit1 != null || emit2 != null) {
+        if (emit1 != null) {
+            filteredWords.compute(emit1.getKeyword(), (em, value) -> value == null ? 1 : value + 1);
+            throw new CustomException(ErrorCode.BAD_WORDS_FILTER);
+        }
+
+        if (emit2 != null) {
+            filteredWords.compute(emit2.getKeyword(), (em, value) -> value == null ? 1 : value + 1);
             throw new CustomException(ErrorCode.BAD_WORDS_FILTER);
         }
     }
@@ -59,12 +72,31 @@ public class FilteringService {
         return filterWordsRepository.findAll().stream().map(FilterWords::getWord).toList();
     }
 
-    public void insertWords(String word) {
-        FilterWords filterWords = FilterWords.builder().word(word).build();
-        filterWordsRepository.save(filterWords);
+    public void insertWords(List<String> word) {
 
-        buildTrie();
+        List<FilterWords> list =
+                word.stream().map(i -> FilterWords.builder().word(i).build()).toList();
+
+        filterWordsRepository.saveAll(list);
+        List<String> wordList = buildTrie();
+        filter = Trie.builder()
+                .ignoreCase()
+                .ignoreOverlaps()
+                .addKeywords(wordList)
+                .build();
     }
 
+    public List<TopFilteredWords> getFilterWordsStatistics() {
+        List<FilteredWordStat> words = filteredWordsRepository.getTopFilteredWords();
 
+        return words.stream()
+                .map((i) -> new TopFilteredWords(i.getWord(), i.getCount()))
+                .toList();
+    }
+
+    @Scheduled(cron = "0 30 5 * * *")
+    public void cleanupMap() {
+        filteringBatchService.insertAllFilteredWords(this.filteredWords);
+        filteredWords.clear();
+    }
 }

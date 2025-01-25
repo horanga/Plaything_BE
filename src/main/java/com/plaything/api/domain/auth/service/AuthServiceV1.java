@@ -4,6 +4,7 @@ import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorCode;
 import com.plaything.api.domain.auth.client.constants.OAuth2Provider;
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
+import com.plaything.api.domain.auth.model.request.LoginRequest;
 import com.plaything.api.domain.auth.model.response.LoginResponse;
 import com.plaything.api.domain.auth.model.response.LoginResult;
 import com.plaything.api.domain.repository.entity.pay.UserRewardActivity;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.Optional;
 
 import static com.plaything.api.domain.auth.client.constants.OAuth2Constants.APPLE_ISSUER;
 import static com.plaything.api.domain.profile.constants.Role.ROLE_USER;
@@ -75,6 +77,18 @@ public class AuthServiceV1 {
             throw new CustomException(ErrorCode.AUTHORIZATION_FAIL);
         }
 
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public String loginForDevelop(LoginRequest loginRequest) {
+        Optional<User> user = userRepository.findByLoginId(loginRequest.loginId());
+
+        if (!user.isPresent()) {
+            log.error("NOT_EXIST_USER: {}", loginRequest.loginId());
+            throw new CustomException(ErrorCode.NOT_EXIST_USER);
+        }
+        String token = jwtProvider.createToken(loginRequest.loginId(), user.get().getRole().toString(), 60 * 60 * 1000L);
+        return token;
     }
 
     @Transactional

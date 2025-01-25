@@ -10,6 +10,7 @@ import com.plaything.api.domain.auth.client.dto.request.GoogleLoginRequest;
 import com.plaything.api.domain.auth.client.dto.response.ApplePublicKeyResponse;
 import com.plaything.api.domain.auth.client.dto.response.GoogleUserInfo;
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
+import com.plaything.api.domain.auth.model.request.LoginRequest;
 import com.plaything.api.domain.auth.model.response.LoginResponse;
 import com.plaything.api.domain.auth.model.response.LoginResult;
 import com.plaything.api.domain.auth.service.AuthServiceV1;
@@ -45,7 +46,7 @@ public class AuthControllerV1 {
     )
     @PostMapping("/create-user")
     public void creatUser(
-            @RequestBody @Valid CreateUserRequest request
+            @Valid @RequestBody CreateUserRequest request
     ) {
         authServiceV1.creatUser(request);
     }
@@ -65,7 +66,7 @@ public class AuthControllerV1 {
     )
     @PostMapping("/google/login")
     public ResponseEntity<LoginResponse> googleLogin(@RequestHeader("Transaction-id") String transactionId,
-                                                     @RequestBody GoogleLoginRequest request) {
+                                                     @RequestBody @Valid GoogleLoginRequest request) {
         GoogleUserInfo userInfo = googleApiClient.getUserInfo("Bearer " + request.accessToken());
         LoginResult result = authServiceV1.login(OAuth2Provider.GOOGLE, userInfo.getSub(), transactionId, request.fcmToken());
 
@@ -89,17 +90,29 @@ public class AuthControllerV1 {
     )
     @PostMapping("/apple/login")
     public ResponseEntity<LoginResponse> appleLogin(@RequestHeader("Transaction-id") String transactionId,
-                                                    @RequestBody AppleLoginRequest request) throws JsonProcessingException, BadRequestException, NoSuchAlgorithmException, InvalidKeySpecException {
+                                                    @Valid @RequestBody AppleLoginRequest request) throws JsonProcessingException, BadRequestException, NoSuchAlgorithmException, InvalidKeySpecException {
         ApplePublicKeyResponse publicKeys = appleApiClient.getPublicKeys();
         Map<String, String> headers = jwtProvider.parseHeaders(request.identityToken());
         PublicKey publicKey = applePublicKeyGenerator.generatePublicKey(headers, publicKeys);
         Claims claim = jwtProvider.getTokenClaims(request.identityToken(), publicKey);
         authServiceV1.validateAppleLogin(claim);
 
-        LoginResult result = authServiceV1.login(OAuth2Provider.APPLE, claim.getId(), transactionId, request.fcmToken());
+        LoginResult result = authServiceV1.login(OAuth2Provider.APPLE, claim.getSubject(), transactionId, request.fcmToken());
         return ResponseEntity.ok()
                 .header("Authorization", "Bearer " + result.token())
                 .body(result.loginResponse());
     }
+
+
+    @Operation(
+            summary = "개발용 로그인 처리",
+            description = "로그인을 진행합니다."
+    )
+    @PostMapping("/login")
+    public String login(
+            @RequestBody @Valid LoginRequest loginRequest) {
+        return authServiceV1.loginForDevelop(loginRequest);
+    }
+
 }
 
