@@ -86,8 +86,7 @@ class FilteringServiceTest {
                 "ㅅㅅ!",
                 "~sex",
                 "@sex",
-                "#sex!",
-                "`1234567890-se{[]]x]||';l/"
+                "#sex!"
         );
 
         for (String word : list) {
@@ -138,10 +137,32 @@ class FilteringServiceTest {
         }
     }
 
+    @DisplayName("계좌번호가 노출되면 메시지를 필터링한다")
+    @Test
+    public void test6() {
+
+        assertThatThrownBy(() -> filteringService.filterWords("479001-01-293842")).isInstanceOf(CustomException.class)
+                .hasMessage("연속된 숫자는 입력할 수 없습니다");
+
+        assertThatThrownBy(() -> filteringService.filterWords("47900101293842")).isInstanceOf(CustomException.class)
+                .hasMessage("연속된 숫자는 입력할 수 없습니다");
+    }
+
+    @DisplayName("휴대폰번호가 노출되면 메시지를 필터링한다")
+    @Test
+    public void test7() {
+
+        assertThatThrownBy(() -> filteringService.filterWords("010-3746-3298")).isInstanceOf(CustomException.class)
+                .hasMessage("연속된 숫자는 입력할 수 없습니다");
+
+        assertThatThrownBy(() -> filteringService.filterWords("01032123228")).isInstanceOf(CustomException.class)
+                .hasMessage("연속된 숫자는 입력할 수 없습니다");
+    }
+//
 //    @Test
 //    void testx() {
 //
-//        List<String> messages = generateTestInputs(5000); // 1000개의 다른 테스트 케이스
+//        List<String> messages = generateTestInputs(5000);
 //        int iterations = 10;
 //        long[] executionTimes = new long[iterations];
 //
@@ -152,7 +173,6 @@ class FilteringServiceTest {
 //                try {
 //                    filteringService.filterWords(chat);
 //                } catch (CustomException e) {
-//                    // 예외는 무시하고 계속 진행
 //                }
 //
 //            }
@@ -180,7 +200,9 @@ class FilteringServiceTest {
 //                "섹!스~관련#단어",
 //                "ㅅㅅ테스트123ABC",
 //                "특수@#$문자!섞인~문장",
-//                "일반적인 대화문장"
+//                "일반적인 대화문장",
+//                "479001-01-293842",
+//                "010-3746-3298"
 //        );
 //
 //        Random random = new Random();

@@ -95,7 +95,8 @@ public enum ErrorCode implements CodeInterFace {
     BAD_WORDS_FILTER("금지된 단어가 포함됐습니다", HttpStatus.BAD_REQUEST),
 
     //중복 요청
-    DUPLICATE_TRANSACTION_REQUEST("중복된 요청입니다", HttpStatus.CONFLICT);
+    DUPLICATE_TRANSACTION_REQUEST("중복된 요청입니다", HttpStatus.CONFLICT),
+    CONSECUTIVE_NUMBERS_NOT_ALLOWED("연속된 숫자는 입력할 수 없습니다", HttpStatus.BAD_REQUEST);
 
     private final String message;
     private final HttpStatus httpStatus;
