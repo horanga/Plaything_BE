@@ -8,6 +8,7 @@ import com.plaything.api.domain.profile.service.ProfileFacadeV1;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -60,7 +61,7 @@ public class MatchingControllerV1 {
     @PostMapping("/create-matching")
     public void createMatching(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestBody MatchingRequest matchingRequest,
+            @Valid @RequestBody MatchingRequest matchingRequest,
             @RequestHeader("Transaction-ID") String transactionId
     ) {
         String user = userDetails.getUsername();
@@ -103,7 +104,7 @@ public class MatchingControllerV1 {
     @PostMapping("/accpet-matching")
     public void acceptMatching(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestBody MatchingRequest matchingRequest,
+            @Valid @RequestBody MatchingRequest matchingRequest,
             @RequestHeader("Transaction-ID") String transactionId
     ) {
         String user = userDetails.getUsername();
