@@ -77,14 +77,16 @@ public class JWTFilter extends OncePerRequestFilter {
         }
     }
 
-    private void handleAuthenticationException(HttpServletResponse response, Exception e) {
+    private void handleAuthenticationException(HttpServletResponse response, Exception e) throws IOException {
         SecurityContextHolder.clearContext();
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.getWriter().write("Authentication failed");
     }
 
-    private void handleUnexpectedException(HttpServletResponse response, Exception e) {
+    private void handleUnexpectedException(HttpServletResponse response, Exception e) throws IOException {
         SecurityContextHolder.clearContext();
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        response.getWriter().write("Authentication failed");
     }
 
 }
