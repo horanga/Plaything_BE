@@ -7,12 +7,6 @@ matrix:
       wordlists:
         - wordlists.txt
     pipeline:
-      - pyspelling.filters.java:
-          javacomments: true      # 주석 체크
-          strings: false
-          javadoc: true          # javadoc (API 문서) 체크
-          variables: false
-          classnames: false
       - pyspelling.filters.html: # Swagger 어노테이션 내용 체크
           comments: false
     sources:
