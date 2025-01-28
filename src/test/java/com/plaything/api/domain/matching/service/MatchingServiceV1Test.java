@@ -2,7 +2,7 @@ package com.plaything.api.domain.matching.service;
 
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.domain.admin.model.response.ProfileRecordResponse;
-import com.plaything.api.domain.admin.sevice.ProfileMonitoringFacadeV1;
+import com.plaything.api.domain.admin.service.ProfileMonitoringFacadeV1;
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
 import com.plaything.api.domain.auth.service.AuthServiceV1;
 import com.plaything.api.domain.image.service.model.SavedImage;
@@ -113,10 +113,10 @@ class MatchingServiceV1Test {
     void setUp() {
 
         CreateUserRequest request = new CreateUserRequest("dusgh1234", "1234", "1");
-        authServiceV1.creatUser(request);
+        authServiceV1.createUser(request);
 
         CreateUserRequest request2 = new CreateUserRequest("dusgh12345", "1234", "1");
-        authServiceV1.creatUser(request2);
+        authServiceV1.createUser(request2);
 
     }
 
@@ -292,7 +292,7 @@ class MatchingServiceV1Test {
         userGenerator.generateWithRoles("fnel123", "123", "1", "알렉1", TOP, List.of(DEGRADER, SADIST), SADIST);
 
         CreateUserRequest request = new CreateUserRequest("fnel11", "123", "aa");
-        authServiceV1.creatUser(request);
+        authServiceV1.createUser(request);
         userGenerator.generateWithRoles("fnel12344", "123", "1", "알렉124", BOTTOM, List.of(MASOCHIST, DEGRADEE), MASOCHIST);
 
 

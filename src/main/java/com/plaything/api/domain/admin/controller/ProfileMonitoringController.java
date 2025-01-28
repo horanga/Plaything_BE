@@ -1,7 +1,7 @@
 package com.plaything.api.domain.admin.controller;
 
 import com.plaything.api.domain.admin.model.response.ProfileRecordResponse;
-import com.plaything.api.domain.admin.sevice.ProfileMonitoringFacadeV1;
+import com.plaything.api.domain.admin.service.ProfileMonitoringFacadeV1;
 import com.plaything.api.domain.profile.model.response.UserStats;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "Monitorings", description = "V1 Profile Monitoring API")
+@Tag(name = "Monitoring", description = "V1 Profile Monitoring API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/admin/profiles")

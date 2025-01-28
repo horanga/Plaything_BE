@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "Fitlers", description = "V1 Filter API")
+@Tag(name = "Filtering", description = "V1 Filter API")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/vi/fitler")
+@RequestMapping("/api/vi/filter")
 public class FilterController {
 
     private final FilteringService filteringService;
@@ -24,7 +24,7 @@ public class FilterController {
                     """
     )
     @GetMapping("/top-words")
-    public List<TopFilteredWords> getFilteredWordsStatic() {
+    public List<TopFilteredWords> getFilteredWordsStatics() {
         return filteringService.getFilterWordsStatistics();
     }
 

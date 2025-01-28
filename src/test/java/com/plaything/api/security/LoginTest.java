@@ -151,7 +151,7 @@ public class LoginTest {
     @DisplayName("프로필을 만들지 않으면, 로그인 시 프로필이 유효하지 않다는 응답이 온다")
     void test3() throws Exception {
 
-        authService.creatUser(new CreateUserRequest("fnel123", "123", "dd"));
+        authService.createUser(new CreateUserRequest("fnel123", "123", "dd"));
         GoogleLoginRequest googleLoginRequest = new GoogleLoginRequest("fnel123", "123");
 
         // when & then

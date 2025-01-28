@@ -29,7 +29,7 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Map;
 
-@Tag(name = "Auths", description = "V1 Auth API")
+@Tag(name = "Auth", description = "V1 Auth API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")
@@ -48,7 +48,7 @@ public class AuthControllerV1 {
     public void creatUser(
             @Valid @RequestBody CreateUserRequest request
     ) {
-        authServiceV1.creatUser(request);
+        authServiceV1.createUser(request);
     }
 
     @Operation(

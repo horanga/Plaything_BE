@@ -2,7 +2,7 @@ package com.plaything.api.domain.chat.service;
 
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.domain.admin.model.response.ProfileRecordResponse;
-import com.plaything.api.domain.admin.sevice.ProfileMonitoringFacadeV1;
+import com.plaything.api.domain.admin.service.ProfileMonitoringFacadeV1;
 import com.plaything.api.domain.chat.model.reqeust.ChatRequest;
 import com.plaything.api.domain.chat.model.response.ChatRoomResponse;
 import com.plaything.api.domain.chat.model.response.ChatWithMissingChat;

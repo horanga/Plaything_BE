@@ -72,7 +72,7 @@ public class ProfileControllerV1 {
                     - Primary Role와 매칭되지 않는 상세 성향을 골랐을 때
                     - 변경 후 상세 성향 중에서 대표 성향이 없을 때
                     
-                    (2)409 Confict
+                    (2)409 Confilct
                     - 변경하려는 닉네임이 이미 존재할 때
                     - 대표 성향을 2개 이상 골랐을 때
                     """

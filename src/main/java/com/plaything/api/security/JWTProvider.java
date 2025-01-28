@@ -69,7 +69,7 @@ public class JWTProvider {
         if (StringUtils.hasText(header) && header.startsWith("Bearer ")) {
             return header.substring(7);
         } else {
-            throw new IllegalArgumentException("Invalid Auth Header");
+            throw new CustomException(ErrorCode.TOKEN_IS_INVALID);
         }
     }
 

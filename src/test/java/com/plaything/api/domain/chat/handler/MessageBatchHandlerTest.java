@@ -67,10 +67,10 @@ public class MessageBatchHandlerTest {
     void setUp() {
 
         CreateUserRequest request = new CreateUserRequest("dusgh1234", "1234", "1");
-        authServiceV1.creatUser(request);
+        authServiceV1.createUser(request);
 
         CreateUserRequest request2 = new CreateUserRequest("dusgh12345", "1234", "1");
-        authServiceV1.creatUser(request2);
+        authServiceV1.createUser(request2);
 
         LocalDate now = LocalDate.now();
         ProfileRegistration profileRegistration = new ProfileRegistration("알렉1", "hi", M, PrimaryRole.TOP, List.of(PersonalityTraitConstant.BOSS), PersonalityTraitConstant.BOSS, List.of(RelationshipPreferenceConstant.DATE_DS), now);

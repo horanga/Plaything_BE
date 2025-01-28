@@ -1,0 +1,17 @@
+matrix:
+  - name: Java
+    aspell:
+      lang: en
+    dictionary:
+      encoding: utf-8
+      wordlists:
+        - wordlists.txt
+    pipeline:
+      - pyspelling.filters.html: # Swagger 어노테이션 내용 체크
+          comments: false
+    sources:
+      - 'src/main/java/com/plaything/api/domain/*/controller/*Controller.java'    # Controller 디렉토리만 검사
+    excludes:
+      - 'src/main/generated/**'
+      - 'src/test/**'
+    default_encoding: utf-8

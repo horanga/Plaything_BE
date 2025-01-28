@@ -1,4 +1,4 @@
-package com.plaything.api.domain.admin.sevice;
+package com.plaything.api.domain.admin.service;
 
 import com.plaything.api.domain.admin.model.response.ProfileRecordResponse;
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
@@ -125,7 +125,7 @@ class ProfileMonitoringFacadeV1Test {
     void test4() {
 
         CreateUserRequest request = new CreateUserRequest("dusgh123", "1234", "aa");
-        authServiceV1.creatUser(request);
+        authServiceV1.createUser(request);
 
         ProfileRegistration registration = new ProfileRegistration(
                 "알렉1",

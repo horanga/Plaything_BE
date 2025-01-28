@@ -82,7 +82,7 @@ public class LoginPointKeyRollBackTest {
     void test3() throws IOException {
 
         CreateUserRequest request = new CreateUserRequest("dusgh1234", "1234", "1");
-        authServiceV1.creatUser(request);
+        authServiceV1.createUser(request);
         LocalDate now = LocalDate.now();
         GoogleLoginRequest googleLoginRequest = new GoogleLoginRequest("dusgh1234", "1234");
 
@@ -111,7 +111,7 @@ public class LoginPointKeyRollBackTest {
     void test4() throws IOException {
 
         CreateUserRequest request = new CreateUserRequest("dusgh1234", "1234", "1");
-        authServiceV1.creatUser(request);
+        authServiceV1.createUser(request);
         LocalDate now = LocalDate.now();
         GoogleLoginRequest googleLoginRequest = new GoogleLoginRequest("dusgh1234", "1234");
 

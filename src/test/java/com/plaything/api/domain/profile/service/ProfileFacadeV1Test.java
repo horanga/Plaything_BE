@@ -70,7 +70,7 @@ class ProfileFacadeV1Test {
     @BeforeEach
     void setUp() {
 
-        authServiceV1.creatUser(new CreateUserRequest("dusgh123", "1234", "dd"));
+        authServiceV1.createUser(new CreateUserRequest("dusgh123", "1234", "dd"));
 
     }
 
@@ -531,7 +531,7 @@ class ProfileFacadeV1Test {
 
 
         CreateUserRequest request = new CreateUserRequest("fnel123", "1234", "aa");
-        authServiceV1.creatUser(request);
+        authServiceV1.createUser(request);
 
         ProfileRegistration registration = new ProfileRegistration(
                 "알렉1",
@@ -578,7 +578,7 @@ class ProfileFacadeV1Test {
     void test17() {
 
         CreateUserRequest request = new CreateUserRequest("fnel123", "1234", "aa");
-        authServiceV1.creatUser(request);
+        authServiceV1.createUser(request);
 
         ProfileRegistration registration = new ProfileRegistration(
                 "알렉1",
@@ -623,7 +623,7 @@ class ProfileFacadeV1Test {
     void test18() {
 
         CreateUserRequest request = new CreateUserRequest("fnel123", "1234", "aa");
-        authServiceV1.creatUser(request);
+        authServiceV1.createUser(request);
 
         ProfileRegistration registration = new ProfileRegistration(
                 "알렉1",

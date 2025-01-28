@@ -71,7 +71,7 @@ public class ProfileRollbackTest {
 
         userGenerator.generate("fnel1234", "123", "d", "연돌이");
         CreateUserRequest request = new CreateUserRequest("fnel123", "1234", "aa");
-        authServiceV1.creatUser(request);
+        authServiceV1.createUser(request);
 
         ProfileRegistration registration = new ProfileRegistration(
                 "알렉1",
@@ -128,7 +128,7 @@ public class ProfileRollbackTest {
 
         userGenerator.generate("fnel1234", "123", "d", "연돌이");
         CreateUserRequest request = new CreateUserRequest("fnel123", "1234", "aa");
-        authServiceV1.creatUser(request);
+        authServiceV1.createUser(request);
 
         ProfileRegistration registration = new ProfileRegistration(
                 "알렉1",
@@ -181,7 +181,7 @@ public class ProfileRollbackTest {
 
         userGenerator.generate("fnel1234", "123", "d", "연돌이");
         CreateUserRequest request = new CreateUserRequest("fnel123", "1234", "aa");
-        authServiceV1.creatUser(request);
+        authServiceV1.createUser(request);
 
         ProfileRegistration registration = new ProfileRegistration(
                 "알렉1",
@@ -234,7 +234,7 @@ public class ProfileRollbackTest {
 
         userGenerator.generate("fnel1234", "123", "d", "연돌이");
         CreateUserRequest request = new CreateUserRequest("fnel123", "1234", "aa");
-        authServiceV1.creatUser(request);
+        authServiceV1.createUser(request);
 
         ProfileRegistration registration = new ProfileRegistration(
                 "알렉1",
@@ -286,7 +286,7 @@ public class ProfileRollbackTest {
 
         userGenerator.generate("fnel1234", "123", "d", "연돌이");
         CreateUserRequest request = new CreateUserRequest("fnel123", "1234", "aa");
-        authServiceV1.creatUser(request);
+        authServiceV1.createUser(request);
 
         ProfileRegistration registration = new ProfileRegistration(
                 "알렉1",
@@ -339,7 +339,7 @@ public class ProfileRollbackTest {
 
         userGenerator.generate("fnel1234", "123", "d", "연돌이");
         CreateUserRequest request = new CreateUserRequest("fnel123", "1234", "aa");
-        authServiceV1.creatUser(request);
+        authServiceV1.createUser(request);
 
         ProfileRegistration registration = new ProfileRegistration(
                 "알렉1",
@@ -391,7 +391,7 @@ public class ProfileRollbackTest {
 
         userGenerator.generate("fnel1234", "123", "d", "연돌이");
         CreateUserRequest request = new CreateUserRequest("fnel123", "1234", "aa");
-        authServiceV1.creatUser(request);
+        authServiceV1.createUser(request);
 
         ProfileRegistration registration = new ProfileRegistration(
                 "알렉1",
@@ -444,7 +444,7 @@ public class ProfileRollbackTest {
 
         userGenerator.generate("fnel1234", "123", "d", "연돌이");
         CreateUserRequest request = new CreateUserRequest("fnel123", "1234", "aa");
-        authServiceV1.creatUser(request);
+        authServiceV1.createUser(request);
 
         ProfileRegistration registration = new ProfileRegistration(
                 "알렉1",
@@ -496,7 +496,7 @@ public class ProfileRollbackTest {
 
         userGenerator.generate("fnel1234", "123", "d", "연돌이");
         CreateUserRequest request = new CreateUserRequest("fnel123", "1234", "aa");
-        authServiceV1.creatUser(request);
+        authServiceV1.createUser(request);
 
         ProfileRegistration registration = new ProfileRegistration(
                 "알렉1",
@@ -548,7 +548,7 @@ public class ProfileRollbackTest {
 
         userGenerator.generate("fnel1234", "123", "d", "연돌이");
         CreateUserRequest request = new CreateUserRequest("fnel123", "1234", "aa");
-        authServiceV1.creatUser(request);
+        authServiceV1.createUser(request);
 
         ProfileRegistration registration = new ProfileRegistration(
                 "알렉1",

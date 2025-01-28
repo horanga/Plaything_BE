@@ -34,6 +34,10 @@ public class StompHandler implements ChannelInterceptor {
         String sessionId = accessor.getSessionId();
         String destination = accessor.getDestination();
 
+        if (command != null && command.equals(StompCommand.SUBSCRIBE) && destination.contains("queue")) {
+            return message;
+        }
+
         if (command != null && command.equals(StompCommand.SEND)) {
             sessionValidator.validateSend(authHeader, sessionId, destination, parseMessage(message));
             return message;
