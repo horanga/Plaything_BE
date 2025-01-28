@@ -10,5 +10,5 @@ matrix:
       - '**/*.java'
     excludes:
       - 'src/main/generated/**'
-      - '**/test/**'
+      - 'src/test/**'
     default_encoding: utf-8
