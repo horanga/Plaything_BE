@@ -10,7 +10,7 @@ matrix:
       - pyspelling.filters.html: # Swagger 어노테이션 내용 체크
           comments: false
     sources:
-      - 'src/**/controller/**/*.java'    # Controller 디렉토리만 검사
+      - 'src/main/java/com/plaything/api/domain/*/controller/*Controller.java'    # Controller 디렉토리만 검사
     excludes:
       - 'src/main/generated/**'
       - 'src/test/**'
