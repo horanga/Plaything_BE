@@ -2,14 +2,15 @@ package com.plaything.api.common.exception;
 
 import com.plaything.api.common.discord.DiscordAlarm;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestControllerAdvice
 public class ApiExceptionHandler {
@@ -31,11 +32,17 @@ public class ApiExceptionHandler {
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleInternalServerError(Exception e, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<ErrorResponse> handleInternalServerError(Exception e, HttpServletRequest request) {
         discordAlarm.sendServerErrorAlarm(e, request);
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                null,
+                HttpStatus.INTERNAL_SERVER_ERROR);
+
+        log.info(e.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(response);
+                .body(errorResponse);
     }
 }
