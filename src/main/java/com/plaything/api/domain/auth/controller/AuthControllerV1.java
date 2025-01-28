@@ -29,7 +29,7 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Map;
 
-@Tag(name = "Auths", description = "V1 Auth API")
+@Tag(name = "Auth", description = "V1 Auth API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")

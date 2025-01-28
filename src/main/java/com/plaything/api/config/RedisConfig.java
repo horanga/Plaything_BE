@@ -40,7 +40,6 @@ public class RedisConfig {
                         .socketOptions(socketOptions)
                         .build())
                 .commandTimeout(Duration.ofSeconds(5))
-                .useSsl()
                 .build();
 
         RedisStandaloneConfiguration serverConfig = new RedisStandaloneConfiguration(host, port);

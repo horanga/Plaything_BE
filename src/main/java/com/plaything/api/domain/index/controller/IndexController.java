@@ -11,7 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "Indexes", description = "V1 Auth API")
+@Tag(name = "Index", description = "V1 Auth API")
 
 @RequiredArgsConstructor
 @RestController

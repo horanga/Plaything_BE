@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "Filters", description = "V1 Filter API")
+@Tag(name = "Filtering", description = "V1 Filter API")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/vi/filter")
