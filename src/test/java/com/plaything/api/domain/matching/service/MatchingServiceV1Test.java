@@ -2,7 +2,7 @@ package com.plaything.api.domain.matching.service;
 
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.domain.admin.model.response.ProfileRecordResponse;
-import com.plaything.api.domain.admin.sevice.ProfileMonitoringFacadeV1;
+import com.plaything.api.domain.admin.service.ProfileMonitoringFacadeV1;
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
 import com.plaything.api.domain.auth.service.AuthServiceV1;
 import com.plaything.api.domain.image.service.model.SavedImage;

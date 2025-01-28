@@ -24,7 +24,7 @@ public class FilterController {
                     """
     )
     @GetMapping("/top-words")
-    public List<TopFilteredWords> getFilteredWordsStatic() {
+    public List<TopFilteredWords> getFilteredWordsStatics() {
         return filteringService.getFilterWordsStatistics();
     }
 

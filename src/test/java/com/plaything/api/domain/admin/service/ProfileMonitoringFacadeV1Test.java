@@ -1,4 +1,4 @@
-package com.plaything.api.domain.admin.sevice;
+package com.plaything.api.domain.admin.service;
 
 import com.plaything.api.domain.admin.model.response.ProfileRecordResponse;
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
