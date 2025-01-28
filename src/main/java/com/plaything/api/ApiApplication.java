@@ -75,7 +75,6 @@ public class ApiApplication {
 
             @Override
             public void onEntryReplacedEvent(EntryReplacedEvent<CircuitBreaker> entryReplacedEvent) {
-
             }
         };
     }
