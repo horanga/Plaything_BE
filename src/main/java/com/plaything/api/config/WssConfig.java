@@ -1,5 +1,6 @@
 package com.plaything.api.config;
 
+import com.plaything.api.domain.chat.handler.StompErrorHandler;
 import com.plaything.api.domain.chat.interceptor.StompHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +22,7 @@ import org.springframework.web.socket.handler.WebSocketHandlerDecorator;
 public class WssConfig implements WebSocketMessageBrokerConfigurer {
 
     private final StompHandler stompHandler;
+    private final StompErrorHandler stompErrorHandler;
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
@@ -49,6 +51,7 @@ public class WssConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/ws-stomp")
                 .setAllowedOrigins("http://localhost:3000",
                         "https://jiangxy.github.io");
+        registry.setErrorHandler(stompErrorHandler);
     }
 
     @Override

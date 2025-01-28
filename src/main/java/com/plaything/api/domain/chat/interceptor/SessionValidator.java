@@ -126,8 +126,7 @@ public class SessionValidator {
         if (matchingResponses.isEmpty()) {
             throw new CustomException(ErrorCode.NOT_EXIST_MATCHING_PARTNER);
         }
-
-
+        
         return matchingResponses.stream().map(i -> {
             if (i.receiverLoginId().equals(loginId)) {
                 return i.senderLoginId();
@@ -158,5 +157,4 @@ public class SessionValidator {
         fcmTokenMap.clear();
         log.info("stomp 데이터 삭제");
     }
-
 }
