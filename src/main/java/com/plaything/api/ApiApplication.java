@@ -77,9 +77,7 @@ public class ApiApplication {
             public void onEntryReplacedEvent(EntryReplacedEvent<CircuitBreaker> entryReplacedEvent) {
 
             }
-        }
-
-                ;
+        };
     }
 }
 
