@@ -55,7 +55,7 @@ public class UserGenerator {
     public void generate(String loginId, String password, String fckToken, String nickName) {
 
         CreateUserRequest request = new CreateUserRequest(loginId, password, fckToken);
-        authServiceV1.creatUser(request);
+        authServiceV1.createUser(request);
 
         LocalDate now = LocalDate.now();
         ProfileRegistration profileRegistration = new ProfileRegistration(
@@ -67,7 +67,7 @@ public class UserGenerator {
     public void generateWithRole(String loginId, String password, String fckToken, String nickName, PrimaryRole primaryRole, PersonalityTraitConstant personalityTraitConstant) {
 
         CreateUserRequest request = new CreateUserRequest(loginId, password, fckToken);
-        authServiceV1.creatUser(request);
+        authServiceV1.createUser(request);
 
         LocalDate now = LocalDate.now();
         ProfileRegistration profileRegistration = new ProfileRegistration(
@@ -86,7 +86,7 @@ public class UserGenerator {
             PersonalityTraitConstant primaryTrait) {
 
         CreateUserRequest request = new CreateUserRequest(loginId, password, fckToken);
-        authServiceV1.creatUser(request);
+        authServiceV1.createUser(request);
 
         LocalDate now = LocalDate.now();
         ProfileRegistration profileRegistration = new ProfileRegistration(

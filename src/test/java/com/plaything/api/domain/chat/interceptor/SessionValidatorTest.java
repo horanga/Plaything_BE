@@ -56,7 +56,7 @@ class SessionValidatorTest {
     void setup() {
 
         CreateUserRequest request = new CreateUserRequest("dusgh1234", "1234", "1");
-        authServiceV1.creatUser(request);
+        authServiceV1.createUser(request);
 
         LocalDate now = LocalDate.now();
         ProfileRegistration profileRegistration = new ProfileRegistration(
@@ -65,7 +65,7 @@ class SessionValidatorTest {
         profileFacadeV1.registerProfile(profileRegistration, "dusgh1234");
 
         CreateUserRequest request2 = new CreateUserRequest("dusgh12345", "1234", "1");
-        authServiceV1.creatUser(request2);
+        authServiceV1.createUser(request2);
 
         ProfileRegistration profileRegistration2 = new ProfileRegistration(
                 "alex2", "hi", M, PrimaryRole.TOP, List.of(PersonalityTraitConstant.BOSS), PersonalityTraitConstant.BOSS, List.of(RelationshipPreferenceConstant.DATE_DS), now);
@@ -73,7 +73,7 @@ class SessionValidatorTest {
         profileFacadeV1.registerProfile(profileRegistration2, "dusgh12345");
 
         CreateUserRequest request3 = new CreateUserRequest("dusgh12346", "1234", "1");
-        authServiceV1.creatUser(request3);
+        authServiceV1.createUser(request3);
 
         Matching matching = Matching.builder().receiverLoginId("dusgh1234").senderLoginId("dusgh12345").isMatched(true).isOvered(false).build();
         matchingRepository.save(matching);

@@ -101,7 +101,7 @@ public class MatchingControllerV1 {
                     """
     )
     @SecurityRequirement(name = "Authorization")
-    @PostMapping("/accpet-matching")
+    @PostMapping("/accept-matching")
     public void acceptMatching(
             @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody MatchingRequest matchingRequest,

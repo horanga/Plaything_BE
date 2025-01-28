@@ -125,7 +125,7 @@ class ProfileMonitoringFacadeV1Test {
     void test4() {
 
         CreateUserRequest request = new CreateUserRequest("dusgh123", "1234", "aa");
-        authServiceV1.creatUser(request);
+        authServiceV1.createUser(request);
 
         ProfileRegistration registration = new ProfileRegistration(
                 "알렉1",

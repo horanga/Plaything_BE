@@ -93,7 +93,7 @@ public class AdPointKeyRollbackTest {
     void test1() throws IOException {
 
         CreateUserRequest request = new CreateUserRequest("dusgh1234", "1234", "1");
-        authServiceV1.creatUser(request);
+        authServiceV1.createUser(request);
         LocalDate now = LocalDate.now();
         GoogleLoginRequest googleLoginRequest = new GoogleLoginRequest("dusgh1234", "1234");
 
@@ -134,7 +134,7 @@ public class AdPointKeyRollbackTest {
     void test2() throws IOException {
 
         CreateUserRequest request = new CreateUserRequest("dusgh1234", "1234", "1");
-        authServiceV1.creatUser(request);
+        authServiceV1.createUser(request);
         LocalDate now = LocalDate.now();
         GoogleLoginRequest googleLoginRequest = new GoogleLoginRequest("dusgh1234", "1234");
 

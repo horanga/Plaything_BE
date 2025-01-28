@@ -48,7 +48,7 @@ public class AuthControllerV1 {
     public void creatUser(
             @Valid @RequestBody CreateUserRequest request
     ) {
-        authServiceV1.creatUser(request);
+        authServiceV1.createUser(request);
     }
 
     @Operation(

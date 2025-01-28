@@ -48,7 +48,7 @@ public class AuthServiceV1 {
         String loginId = provider.name() + providerId;
         User user = userRepository.findByLoginId(loginId).orElse(null);
         if (user == null) {
-            user = creatUser(new CreateUserRequest(loginId, provider.name(), fcmToken));
+            user = createUser(new CreateUserRequest(loginId, provider.name(), fcmToken));
         } else {
             boolean isFckTokenSame = user.getFcmToken().equals(fcmToken);
             if (!isFckTokenSame) {
@@ -92,7 +92,7 @@ public class AuthServiceV1 {
     }
 
     @Transactional
-    public User creatUser(CreateUserRequest request) {
+    public User createUser(CreateUserRequest request) {
 
 //        Optional<User> user = userRepository.findByLoginId(request.loginId());
 //
