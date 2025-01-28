@@ -1,5 +1,6 @@
 package com.plaything.api.domain.matching.service;
 
+import com.plaything.api.domain.matching.model.response.MatchingRedisData;
 import com.plaything.api.domain.matching.model.response.UserMatching;
 import com.plaything.api.domain.profile.service.ProfileFacadeV1;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -10,9 +11,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -32,13 +30,26 @@ public class RedisService {
     private final ProfileFacadeV1 profileFacadeV1;
     private final Map<String, int[]> viewCountMap = new ConcurrentHashMap<>();
 
-    @CircuitBreaker(name = SIMPLE_CIRCUIT_BREAKER_CONIFG, fallbackMethod = "findMatchingCandidatesFallback")
     public List<UserMatching> findMatchingCandidates(String loginId, int duration, TimeUnit timeUnit) {
+
+        MatchingRedisData redisCache = getRedisCache(loginId);
+        return getUserMatchingInfo(loginId,
+                redisCache.candidateList(),
+                redisCache.matchingList(),
+                redisCache.hideList(),
+                redisCache.lastProfileId(),
+                redisCache.count(),
+                duration,
+                timeUnit);
+    }
+
+    @CircuitBreaker(name = SIMPLE_CIRCUIT_BREAKER_CONIFG, fallbackMethod = "redisCacheFallback")
+    public MatchingRedisData getRedisCache(String loginId) {
         String candidateKey = loginId + MATCHING_CANDIDATE_REDIS_KEY;
         String matchingKey = loginId + MATCHING_LIST_REDIS_KEY;
         String profileKey = loginId + LAST_PROFILE_ID_REDIS_KEY;
         String countKey = loginId + COUNT_REDIS_KEY;
-        String profileHideKey = loginId +HIDE_PROFILE_KEY;
+        String profileHideKey = loginId + HIDE_PROFILE_KEY;
 
         List<Object> results = redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
             connection.listCommands().lRange(candidateKey.getBytes(), 0, -1);
@@ -55,17 +66,10 @@ public class RedisService {
         String lastProfileId = (String) results.get(3);
         String count = (String) results.get(4);
 
-        return getUserMatchingInfo(loginId,
-                candidateList,
-                matchingList,
-                hideList,
-                lastProfileId,
-                count,
-                duration,
-                timeUnit);
+        return new MatchingRedisData(candidateList, matchingList, hideList, lastProfileId, count);
     }
 
-    public List<UserMatching> findMatchingCandidatesFallback(String loginId, int duration, TimeUnit timeUnit, Exception ex) {
+    public List<UserMatching> redisCacheFallback(String loginId, Exception ex) {
         logError(ex);
         List<String> candidates = matchingServiceV1.getMatchingCandidate(loginId);
         List<String> partners = matchingServiceV1.getMatchingPartner(loginId);
@@ -113,7 +117,7 @@ public class RedisService {
             TimeUnit timeUnit) {
 
 
-        if (candidateList.isEmpty() || matchingList.isEmpty()|| hideList.isEmpty()) {
+        if (candidateList.isEmpty() || matchingList.isEmpty() || hideList.isEmpty()) {
             return refreshCacheFromDB(
                     candidateList,
                     matchingList,
@@ -162,9 +166,9 @@ public class RedisService {
             cacheListWithExpiry(loginId + MATCHING_LIST_REDIS_KEY, matchingList, duration, timeUnit);
         }
 
-        if(hideList.isEmpty()){
+        if (hideList.isEmpty()) {
             hideList = profileFacadeV1.getHideList(loginId);
-            cacheListWithExpiry(loginId+HIDE_PROFILE_KEY, hideList, duration, timeUnit);
+            cacheListWithExpiry(loginId + HIDE_PROFILE_KEY, hideList, duration, timeUnit);
         }
 
         List<String> candidates = getAvailableCandidates(candidateList, count == null ? 0 : Integer.parseInt(count) / MAX_SKIP_COUNT);
