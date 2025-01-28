@@ -53,3 +53,4 @@ indexServiceV
 refreshIndex
 userDetails
 userdetails
+getFilteredWordsStatics
