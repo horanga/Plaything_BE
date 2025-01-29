@@ -144,11 +144,11 @@ class MatchingServiceV1Test {
         assertThat(list).extracting("nickName").containsExactly("알렉2", "알렉3", "알렉4");
         assertThat(list).extracting("introduction").containsExactly("hi", "hi", "hi");
 
-        assertThat(list.get(0).personalityTraitList()).extracting("personalityTrait").containsExactly(primary2);
+        assertThat(list.get(0).personalityTraitList()).extracting("personalityTraitList").containsExactly(primary2);
         assertThat(list.get(0).personalityTraitList()).extracting("isPrimaryTrait").containsExactly(true);
-        assertThat(list.get(1).personalityTraitList()).extracting("personalityTrait").containsExactly(primary2);
+        assertThat(list.get(1).personalityTraitList()).extracting("personalityTraitList").containsExactly(primary2);
         assertThat(list.get(1).personalityTraitList()).extracting("isPrimaryTrait").containsExactly(true);
-        assertThat(list.get(2).personalityTraitList()).extracting("personalityTrait").containsExactly(primary2);
+        assertThat(list.get(2).personalityTraitList()).extracting("personalityTraitList").containsExactly(primary2);
         assertThat(list.get(2).personalityTraitList()).extracting("isPrimaryTrait").containsExactly(true);
 
         List<UserMatching> list2 = matchingServiceV1.searchPartner("fnel2", Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), 0L);
@@ -157,7 +157,7 @@ class MatchingServiceV1Test {
         assertThat(list2).extracting("primaryRole").containsExactly(TOP);
         assertThat(list2).extracting("nickName").containsExactly("알렉1");
         assertThat(list2).extracting("introduction").containsExactly("hi");
-        assertThat(list2.get(0).personalityTraitList()).extracting("personalityTrait").containsExactly(primary);
+        assertThat(list2.get(0).personalityTraitList()).extracting("personalityTraitList").containsExactly(primary);
         assertThat(list2.get(0).personalityTraitList()).extracting("isPrimaryTrait").containsExactly(true);
 
     }
@@ -228,12 +228,12 @@ class MatchingServiceV1Test {
         List<UserMatching> list1 = matchingServiceV1.searchPartner("fnel1", Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), 0l);
         assertThat(list1).extracting("primaryRole").containsExactly(SWITCH);
         assertThat(list1).extracting("nickName").containsExactly("알렉2");
-        assertThat(list1.get(0).personalityTraitList()).extracting("personalityTrait").containsExactly(SADIST);
+        assertThat(list1.get(0).personalityTraitList()).extracting("personalityTraitList").containsExactly(SADIST);
 
         List<UserMatching> list2 = matchingServiceV1.searchPartner("fnel3", Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), 0l);
         assertThat(list2).extracting("primaryRole").containsExactly(ETC);
         assertThat(list2).extracting("nickName").containsExactly("알렉4");
-        assertThat(list2.get(0).personalityTraitList()).extracting("personalityTrait").containsExactly(SADIST);
+        assertThat(list2.get(0).personalityTraitList()).extracting("personalityTraitList").containsExactly(SADIST);
 
 
     }
@@ -281,7 +281,7 @@ class MatchingServiceV1Test {
         assertThat(matched).hasSize(1);
         assertThat(matched).extracting("primaryRole").containsExactly(BOTTOM);
         assertThat(matched).extracting("nickName").containsExactly("알렉3");
-        assertThat(matched.get(0).personalityTraitList()).extracting("personalityTrait").containsExactly(MASOCHIST, PREY);
+        assertThat(matched.get(0).personalityTraitList()).extracting("personalityTraitList").containsExactly(MASOCHIST, PREY);
         assertThat(matched.get(0).personalityTraitList()).extracting("isPrimaryTrait").containsExactly(true, false);
     }
 
@@ -304,7 +304,7 @@ class MatchingServiceV1Test {
         assertThat(matched).hasSize(1);
         assertThat(matched).extracting("primaryRole").containsExactly(BOTTOM);
         assertThat(matched).extracting("nickName").containsExactly("알렉124");
-        assertThat(matched.get(0).personalityTraitList()).extracting("personalityTrait").containsExactly(MASOCHIST, DEGRADEE);
+        assertThat(matched.get(0).personalityTraitList()).extracting("personalityTraitList").containsExactly(MASOCHIST, DEGRADEE);
         assertThat(matched.get(0).personalityTraitList()).extracting("isPrimaryTrait").containsExactly(true, false);
     }
 
@@ -327,7 +327,7 @@ class MatchingServiceV1Test {
         assertThat(matched2).hasSize(1);
         assertThat(matched2).extracting("primaryRole").containsExactly(BOTTOM);
         assertThat(matched2).extracting("nickName").containsExactly("알렉12");
-        assertThat(matched2.get(0).personalityTraitList()).extracting("personalityTrait").containsExactly(MASOCHIST, DEGRADEE);
+        assertThat(matched2.get(0).personalityTraitList()).extracting("personalityTraitList").containsExactly(MASOCHIST, DEGRADEE);
         assertThat(matched2.get(0).personalityTraitList()).extracting("isPrimaryTrait").containsExactly(true, false);
     }
 

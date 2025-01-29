@@ -9,6 +9,6 @@ import java.util.List;
 public record PointKeyLogResponse(
 
         @Schema(description = "key 로그 list")
-        List<PointKeyLog> pointKeyLogs) {
+        List<PointKeyLog> pointKeyLogList) {
 
 }

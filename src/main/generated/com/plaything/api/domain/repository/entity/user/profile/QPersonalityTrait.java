@@ -5,7 +5,9 @@ import static com.querydsl.core.types.PathMetadataFactory.*;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
+
 import javax.annotation.processing.Generated;
+
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
 
@@ -20,7 +22,7 @@ public class QPersonalityTrait extends EntityPathBase<PersonalityTrait> {
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
-    public static final QPersonalityTrait personalityTrait = new QPersonalityTrait("personalityTrait");
+    public static final QPersonalityTrait personalityTrait = new QPersonalityTrait("personalityTraitList");
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 

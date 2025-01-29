@@ -5,7 +5,9 @@ import static com.querydsl.core.types.PathMetadataFactory.*;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
+
 import javax.annotation.processing.Generated;
+
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
 
@@ -34,7 +36,7 @@ public class QProfile extends EntityPathBase<Profile> {
 
     public final StringPath nickName = createString("nickName");
 
-    public final ListPath<PersonalityTrait, QPersonalityTrait> personalityTrait = this.<PersonalityTrait, QPersonalityTrait>createList("personalityTrait", PersonalityTrait.class, QPersonalityTrait.class, PathInits.DIRECT2);
+    public final ListPath<PersonalityTrait, QPersonalityTrait> personalityTrait = this.<PersonalityTrait, QPersonalityTrait>createList("personalityTraitList", PersonalityTrait.class, QPersonalityTrait.class, PathInits.DIRECT2);
 
     public final EnumPath<com.plaything.api.domain.profile.constants.PrimaryRole> primaryRole = createEnum("primaryRole", com.plaything.api.domain.profile.constants.PrimaryRole.class);
 
@@ -42,7 +44,7 @@ public class QProfile extends EntityPathBase<Profile> {
 
     public final EnumPath<com.plaything.api.domain.profile.constants.ProfileStatus> profileStatus = createEnum("profileStatus", com.plaything.api.domain.profile.constants.ProfileStatus.class);
 
-    public final ListPath<RelationshipPreference, QRelationshipPreference> relationshipPreference = this.<RelationshipPreference, QRelationshipPreference>createList("relationshipPreference", RelationshipPreference.class, QRelationshipPreference.class, PathInits.DIRECT2);
+    public final ListPath<RelationshipPreference, QRelationshipPreference> relationshipPreference = this.<RelationshipPreference, QRelationshipPreference>createList("relationshipPreferenceList", RelationshipPreference.class, QRelationshipPreference.class, PathInits.DIRECT2);
 
     public QProfile(String variable) {
         super(Profile.class, forVariable(variable));

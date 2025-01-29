@@ -24,7 +24,7 @@ public record MyPageProfile(
         ProfileStatus profileStatus,
 
         @Schema(description = "유저 사진")
-        List<ProfileImageResponse> profileImageResponses,
+        List<ProfileImageResponse> profileImageList,
 
         @Schema(description = "닉네임")
         String nickName,
@@ -42,10 +42,10 @@ public record MyPageProfile(
         int age,
 
         @Schema(description = "세부 성향")
-        List<PersonalityTraitResponse> personalityTrait,
+        List<PersonalityTraitResponse> personalityTraitList,
 
         @Schema(description = "선호 관계")
-        List<RelationshipPreferenceResponse> relationshipPreference,
+        List<RelationshipPreferenceResponse> relationshipPreferenceList,
 
         @Schema(description = "마지막 광소 시청 시간")
         LocalDateTime lastAdViewTime,

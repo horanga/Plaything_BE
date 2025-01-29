@@ -56,16 +56,16 @@ public class ChatServiceTest {
 //        sendMessage("dusgh12345", "dusgh1234", "하이", 4, now);
 //        sendMessage("dusgh12345", "dusgh1234", "그냥 쉬는중ㅋㅋ", 5, now);
 //
-//        List<ChatRoom> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
+//        List<ChatRoom> chatRoomList = chatFacadeV1.getChatRooms("dusgh1234", null);
 //
-//        assertThat(chatRooms.get(0).partnerProfile().nickName()).isEqualTo("알렉2");
-//        assertThat(chatRooms.get(0).partnerProfile().primaryRole()).isEqualTo("MT");
-//        assertThat(chatRooms.get(0).partnerProfile().mainPhoto()).isEqualTo("https://d25ulpahxovik9.cloudfront.net/abcd");
-//        assertThat(chatRooms.get(0).lastChat()).isEqualTo("그냥 쉬는중ㅋㅋ");
-//        assertThat(chatRooms.get(0).lastChatSender()).isEqualTo("dusgh12345");
+//        assertThat(chatRoomList.get(0).partnerProfile().nickName()).isEqualTo("알렉2");
+//        assertThat(chatRoomList.get(0).partnerProfile().primaryRole()).isEqualTo("MT");
+//        assertThat(chatRoomList.get(0).partnerProfile().mainPhoto()).isEqualTo("https://d25ulpahxovik9.cloudfront.net/abcd");
+//        assertThat(chatRoomList.get(0).lastChat()).isEqualTo("그냥 쉬는중ㅋㅋ");
+//        assertThat(chatRoomList.get(0).lastChatSender()).isEqualTo("dusgh12345");
 //
 //
-//        ChatList chatList = chatFacadeV1.getChatList("dusgh1234", chatRooms.get(0).chatRoomId(), null);
+//        ChatList chatList = chatFacadeV1.getChatList("dusgh1234", chatRoomList.get(0).chatRoomId(), null);
 //        assertThat(chatList.message()).extracting("message")
 //                .containsExactly("그냥 쉬는중ㅋㅋ", "하이", "뭐해?", "반가워", "안녕");
 //
@@ -95,16 +95,16 @@ public class ChatServiceTest {
 //        sendMessage("dusgh12345", "dusgh1234", "하이", 4, now);
 //        sendMessage("dusgh12345", "dusgh1234", "그냥 쉬는중ㅋㅋ", 5, now);
 //
-//        List<ChatRoom> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
+//        List<ChatRoom> chatRoomList = chatFacadeV1.getChatRooms("dusgh1234", null);
 //
-//        assertThat(chatRooms.get(0).partnerProfile().nickName()).isEqualTo("알렉2");
-//        assertThat(chatRooms.get(0).partnerProfile().primaryRole()).isEqualTo("MT");
-//        assertThat(chatRooms.get(0).partnerProfile().mainPhoto()).isEqualTo("https://d25ulpahxovik9.cloudfront.net/abcd");
-//        assertThat(chatRooms.get(0).lastChat()).isEqualTo("그냥 쉬는중ㅋㅋ");
-//        assertThat(chatRooms.get(0).lastChatSender()).isEqualTo("dusgh12345");
+//        assertThat(chatRoomList.get(0).partnerProfile().nickName()).isEqualTo("알렉2");
+//        assertThat(chatRoomList.get(0).partnerProfile().primaryRole()).isEqualTo("MT");
+//        assertThat(chatRoomList.get(0).partnerProfile().mainPhoto()).isEqualTo("https://d25ulpahxovik9.cloudfront.net/abcd");
+//        assertThat(chatRoomList.get(0).lastChat()).isEqualTo("그냥 쉬는중ㅋㅋ");
+//        assertThat(chatRoomList.get(0).lastChatSender()).isEqualTo("dusgh12345");
 //
 //
-//        ChatList chatList = chatFacadeV1.getChatList("dusgh1234", chatRooms.get(0).chatRoomId(), null);
+//        ChatList chatList = chatFacadeV1.getChatList("dusgh1234", chatRoomList.get(0).chatRoomId(), null);
 //        assertThat(chatList.message()).hasSize(10);
 //        assertThat(chatList.message()).extracting("message")
 //                .containsExactly("그냥 쉬는중ㅋㅋ", "하이", "뭐해?", "반가워", "안녕", "시작20", "시작19", "시작18", "시작17", "시작16");
@@ -126,7 +126,7 @@ public class ChatServiceTest {
 //                        "dusgh1234");
 //
 //
-//        ChatList chatList2 = chatFacadeV1.getChatList("dusgh1234", chatRooms.get(0).chatRoomId(), chatList.message().get(9).id());
+//        ChatList chatList2 = chatFacadeV1.getChatList("dusgh1234", chatRoomList.get(0).chatRoomId(), chatList.message().get(9).id());
 //
 //        assertThat(chatList2.message()).hasSize(10);
 //        assertThat(chatList2.message()).extracting("message")
@@ -149,7 +149,7 @@ public class ChatServiceTest {
 //                        "dusgh1234");
 //
 //
-//        ChatList chatList3 = chatFacadeV1.getChatList("dusgh1234", chatRooms.get(0).chatRoomId(), chatList2.message().get(9).id());
+//        ChatList chatList3 = chatFacadeV1.getChatList("dusgh1234", chatRoomList.get(0).chatRoomId(), chatList2.message().get(9).id());
 //
 //        assertThat(chatList3.message()).hasSize(5);
 //        assertThat(chatList3.message()).extracting("message")
@@ -185,9 +185,9 @@ public class ChatServiceTest {
 //
 //        }
 //
-//        List<ChatRoom> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
+//        List<ChatRoom> chatRoomList = chatFacadeV1.getChatRooms("dusgh1234", null);
 //
-//        ChatList chatList = chatFacadeV1.getChatList("dusgh1234", chatRooms.get(0).chatRoomId(), null);
+//        ChatList chatList = chatFacadeV1.getChatList("dusgh1234", chatRoomList.get(0).chatRoomId(), null);
 //        assertThat(chatList.message()).hasSize(5);
 //        assertThat(chatList.message()).extracting("message")
 //                .containsExactly("하이30", "하이29", "하이28", "하이27", "하이26");
@@ -262,9 +262,9 @@ public class ChatServiceTest {
 //        }
 //
 //        executorService.shutdown();
-//        List<ChatRoom> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
+//        List<ChatRoom> chatRoomList = chatFacadeV1.getChatRooms("dusgh1234", null);
 //
-//        ChatList chatList = chatFacadeV1.getChatList("dusgh1234", chatRooms.get(0).chatRoomId(), null);
+//        ChatList chatList = chatFacadeV1.getChatList("dusgh1234", chatRoomList.get(0).chatRoomId(), null);
 //        assertThat(chatList.message()).hasSize(5);
 //        assertThat(chatList.message()).extracting("message")
 //                .containsExactly("하이10", "하이9", "하이8", "하이7", "하이6", "하이5", "하이4", "하이3", "하이2", "하이1");

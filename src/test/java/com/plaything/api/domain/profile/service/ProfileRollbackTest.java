@@ -115,9 +115,9 @@ public class ProfileRollbackTest {
         assertThat(profile.gender()).isEqualTo(M);
         assertThat(profile.primaryRole()).isEqualTo("MT");
         assertThat(profile.introduction()).isEqualTo("안녕하세요");
-        assertThat(profile.personalityTrait()).extracting("personalityTrait").containsExactly(SPANKER, HUNTER);
-        assertThat(profile.personalityTrait()).extracting("isPrimaryTrait").containsExactly(false, true);
-        assertThat(profile.relationshipPreference()).extracting("relationshipPreference").containsExactly(DATE_DS, DS);
+        assertThat(profile.personalityTraitList()).extracting("personalityTraitList").containsExactly(SPANKER, HUNTER);
+        assertThat(profile.personalityTraitList()).extracting("isPrimaryTrait").containsExactly(false, true);
+        assertThat(profile.relationshipPreferenceList()).extracting("relationshipPreferenceList").containsExactly(DATE_DS, DS);
 
 
     }
@@ -170,9 +170,9 @@ public class ProfileRollbackTest {
         assertThat(profile.gender()).isEqualTo(M);
         assertThat(profile.primaryRole()).isEqualTo("MT");
         assertThat(profile.introduction()).isEqualTo("안녕하세요");
-        assertThat(profile.personalityTrait()).extracting("personalityTrait").containsExactly(SPANKER, HUNTER);
-        assertThat(profile.personalityTrait()).extracting("isPrimaryTrait").containsExactly(false, true);
-        assertThat(profile.relationshipPreference()).extracting("relationshipPreference").containsExactly(DATE_DS, DS);
+        assertThat(profile.personalityTraitList()).extracting("personalityTraitList").containsExactly(SPANKER, HUNTER);
+        assertThat(profile.personalityTraitList()).extracting("isPrimaryTrait").containsExactly(false, true);
+        assertThat(profile.relationshipPreferenceList()).extracting("relationshipPreferenceList").containsExactly(DATE_DS, DS);
     }
 
     @DisplayName("대표성향과 다른 상세성향을 선택하면 프로필 업데이트가 실패한다(탑->바텀)")
@@ -223,9 +223,9 @@ public class ProfileRollbackTest {
         assertThat(profile.gender()).isEqualTo(M);
         assertThat(profile.primaryRole()).isEqualTo("MT");
         assertThat(profile.introduction()).isEqualTo("안녕하세요");
-        assertThat(profile.personalityTrait()).extracting("personalityTrait").containsExactly(SPANKER, HUNTER);
-        assertThat(profile.personalityTrait()).extracting("isPrimaryTrait").containsExactly(false, true);
-        assertThat(profile.relationshipPreference()).extracting("relationshipPreference").containsExactly(DATE_DS, DS);
+        assertThat(profile.personalityTraitList()).extracting("personalityTraitList").containsExactly(SPANKER, HUNTER);
+        assertThat(profile.personalityTraitList()).extracting("isPrimaryTrait").containsExactly(false, true);
+        assertThat(profile.relationshipPreferenceList()).extracting("relationshipPreferenceList").containsExactly(DATE_DS, DS);
     }
 
     @DisplayName("대표성향과 다른 상세성향을 선택하면 프로필 업데이트가 실패한다(바텀->탑)")
@@ -275,9 +275,9 @@ public class ProfileRollbackTest {
         assertThat(profile.nickName()).isEqualTo("알렉1");
         assertThat(profile.gender()).isEqualTo(M);
         assertThat(profile.introduction()).isEqualTo("안녕하세요");
-        assertThat(profile.personalityTrait()).extracting("personalityTrait").containsExactly(SPANKEE);
-        assertThat(profile.personalityTrait()).extracting("isPrimaryTrait").containsExactly(true);
-        assertThat(profile.relationshipPreference()).extracting("relationshipPreference").containsExactly(DATE_DS, DS);
+        assertThat(profile.personalityTraitList()).extracting("personalityTraitList").containsExactly(SPANKEE);
+        assertThat(profile.personalityTraitList()).extracting("isPrimaryTrait").containsExactly(true);
+        assertThat(profile.relationshipPreferenceList()).extracting("relationshipPreferenceList").containsExactly(DATE_DS, DS);
     }
 
     @DisplayName("대표성향과 다른 상세성향을 선택하면 프로필 업데이트가 실패한다2(탑)")
@@ -328,9 +328,9 @@ public class ProfileRollbackTest {
         assertThat(profile.gender()).isEqualTo(M);
         assertThat(profile.primaryRole()).isEqualTo("MT");
         assertThat(profile.introduction()).isEqualTo("안녕하세요");
-        assertThat(profile.personalityTrait()).extracting("personalityTrait").containsExactly(SPANKER, HUNTER);
-        assertThat(profile.personalityTrait()).extracting("isPrimaryTrait").containsExactly(false, true);
-        assertThat(profile.relationshipPreference()).extracting("relationshipPreference").containsExactly(DATE_DS, DS);
+        assertThat(profile.personalityTraitList()).extracting("personalityTraitList").containsExactly(SPANKER, HUNTER);
+        assertThat(profile.personalityTraitList()).extracting("isPrimaryTrait").containsExactly(false, true);
+        assertThat(profile.relationshipPreferenceList()).extracting("relationshipPreferenceList").containsExactly(DATE_DS, DS);
     }
 
     @DisplayName("대표성향과 다른 상세성향을 선택하면 프로필 업데이트가 실패한다2(바텀)")
@@ -380,9 +380,9 @@ public class ProfileRollbackTest {
         assertThat(profile.nickName()).isEqualTo("알렉1");
         assertThat(profile.gender()).isEqualTo(M);
         assertThat(profile.introduction()).isEqualTo("안녕하세요");
-        assertThat(profile.personalityTrait()).extracting("personalityTrait").containsExactly(SPANKEE, ROPE_BUNNY);
-        assertThat(profile.personalityTrait()).extracting("isPrimaryTrait").containsExactly(true, false);
-        assertThat(profile.relationshipPreference()).extracting("relationshipPreference").containsExactly(DATE_DS, DS);
+        assertThat(profile.personalityTraitList()).extracting("personalityTraitList").containsExactly(SPANKEE, ROPE_BUNNY);
+        assertThat(profile.personalityTraitList()).extracting("isPrimaryTrait").containsExactly(true, false);
+        assertThat(profile.relationshipPreferenceList()).extracting("relationshipPreferenceList").containsExactly(DATE_DS, DS);
     }
 
     @DisplayName("대표성향과 다른 상세성향을 선택하면 프로필 업데이트가 실패한다3")
@@ -433,9 +433,9 @@ public class ProfileRollbackTest {
         assertThat(profile.gender()).isEqualTo(M);
         assertThat(profile.primaryRole()).isEqualTo("MT");
         assertThat(profile.introduction()).isEqualTo("안녕하세요");
-        assertThat(profile.personalityTrait()).extracting("personalityTrait").containsExactly(SPANKER, HUNTER);
-        assertThat(profile.personalityTrait()).extracting("isPrimaryTrait").containsExactly(false, true);
-        assertThat(profile.relationshipPreference()).extracting("relationshipPreference").containsExactly(DATE_DS, DS);
+        assertThat(profile.personalityTraitList()).extracting("personalityTraitList").containsExactly(SPANKER, HUNTER);
+        assertThat(profile.personalityTraitList()).extracting("isPrimaryTrait").containsExactly(false, true);
+        assertThat(profile.relationshipPreferenceList()).extracting("relationshipPreferenceList").containsExactly(DATE_DS, DS);
     }
 
     @DisplayName("대표성향과 다른 상세성향을 선택하면 프로필 업데이트가 실패한다3")
@@ -485,9 +485,9 @@ public class ProfileRollbackTest {
         assertThat(profile.nickName()).isEqualTo("알렉1");
         assertThat(profile.gender()).isEqualTo(M);
         assertThat(profile.introduction()).isEqualTo("안녕하세요");
-        assertThat(profile.personalityTrait()).extracting("personalityTrait").containsExactly(SPANKEE, ROPE_BUNNY);
-        assertThat(profile.personalityTrait()).extracting("isPrimaryTrait").containsExactly(true, false);
-        assertThat(profile.relationshipPreference()).extracting("relationshipPreference").containsExactly(DATE_DS, DS);
+        assertThat(profile.personalityTraitList()).extracting("personalityTraitList").containsExactly(SPANKEE, ROPE_BUNNY);
+        assertThat(profile.personalityTraitList()).extracting("isPrimaryTrait").containsExactly(true, false);
+        assertThat(profile.relationshipPreferenceList()).extracting("relationshipPreferenceList").containsExactly(DATE_DS, DS);
     }
 
     @DisplayName("대표성향을 두개 이상 선택하면 프로필 업데이트에 실패한다(탑)")
@@ -537,9 +537,9 @@ public class ProfileRollbackTest {
         assertThat(profile.nickName()).isEqualTo("알렉1");
         assertThat(profile.gender()).isEqualTo(M);
         assertThat(profile.introduction()).isEqualTo("안녕하세요");
-        assertThat(profile.personalityTrait()).extracting("personalityTrait").containsExactly(SPANKER, HUNTER);
-        assertThat(profile.personalityTrait()).extracting("isPrimaryTrait").containsExactly(false, true);
-        assertThat(profile.relationshipPreference()).extracting("relationshipPreference").containsExactly(DATE_DS, DS);
+        assertThat(profile.personalityTraitList()).extracting("personalityTraitList").containsExactly(SPANKER, HUNTER);
+        assertThat(profile.personalityTraitList()).extracting("isPrimaryTrait").containsExactly(false, true);
+        assertThat(profile.relationshipPreferenceList()).extracting("relationshipPreferenceList").containsExactly(DATE_DS, DS);
     }
 
     @DisplayName("대표성향을 두개 이상 선택하면 프로필 업데이트에 실패한다(바텀)")
@@ -589,8 +589,8 @@ public class ProfileRollbackTest {
         assertThat(profile.nickName()).isEqualTo("알렉1");
         assertThat(profile.gender()).isEqualTo(M);
         assertThat(profile.introduction()).isEqualTo("안녕하세요");
-        assertThat(profile.personalityTrait()).extracting("personalityTrait").containsExactly(BRAT);
-        assertThat(profile.personalityTrait()).extracting("isPrimaryTrait").containsExactly(true);
-        assertThat(profile.relationshipPreference()).extracting("relationshipPreference").containsExactly(DATE_DS, DS);
+        assertThat(profile.personalityTraitList()).extracting("personalityTraitList").containsExactly(BRAT);
+        assertThat(profile.personalityTraitList()).extracting("isPrimaryTrait").containsExactly(true);
+        assertThat(profile.relationshipPreferenceList()).extracting("relationshipPreferenceList").containsExactly(DATE_DS, DS);
     }
 }

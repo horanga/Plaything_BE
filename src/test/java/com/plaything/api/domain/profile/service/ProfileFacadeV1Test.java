@@ -89,7 +89,7 @@ class ProfileFacadeV1Test {
         assertThat(profile.getNickName()).isEqualTo("dusgh123");
         assertThat(profile.getGender()).isEqualTo(M);
         assertThat(profile.getPrimaryRole()).isEqualTo(TOP);
-        assertThat(profile.getRelationshipPreference()).extracting("relationshipPreference").containsExactly(RelationshipPreferenceConstant.DATE_DS);
+        assertThat(profile.getRelationshipPreference()).extracting("relationshipPreferenceList").containsExactly(RelationshipPreferenceConstant.DATE_DS);
         assertThat(profile.getPersonalityTrait()).extracting("trait").containsExactly(PersonalityTraitConstant.BOSS);
         assertThat(profile.getBirthDate()).isEqualTo(now);
     }
@@ -109,7 +109,7 @@ class ProfileFacadeV1Test {
         assertThat(profile.getNickName()).isEqualTo("dusgh123");
         assertThat(profile.getGender()).isEqualTo(M);
         assertThat(profile.getPrimaryRole()).isEqualTo(TOP);
-        assertThat(profile.getRelationshipPreference()).extracting("relationshipPreference").containsExactly(RelationshipPreferenceConstant.DATE_DS);
+        assertThat(profile.getRelationshipPreference()).extracting("relationshipPreferenceList").containsExactly(RelationshipPreferenceConstant.DATE_DS);
         assertThat(profile.getPersonalityTrait()).extracting("trait").containsExactly(PersonalityTraitConstant.BOSS, HUNTER);
         assertThat(profile.getPersonalityTrait()).extracting("isPrimaryTrait").containsExactly(true, false);
         assertThat(profile.getBirthDate()).isEqualTo(now);
@@ -209,9 +209,9 @@ class ProfileFacadeV1Test {
         assertThat(profile.isBaned()).isFalse();
         assertThat(profile.gender()).isEqualTo(gender2);
         assertThat(profile.isPrivate()).isFalse();
-        assertThat(profile.personalityTrait()).extracting("personalityTrait").containsExactly(trait1, trait2);
-        assertThat(profile.personalityTrait()).extracting("isPrimaryTrait").containsExactly(true, false);
-        assertThat(profile.relationshipPreference()).extracting("relationshipPreference").containsExactly(RelationshipPreferenceConstant.DATE_DS);
+        assertThat(profile.personalityTraitList()).extracting("personalityTraitList").containsExactly(trait1, trait2);
+        assertThat(profile.personalityTraitList()).extracting("isPrimaryTrait").containsExactly(true, false);
+        assertThat(profile.relationshipPreferenceList()).extracting("relationshipPreferenceList").containsExactly(RelationshipPreferenceConstant.DATE_DS);
     }
 
 
@@ -567,9 +567,9 @@ class ProfileFacadeV1Test {
         assertThat(profile2.nickName()).isEqualTo("알렉2");
         assertThat(profile2.primaryRole()).isEqualTo("MT");
         assertThat(profile2.introduction()).isEqualTo("안녕하세요");
-        assertThat(profile2.personalityTrait()).extracting("personalityTrait").containsExactly(HUNTER, BRAT_TAMER);
-        assertThat(profile2.personalityTrait()).extracting("isPrimaryTrait").containsExactly(true, false);
-        assertThat(profile2.relationshipPreference()).extracting("relationshipPreference").containsExactly(DS, HOM);
+        assertThat(profile2.personalityTraitList()).extracting("personalityTraitList").containsExactly(HUNTER, BRAT_TAMER);
+        assertThat(profile2.personalityTraitList()).extracting("isPrimaryTrait").containsExactly(true, false);
+        assertThat(profile2.relationshipPreferenceList()).extracting("relationshipPreferenceList").containsExactly(DS, HOM);
     }
 
 
@@ -613,9 +613,9 @@ class ProfileFacadeV1Test {
         assertThat(profile2.nickName()).isEqualTo("알렉1");
         assertThat(profile2.primaryRole()).isEqualTo("MT");
         assertThat(profile2.introduction()).isEqualTo("안녕하세요");
-        assertThat(profile2.personalityTrait()).extracting("personalityTrait").containsExactly(SPANKER, HUNTER, BRAT_TAMER);
-        assertThat(profile2.personalityTrait()).extracting("isPrimaryTrait").containsExactly(false, true, false);
-        assertThat(profile2.relationshipPreference()).extracting("relationshipPreference").containsExactly(DATE_DS, DS, HOM);
+        assertThat(profile2.personalityTraitList()).extracting("personalityTraitList").containsExactly(SPANKER, HUNTER, BRAT_TAMER);
+        assertThat(profile2.personalityTraitList()).extracting("isPrimaryTrait").containsExactly(false, true, false);
+        assertThat(profile2.relationshipPreferenceList()).extracting("relationshipPreferenceList").containsExactly(DATE_DS, DS, HOM);
     }
 
     @DisplayName("세부성향과 관계지향을 리미트를 초과하면, 초과하기 건까지의 값만 업데이트된다")
@@ -658,21 +658,21 @@ class ProfileFacadeV1Test {
         MyPageProfile profile2 = profileFacadeV1.getMyPageProfile("fnel123");
 
 
-        assertThat(profile2.personalityTrait()).extracting("personalityTrait").containsExactly(
+        assertThat(profile2.personalityTraitList()).extracting("personalityTraitList").containsExactly(
                 SPANKER,
                 HUNTER,
                 BRAT_TAMER,
                 DOMINANT,
                 DEGRADER,
                 DADDY_MOMMY);
-        assertThat(profile2.personalityTrait()).extracting("isPrimaryTrait").containsExactly(
+        assertThat(profile2.personalityTraitList()).extracting("isPrimaryTrait").containsExactly(
                 false,
                 true,
                 false,
                 false,
                 false,
                 false);
-        assertThat(profile2.relationshipPreference()).extracting("relationshipPreference").containsExactly(
+        assertThat(profile2.relationshipPreferenceList()).extracting("relationshipPreferenceList").containsExactly(
                 MARRIAGE_DS,
                 DATE_DS,
                 DS,

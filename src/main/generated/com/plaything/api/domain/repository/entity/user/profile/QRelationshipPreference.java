@@ -5,7 +5,9 @@ import static com.querydsl.core.types.PathMetadataFactory.*;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
+
 import javax.annotation.processing.Generated;
+
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
 
@@ -26,7 +28,7 @@ public class QRelationshipPreference extends EntityPathBase<RelationshipPreferen
 
     public final QProfile profile;
 
-    public final EnumPath<com.plaything.api.domain.profile.constants.RelationshipPreferenceConstant> relationshipPreference = createEnum("relationshipPreference", com.plaything.api.domain.profile.constants.RelationshipPreferenceConstant.class);
+    public final EnumPath<com.plaything.api.domain.profile.constants.RelationshipPreferenceConstant> relationshipPreference = createEnum("relationshipPreferenceList", com.plaything.api.domain.profile.constants.RelationshipPreferenceConstant.class);
 
     public QRelationshipPreference(String variable) {
         this(RelationshipPreference.class, forVariable(variable), INITS);
