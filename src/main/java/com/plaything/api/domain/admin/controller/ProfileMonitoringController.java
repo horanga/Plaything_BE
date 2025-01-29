@@ -6,6 +6,7 @@ import com.plaything.api.domain.profile.model.response.UserStats;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,8 +24,8 @@ public class ProfileMonitoringController {
             description = "유저 프로필 모니터링 정보 불러오기"
     )
     @GetMapping
-    public List<ProfileRecordResponse> getProfileRecords() {
-        return profileMonitoringFacadeV1.getRecords();
+    public ResponseEntity<List<ProfileRecordResponse>> getProfileRecords() {
+        return ResponseEntity.ok().body(profileMonitoringFacadeV1.getRecords());
     }
 
     @Operation(
@@ -32,10 +33,10 @@ public class ProfileMonitoringController {
             description = "유저 금지 행위 통계"
     )
     @GetMapping("/{id}")
-    public UserStats getUserStats(
+    public ResponseEntity<UserStats> getUserStats(
             @PathVariable("id") Long id
     ) {
-        return profileMonitoringFacadeV1.getUserStats(id);
+        return ResponseEntity.ok().body(profileMonitoringFacadeV1.getUserStats(id));
     }
 
     @Operation(

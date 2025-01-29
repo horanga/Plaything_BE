@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -130,11 +131,12 @@ public class MatchingControllerV1 {
     )
     @SecurityRequirement(name = "Authorization")
     @GetMapping
-    public List<UserMatching> matching(
+    public ResponseEntity<List<UserMatching>> matching(
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         String user = userDetails.getUsername();
-        return matchingFacadeV1.findMatchingCandidates(user, CACHE_DURATION_DAY, CACHE_DURATION_UNIT_DAYS);
+        return ResponseEntity.ok().body(
+                matchingFacadeV1.findMatchingCandidates(user, CACHE_DURATION_DAY, CACHE_DURATION_UNIT_DAYS));
     }
 
     @Operation(

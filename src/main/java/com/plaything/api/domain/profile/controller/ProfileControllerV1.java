@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -106,11 +107,11 @@ public class ProfileControllerV1 {
     )
     @SecurityRequirement(name = "Authorization")
     @GetMapping("/get-profile")
-    public MyPageProfile getProfile(
+    public ResponseEntity<MyPageProfile> getProfile(
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         String user = userDetails.getUsername();
-        return profileFacadeV1.getMyPageProfile(user);
+        return ResponseEntity.ok().body(profileFacadeV1.getMyPageProfile(user));
     }
 
     @Operation(
@@ -239,8 +240,7 @@ public class ProfileControllerV1 {
         String user = userDetails.getUsername();
         profileFacadeV1.delete(user);
     }
-
-
+//
 //
 //    @DeleteMapping("/{id}/image")
 //    public ResponseEntity<Object> deleteUserImage(@PathVariable Long id,

@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,10 +29,10 @@ public class NotificationControllerV1 {
     )
     @SecurityRequirement(name = "Authorization")
     @GetMapping("/get-notification")
-    public List<NotificationResponse> getNotification(
+    public ResponseEntity<List<NotificationResponse>> getNotification(
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         String user = userDetails.getUsername();
-        return notificationServiceV1.getNotification(user);
+        return ResponseEntity.ok().body(notificationServiceV1.getNotification(user));
     }
 }

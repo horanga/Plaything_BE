@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,12 +26,12 @@ public class IndexController {
     )
     @SecurityRequirement(name = "Authorization")
     @GetMapping
-    public IndexResponse refreshIndex(
+    public ResponseEntity<IndexResponse> refreshIndex(
             @AuthenticationPrincipal UserDetails userDetails
     ) {
 
         //TODO 웹소켓 연결 끊겼을 때로 변경
         String user = userDetails.getUsername();
-        return indexServiceV1.refreshIndex(user);
+        return ResponseEntity.ok().body(indexServiceV1.refreshIndex(user));
     }
 }

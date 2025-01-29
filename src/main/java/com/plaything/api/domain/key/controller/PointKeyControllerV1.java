@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -51,12 +52,12 @@ public class PointKeyControllerV1 {
     )
     @SecurityRequirement(name = "Authorization")
     @GetMapping("/get-keylog")
-    public List<PointKeyLog> getPointKeyLog(
+    public ResponseEntity<List<PointKeyLog>> getPointKeyLog(
             @AuthenticationPrincipal UserDetails userDetails
     ) {
 
         String user = userDetails.getUsername();
-        return pointKeyFacadeV1.getPointKeyLog(user);
+        return ResponseEntity.ok().body(pointKeyFacadeV1.getPointKeyLog(user));
     }
 
 
@@ -66,11 +67,11 @@ public class PointKeyControllerV1 {
     )
     @SecurityRequirement(name = "Authorization")
     @GetMapping("/get-key")
-    public AvailablePointKey getPointKey(
+    public ResponseEntity<AvailablePointKey> getPointKey(
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         String user = userDetails.getUsername();
-        return pointKeyFacadeV1.getAvailablePointKey(user);
+        return ResponseEntity.ok().body(pointKeyFacadeV1.getAvailablePointKey(user));
     }
 
 }

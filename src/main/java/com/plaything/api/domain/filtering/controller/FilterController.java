@@ -5,6 +5,7 @@ import com.plaything.api.domain.filtering.service.FilteringService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,8 +25,8 @@ public class FilterController {
                     """
     )
     @GetMapping("/top-words")
-    public List<TopFilteredWords> getFilteredWordsStatics() {
-        return filteringService.getFilterWordsStatistics();
+    public ResponseEntity<List<TopFilteredWords>> getFilteredWordsStatics() {
+        return ResponseEntity.ok().body(filteringService.getFilterWordsStatistics());
     }
 
     @Operation(
