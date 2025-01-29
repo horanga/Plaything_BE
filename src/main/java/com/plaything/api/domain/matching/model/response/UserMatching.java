@@ -1,6 +1,5 @@
 package com.plaything.api.domain.matching.model.response;
 
-import com.plaything.api.domain.profile.constants.PrimaryRole;
 import com.plaything.api.domain.profile.model.response.PersonalityTraitResponse;
 import com.plaything.api.domain.profile.model.response.ProfileImageResponse;
 import com.plaything.api.domain.profile.model.response.RelationshipPreferenceResponse;
@@ -16,7 +15,7 @@ public record UserMatching(
         String loginId,
 
         @Schema(description = "대표 성향")
-        PrimaryRole primaryRole,
+        String primaryRole,
 
         @Schema(description = "닉네임")
         String nickName,
