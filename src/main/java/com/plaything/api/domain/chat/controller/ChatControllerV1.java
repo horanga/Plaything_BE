@@ -1,6 +1,6 @@
 package com.plaything.api.domain.chat.controller;
 
-import com.plaything.api.domain.chat.model.response.ChatList;
+import com.plaything.api.domain.chat.model.response.ChatResponse;
 import com.plaything.api.domain.chat.model.response.ChatRoomResponse;
 import com.plaything.api.domain.chat.service.ChatFacadeV1;
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,7 +52,7 @@ public class ChatControllerV1 {
 
     )
     @GetMapping("/chat-list/{chatRoomId}")
-    public ChatList chatList(
+    public List<ChatResponse> chatList(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable("chatRoomId") Long chatRoomId,
             @RequestParam(value = "lastChatId", required = false) Long lastChatId

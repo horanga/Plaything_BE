@@ -3,17 +3,17 @@ package com.plaything.api.domain.chat.service;
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorCode;
 import com.plaything.api.domain.chat.model.reqeust.ChatRequest;
-import com.plaything.api.domain.chat.model.response.ChatList;
 import com.plaything.api.domain.chat.model.response.ChatProfile;
+import com.plaything.api.domain.chat.model.response.ChatResponse;
 import com.plaything.api.domain.chat.model.response.ChatRoomResponse;
 import com.plaything.api.domain.chat.model.response.ChatWithMissingChat;
 import com.plaything.api.domain.filtering.service.FilteringService;
+import com.plaything.api.domain.profile.util.ImageUrlGenerator;
 import com.plaything.api.domain.repository.entity.chat.ChatRoom;
-import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.entity.profile.Profile;
+import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.repo.profile.ProfileRepository;
 import com.plaything.api.domain.repository.repo.user.UserRepository;
-import com.plaything.api.domain.profile.util.ImageUrlGenerator;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +60,7 @@ public class ChatFacadeV1 {
         chatRoomServiceV1.leaveRoom(id, requesterLoginId);
     }
 
-    public ChatList getChatList(String requesterLoginId, Long chatRoomId, Long lastChatId) {
+    public List<ChatResponse> getChatList(String requesterLoginId, Long chatRoomId, Long lastChatId) {
         User user = userRepository.findByLoginId(requesterLoginId)
                 .orElseThrow(() ->
                         new CustomException(ErrorCode.NOT_EXIST_USER));

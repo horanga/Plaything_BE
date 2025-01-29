@@ -4,7 +4,6 @@ import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorCode;
 import com.plaything.api.domain.chat.model.reqeust.ChatRequest;
 import com.plaything.api.domain.chat.model.reqeust.ChatWithSequence;
-import com.plaything.api.domain.chat.model.response.ChatList;
 import com.plaything.api.domain.chat.model.response.ChatResponse;
 import com.plaything.api.domain.chat.model.response.ChatWithMissingChat;
 import com.plaything.api.domain.repository.entity.chat.Chat;
@@ -38,13 +37,12 @@ public class ChatServiceV1 {
 
     private final ChatRoomRepository chatRoomRepository;
 
-    public ChatList chatList(Long chatRoomId, String requesterNickName, Long lastId, LocalDate now) {
+    public List<ChatResponse> chatList(Long chatRoomId, String requesterNickName, Long lastId, LocalDate now) {
 
         List<Chat> chats = chatQueryRepository.findChat(chatRoomId, lastId, now);
-        List<ChatResponse> res = chats.stream()
+        return chats.stream()
                 .map(i -> ChatResponse.toResponse(i, requesterNickName))
                 .toList();
-        return new ChatList(res);
     }
 
     //웹소켓은 트랜잭션 경계가 명확하지 않다. 하나의 커넥션으로만 처리돼서
