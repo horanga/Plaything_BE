@@ -25,6 +25,8 @@ public class Notification extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private NotificationType type;
 
+    private String requesterLoginId;
+
     private String requesterNickName;
 
     private String requesterMainPhoto;

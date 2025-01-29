@@ -149,7 +149,7 @@ public class PointKeyUsageRollbackTest {
 
         doThrow(new IOException())
                 .when(notificationServiceV1)
-                .saveNotification(any(), any(), any());
+                .saveNotification(any(), any(), any(), any());
 
         assertThatThrownBy(() -> matchingFacadeV1.sendMatchingRequest("dusgh1234", new MatchingRequest("dusgh12345"), "123"))
                 .isInstanceOf(CustomException.class);
@@ -185,7 +185,7 @@ public class PointKeyUsageRollbackTest {
 
         doThrow(new RuntimeException())
                 .when(notificationServiceV1)
-                .saveNotification(any(), any(), any());
+                .saveNotification(any(), any(), any(), any());
 
         User user = userRepository.findByLoginId("dusgh12345").get();
         MatchingRequest matchingRequest = new MatchingRequest(user.getNickname());

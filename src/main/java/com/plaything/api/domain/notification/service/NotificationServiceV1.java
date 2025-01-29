@@ -2,11 +2,11 @@ package com.plaything.api.domain.notification.service;
 
 import com.plaything.api.domain.notification.constant.NotificationType;
 import com.plaything.api.domain.notification.model.response.NotificationResponse;
-import com.plaything.api.domain.repository.entity.notification.Notification;
-import com.plaything.api.domain.repository.entity.user.User;
-import com.plaything.api.domain.repository.entity.profile.Profile;
-import com.plaything.api.domain.repository.repo.notification.NotificationRepository;
 import com.plaything.api.domain.profile.util.ImageUrlGenerator;
+import com.plaything.api.domain.repository.entity.notification.Notification;
+import com.plaything.api.domain.repository.entity.profile.Profile;
+import com.plaything.api.domain.repository.entity.user.User;
+import com.plaything.api.domain.repository.repo.notification.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,12 +23,14 @@ public class NotificationServiceV1 {
 
     public void saveNotification(
             NotificationType type,
+            String loginId,
             Profile requesterProfile,
             User receiver
     ) throws IOException {
         Notification notification = Notification.builder()
                 .type(type)
                 .requesterNickName(requesterProfile.getNickName())
+                .requesterLoginId(loginId)
                 .requesterMainPhoto(urlGenerator.getImageUrl(requesterProfile.getMainPhotoFileName()))
                 .receiver(receiver)
                 .build();
