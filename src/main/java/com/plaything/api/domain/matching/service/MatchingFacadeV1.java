@@ -5,6 +5,7 @@ import com.plaything.api.common.exception.ErrorCode;
 import com.plaything.api.common.validator.DuplicateRequestChecker;
 import com.plaything.api.domain.key.model.request.MatchingRequest;
 import com.plaything.api.domain.key.service.PointKeyServiceV1;
+import com.plaything.api.domain.matching.model.response.MatchingData;
 import com.plaything.api.domain.matching.model.response.UserMatching;
 import com.plaything.api.domain.profile.service.UserServiceV1;
 import com.plaything.api.domain.repository.entity.user.User;
@@ -27,7 +28,8 @@ public class MatchingFacadeV1 {
     private final RedisService redisService;
 
     public List<UserMatching> findMatchingCandidates(String loginId, int duration, TimeUnit timeUnit) {
-        return redisService.findMatchingCandidates(loginId, duration, timeUnit);
+        MatchingData redisCache = redisService.getRedisCache(loginId);
+        return redisService.getUserMatchingInfo(redisCache, loginId, duration, timeUnit);
     }
 
     public void updateLastViewedProfile(String loginId, Long profileId, int countDuration, int profileDuration, TimeUnit timeUnit) {

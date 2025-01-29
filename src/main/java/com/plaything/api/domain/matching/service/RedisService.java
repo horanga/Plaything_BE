@@ -1,6 +1,6 @@
 package com.plaything.api.domain.matching.service;
 
-import com.plaything.api.domain.matching.model.response.MatchingRedisData;
+import com.plaything.api.domain.matching.model.response.MatchingData;
 import com.plaything.api.domain.matching.model.response.UserMatching;
 import com.plaything.api.domain.profile.service.ProfileFacadeV1;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -29,22 +29,11 @@ public class RedisService {
     private final MatchingServiceV1 matchingServiceV1;
     private final ProfileFacadeV1 profileFacadeV1;
     private final Map<String, int[]> viewCountMap = new ConcurrentHashMap<>();
-
-    public List<UserMatching> findMatchingCandidates(String loginId, int duration, TimeUnit timeUnit) {
-
-        MatchingRedisData redisCache = getRedisCache(loginId);
-        return getUserMatchingInfo(loginId,
-                redisCache.candidateList(),
-                redisCache.matchingList(),
-                redisCache.hideList(),
-                redisCache.lastProfileId(),
-                redisCache.count(),
-                duration,
-                timeUnit);
-    }
+    // int[0] count
+    // int[1] profileId
 
     @CircuitBreaker(name = SIMPLE_CIRCUIT_BREAKER_CONIFG, fallbackMethod = "redisCacheFallback")
-    public MatchingRedisData getRedisCache(String loginId) {
+    public MatchingData getRedisCache(String loginId) {
         String candidateKey = loginId + MATCHING_CANDIDATE_REDIS_KEY;
         String matchingKey = loginId + MATCHING_LIST_REDIS_KEY;
         String profileKey = loginId + LAST_PROFILE_ID_REDIS_KEY;
@@ -66,21 +55,21 @@ public class RedisService {
         String lastProfileId = (String) results.get(3);
         String count = (String) results.get(4);
 
-        return new MatchingRedisData(candidateList, matchingList, hideList, lastProfileId, count);
+        return new MatchingData(candidateList, matchingList, hideList, lastProfileId, count, true);
     }
 
-    public List<UserMatching> redisCacheFallback(String loginId, Exception ex) {
+    public MatchingData redisCacheFallback(String loginId, Exception ex) {
         logError(ex);
         List<String> candidates = matchingServiceV1.getMatchingCandidate(loginId);
         List<String> partners = matchingServiceV1.getMatchingPartner(loginId);
         List<String> hideList = profileFacadeV1.getHideList(loginId);
 
         if (!viewCountMap.containsKey(loginId)) {
-            return matchingServiceV1.searchPartner(loginId, candidates, partners, hideList, 0);
+            return new MatchingData(candidates, partners, hideList, "0", "0", false);
         }
-        int[] counts = viewCountMap.get(loginId);
-        List<String> availableCandidate = getAvailableCandidates(candidates, counts[0] / MAX_SKIP_COUNT);
-        return matchingServiceV1.searchPartner(loginId, availableCandidate, partners, hideList, counts[1]);
+        int[] info = viewCountMap.get(loginId);
+        List<String> availableCandidate = getAvailableCandidates(candidates, info[0] / MAX_SKIP_COUNT);
+        return new MatchingData(availableCandidate, partners, hideList, String.valueOf(info[1]), String.valueOf(info[0]), false);
     }
 
 
@@ -106,27 +95,30 @@ public class RedisService {
         count[1]++; //profileId
     }
 
-    private List<UserMatching> getUserMatchingInfo(
-            String loginId,
-            List<String> candidateList,
-            List<String> matchingList,
-            List<String> hideList,
-            String lastProfileId,
-            String count,
-            int duration,
-            TimeUnit timeUnit) {
+    public List<UserMatching> getUserMatchingInfo(MatchingData cache,
+                                                  String loginId,
+                                                  int duration,
+                                                  TimeUnit timeUnit) {
 
+        List<String> candidateList = cache.candidateList();
+        List<String> matchingList = cache.matchingList();
+        List<String> hideList = cache.hideList();
+        String lastProfileId = cache.lastProfileId();
+        String count = cache.count();
 
-        if (candidateList.isEmpty() || matchingList.isEmpty() || hideList.isEmpty()) {
-            return refreshCacheFromDB(
-                    candidateList,
-                    matchingList,
-                    hideList,
-                    lastProfileId,
-                    loginId,
-                    duration,
-                    timeUnit,
-                    count);
+        if (cache.isAvailable()) {
+
+            if (candidateList.isEmpty() || matchingList.isEmpty() || hideList.isEmpty()) {
+                return refreshCacheFromDB(
+                        candidateList,
+                        matchingList,
+                        hideList,
+                        lastProfileId,
+                        loginId,
+                        duration,
+                        timeUnit,
+                        count);
+            }
         }
 
         List<String> candidates = getAvailableCandidates(candidateList, count == null ? 0 : Integer.parseInt(count) / MAX_SKIP_COUNT);
