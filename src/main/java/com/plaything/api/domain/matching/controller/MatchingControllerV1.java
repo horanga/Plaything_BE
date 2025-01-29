@@ -2,7 +2,7 @@ package com.plaything.api.domain.matching.controller;
 
 
 import com.plaything.api.domain.key.model.request.MatchingRequest;
-import com.plaything.api.domain.matching.model.response.UserMatching;
+import com.plaything.api.domain.matching.model.response.UserMatchingResponse;
 import com.plaything.api.domain.matching.service.MatchingFacadeV1;
 import com.plaything.api.domain.profile.service.ProfileFacadeV1;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,13 +10,11 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import static com.plaything.api.domain.matching.constants.MatchingConstants.*;
 
@@ -131,11 +129,11 @@ public class MatchingControllerV1 {
     )
     @SecurityRequirement(name = "Authorization")
     @GetMapping
-    public ResponseEntity<List<UserMatching>> matching(
+    public UserMatchingResponse matching(
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         String user = userDetails.getUsername();
-        return ResponseEntity.ok().body(
+        return new UserMatchingResponse(
                 matchingFacadeV1.findMatchingCandidates(user, CACHE_DURATION_DAY, CACHE_DURATION_UNIT_DAYS));
     }
 

@@ -1,9 +1,8 @@
 package com.plaything.api.domain.notification.service;
 
 import com.plaything.api.domain.notification.constant.NotificationType;
-import com.plaything.api.domain.notification.model.response.NotificationResponse;
+import com.plaything.api.domain.notification.model.response.Notification;
 import com.plaything.api.domain.profile.util.ImageUrlGenerator;
-import com.plaything.api.domain.repository.entity.notification.Notification;
 import com.plaything.api.domain.repository.entity.profile.Profile;
 import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.repo.notification.NotificationRepository;
@@ -27,7 +26,7 @@ public class NotificationServiceV1 {
             Profile requesterProfile,
             User receiver
     ) throws IOException {
-        Notification notification = Notification.builder()
+        com.plaything.api.domain.repository.entity.notification.Notification notification = com.plaything.api.domain.repository.entity.notification.Notification.builder()
                 .type(type)
                 .requesterNickName(requesterProfile.getNickName())
                 .requesterLoginId(loginId)
@@ -37,9 +36,9 @@ public class NotificationServiceV1 {
         notificationRepository.save(notification);
     }
 
-    public List<NotificationResponse> getNotification(String receiver) {
+    public List<Notification> getNotification(String receiver) {
         return notificationRepository.findByReceiver_LoginId(receiver).stream()
-                .map(NotificationResponse::toResponse)
+                .map(Notification::toResponse)
                 .toList();
     }
 }

@@ -2,20 +2,18 @@ package com.plaything.api.domain.key.controller;
 
 import com.plaything.api.domain.key.model.request.AdRewardRequest;
 import com.plaything.api.domain.key.model.response.AvailablePointKey;
-import com.plaything.api.domain.key.model.response.PointKeyLog;
+import com.plaything.api.domain.key.model.response.PointKeyLogResponse;
 import com.plaything.api.domain.key.service.PointKeyFacadeV1;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Tag(name = "Points", description = "V1 PointKey API")
 @RestController
@@ -52,12 +50,12 @@ public class PointKeyControllerV1 {
     )
     @SecurityRequirement(name = "Authorization")
     @GetMapping("/get-keylog")
-    public ResponseEntity<List<PointKeyLog>> getPointKeyLog(
+    public PointKeyLogResponse getPointKeyLog(
             @AuthenticationPrincipal UserDetails userDetails
     ) {
 
         String user = userDetails.getUsername();
-        return ResponseEntity.ok().body(pointKeyFacadeV1.getPointKeyLog(user));
+        return new PointKeyLogResponse(pointKeyFacadeV1.getPointKeyLog(user));
     }
 
 
@@ -67,11 +65,11 @@ public class PointKeyControllerV1 {
     )
     @SecurityRequirement(name = "Authorization")
     @GetMapping("/get-key")
-    public ResponseEntity<AvailablePointKey> getPointKey(
+    public AvailablePointKey getPointKey(
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         String user = userDetails.getUsername();
-        return ResponseEntity.ok().body(pointKeyFacadeV1.getAvailablePointKey(user));
+        return pointKeyFacadeV1.getAvailablePointKey(user);
     }
 
 }

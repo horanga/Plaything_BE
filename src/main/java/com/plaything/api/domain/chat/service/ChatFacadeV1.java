@@ -3,13 +3,12 @@ package com.plaything.api.domain.chat.service;
 import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorCode;
 import com.plaything.api.domain.chat.model.reqeust.ChatRequest;
+import com.plaything.api.domain.chat.model.response.Chat;
 import com.plaything.api.domain.chat.model.response.ChatProfile;
-import com.plaything.api.domain.chat.model.response.ChatResponse;
-import com.plaything.api.domain.chat.model.response.ChatRoomResponse;
+import com.plaything.api.domain.chat.model.response.ChatRoom;
 import com.plaything.api.domain.chat.model.response.ChatWithMissingChat;
 import com.plaything.api.domain.filtering.service.FilteringService;
 import com.plaything.api.domain.profile.util.ImageUrlGenerator;
-import com.plaything.api.domain.repository.entity.chat.ChatRoom;
 import com.plaything.api.domain.repository.entity.profile.Profile;
 import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.repo.profile.ProfileRepository;
@@ -45,12 +44,12 @@ public class ChatFacadeV1 {
 
     private final ImageUrlGenerator urlGenerator;
 
-    public List<ChatRoomResponse> getChatRooms(String requesterLoginId, Long lastChatRoomId) {
+    public List<ChatRoom> getChatRooms(String requesterLoginId, Long lastChatRoomId) {
         User user = userRepository.findByLoginId(requesterLoginId)
                 .orElseThrow(() ->
                         new CustomException(ErrorCode.NOT_EXIST_USER));
 
-        List<ChatRoom> chatRooms = chatRoomServiceV1.findChatRooms(requesterLoginId, lastChatRoomId);
+        List<com.plaything.api.domain.repository.entity.chat.ChatRoom> chatRooms = chatRoomServiceV1.findChatRooms(requesterLoginId, lastChatRoomId);
         Map<String, Profile> profileMap = getProfileMap(chatRooms, requesterLoginId);
 
         return getChatRoomResponse(chatRooms, profileMap, requesterLoginId);
@@ -60,7 +59,7 @@ public class ChatFacadeV1 {
         chatRoomServiceV1.leaveRoom(id, requesterLoginId);
     }
 
-    public List<ChatResponse> getChatList(String requesterLoginId, Long chatRoomId, Long lastChatId) {
+    public List<Chat> getChatList(String requesterLoginId, Long chatRoomId, Long lastChatId) {
         User user = userRepository.findByLoginId(requesterLoginId)
                 .orElseThrow(() ->
                         new CustomException(ErrorCode.NOT_EXIST_USER));
@@ -81,7 +80,7 @@ public class ChatFacadeV1 {
         log.info("채팅 rate 삭제:" + LocalDateTime.now());
     }
 
-    private Map<String, Profile> getProfileMap(List<ChatRoom> chatRooms, String requestNickname) {
+    private Map<String, Profile> getProfileMap(List<com.plaything.api.domain.repository.entity.chat.ChatRoom> chatRooms, String requestNickname) {
         List<String> partnerLoginId
                 = chatRooms.stream().map(i -> getPartnerLoginId(i, requestNickname)).toList();
 
@@ -95,10 +94,10 @@ public class ChatFacadeV1 {
                 ));
     }
 
-    private List<ChatRoomResponse> getChatRoomResponse(List<ChatRoom> chatRooms, Map<String, Profile> profileMap, String requestLoginId) {
+    private List<ChatRoom> getChatRoomResponse(List<com.plaything.api.domain.repository.entity.chat.ChatRoom> chatRooms, Map<String, Profile> profileMap, String requestLoginId) {
 
         return chatRooms.stream()
-                .map(chatRoom -> new ChatRoomResponse(
+                .map(chatRoom -> new ChatRoom(
                         chatRoom.getId(),
                         chatRoom.getLastChat(),
                         chatRoom.getLastChatAt(),
@@ -111,7 +110,7 @@ public class ChatFacadeV1 {
                 .toList();
     }
 
-    private String getPartnerLoginId(ChatRoom chatRoom, String requesterNickname) {
+    private String getPartnerLoginId(com.plaything.api.domain.repository.entity.chat.ChatRoom chatRoom, String requesterNickname) {
         return chatRoom.getSenderLoginId().equals(requesterNickname) ?
                 chatRoom.getReceiverLoginId()
                 : chatRoom.getSenderLoginId();

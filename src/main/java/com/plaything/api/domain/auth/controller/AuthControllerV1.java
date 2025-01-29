@@ -103,7 +103,6 @@ public class AuthControllerV1 {
                 .body(result.loginResponse());
     }
 
-
     @Operation(
             summary = "개발용 로그인 처리",
             description = "로그인을 진행합니다."

@@ -1,11 +1,10 @@
 package com.plaything.api.domain.filtering.controller;
 
-import com.plaything.api.domain.filtering.model.response.TopFilteredWords;
+import com.plaything.api.domain.filtering.model.response.TopFilteredWordsResponse;
 import com.plaything.api.domain.filtering.service.FilteringService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,8 +24,8 @@ public class FilterController {
                     """
     )
     @GetMapping("/top-words")
-    public ResponseEntity<List<TopFilteredWords>> getFilteredWordsStatics() {
-        return ResponseEntity.ok().body(filteringService.getFilterWordsStatistics());
+    public TopFilteredWordsResponse getFilteredWordsStatics() {
+        return new TopFilteredWordsResponse(filteringService.getFilterWordsStatistics());
     }
 
     @Operation(

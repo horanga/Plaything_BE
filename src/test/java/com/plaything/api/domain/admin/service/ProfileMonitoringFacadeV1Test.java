@@ -1,6 +1,6 @@
 package com.plaything.api.domain.admin.service;
 
-import com.plaything.api.domain.admin.model.response.ProfileRecordResponse;
+import com.plaything.api.domain.admin.model.response.ProfileRecord;
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
 import com.plaything.api.domain.auth.service.AuthServiceV1;
 import com.plaything.api.domain.profile.model.request.ProfileRegistration;
@@ -63,7 +63,7 @@ class ProfileMonitoringFacadeV1Test {
     @Test
     void test1() {
 
-        List<ProfileRecordResponse> records = profileMonitoringFacadeV1.getRecords();
+        List<ProfileRecord> records = profileMonitoringFacadeV1.getRecords();
 
         assertThat(records).hasSize(2);
         assertThat(records).extracting("nickName").containsExactly("알렉스", "알렉스2");
@@ -75,10 +75,10 @@ class ProfileMonitoringFacadeV1Test {
     @Test
     void test2() {
 
-        List<ProfileRecordResponse> records = profileMonitoringFacadeV1.getRecords();
+        List<ProfileRecord> records = profileMonitoringFacadeV1.getRecords();
 
         profileMonitoringFacadeV1.approveProfile(records.get(0).recordId());
-        List<ProfileRecordResponse> records2 = profileMonitoringFacadeV1.getRecords();
+        List<ProfileRecord> records2 = profileMonitoringFacadeV1.getRecords();
 
         assertThat(records2).hasSize(1);
         assertThat(records2).extracting("nickName").containsExactly("알렉스2");
@@ -90,11 +90,11 @@ class ProfileMonitoringFacadeV1Test {
     @Test
     void test3() {
 
-        List<ProfileRecordResponse> records = profileMonitoringFacadeV1.getRecords();
+        List<ProfileRecord> records = profileMonitoringFacadeV1.getRecords();
 
         profileMonitoringFacadeV1.rejectProfile(records.get(0).recordId(), "수위가 너무 높음");
 
-        List<ProfileRecordResponse> records2 = profileMonitoringFacadeV1.getRecords();
+        List<ProfileRecord> records2 = profileMonitoringFacadeV1.getRecords();
 
         assertThat(records2).hasSize(1);
         List<RejectedProfile> all = rejectedProfileRepository.findAll();
@@ -158,7 +158,7 @@ class ProfileMonitoringFacadeV1Test {
 
         profileFacadeV1.updateProfile(profileUpdate, "dusgh123");
 
-        List<ProfileRecordResponse> records = profileMonitoringFacadeV1.getRecords();
+        List<ProfileRecord> records = profileMonitoringFacadeV1.getRecords();
         assertThat(records).hasSize(4);
         assertThat(records).extracting("nickName").containsExactly("알렉스", "알렉스2", "알렉1", "알렉2");
         assertThat(records).extracting("introduction").containsExactly("hi", "hi", "안녕하세요", "hi");

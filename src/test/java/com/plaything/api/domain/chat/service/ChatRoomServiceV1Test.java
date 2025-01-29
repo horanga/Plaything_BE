@@ -1,10 +1,10 @@
 package com.plaything.api.domain.chat.service;
 
 import com.plaything.api.common.exception.CustomException;
-import com.plaything.api.domain.admin.model.response.ProfileRecordResponse;
+import com.plaything.api.domain.admin.model.response.ProfileRecord;
 import com.plaything.api.domain.admin.service.ProfileMonitoringFacadeV1;
 import com.plaything.api.domain.chat.model.reqeust.ChatRequest;
-import com.plaything.api.domain.chat.model.response.ChatRoomResponse;
+import com.plaything.api.domain.chat.model.response.ChatRoom;
 import com.plaything.api.domain.chat.model.response.ChatWithMissingChat;
 import com.plaything.api.domain.index.model.response.IndexResponse;
 import com.plaything.api.domain.index.service.IndexServiceV1;
@@ -13,7 +13,6 @@ import com.plaything.api.domain.key.model.request.AdRewardRequest;
 import com.plaything.api.domain.key.service.PointKeyFacadeV1;
 import com.plaything.api.domain.profile.service.UserServiceV1;
 import com.plaything.api.domain.profile.util.ImageUrlGenerator;
-import com.plaything.api.domain.repository.entity.chat.ChatRoom;
 import com.plaything.api.domain.repository.entity.pay.PointKey;
 import com.plaything.api.domain.repository.entity.user.User;
 import com.plaything.api.domain.repository.repo.chat.ChatRoomRepository;
@@ -138,7 +137,7 @@ class ChatRoomServiceV1Test {
         ChatRequest msg = new ChatRequest(11, sender, receiver, "안녕하십니까!");
         chatServiceV1.saveChatMessage(msg, now);
 
-        List<ChatRoomResponse> chatRooms = chatFacadeV1.getChatRooms(sender, null);
+        List<ChatRoom> chatRooms = chatFacadeV1.getChatRooms(sender, null);
 
         assertThat(chatRooms.get(index).partnerProfile().nickName()).isEqualTo(partnerNickname);
         assertThat(chatRooms.get(index).partnerProfile().primaryRole()).isEqualTo(partnerRole);
@@ -171,10 +170,10 @@ class ChatRoomServiceV1Test {
         ChatRequest msg = new ChatRequest(4, receiverLoginId, senderLoginId, "안녕하십니까!");
         chatServiceV1.saveChatMessage(msg, now);
 
-        List<ChatRoomResponse> chatRooms = chatFacadeV1.getChatRooms(senderLoginId, null);
+        List<ChatRoom> chatRooms = chatFacadeV1.getChatRooms(senderLoginId, null);
         assertThat(chatRooms.get(2).lastChat()).isEqualTo("안녕하십니까!");
         assertThat(chatRooms.get(2).lastChatSender()).isEqualTo(receiverLoginId);
-        ChatRoom room = chatRoomRepository.findChatRoomByUsers(senderLoginId, receiverLoginId).get();
+        com.plaything.api.domain.repository.entity.chat.ChatRoom room = chatRoomRepository.findChatRoomByUsers(senderLoginId, receiverLoginId).get();
         assertThat(room.getLastSequence()).isEqualTo(5);
     }
 
@@ -198,7 +197,7 @@ class ChatRoomServiceV1Test {
             Thread.sleep(300);
         }
 
-        List<ChatRoomResponse> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
+        List<ChatRoom> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
         assertThat(chatRooms).extracting(
                         "partnerProfile.mainPhoto",
                         "partnerProfile.primaryRole",
@@ -215,7 +214,7 @@ class ChatRoomServiceV1Test {
                         tuple(imageUrlGenerator.getImageUrl("abc52"), "MT", "연52"),
                         tuple(imageUrlGenerator.getImageUrl("abc51"), "MT", "연51"));
 
-        List<ChatRoomResponse> chatRooms2 = chatFacadeV1.getChatRooms("dusgh1234", chatRooms.get(9).chatRoomId());
+        List<ChatRoom> chatRooms2 = chatFacadeV1.getChatRooms("dusgh1234", chatRooms.get(9).chatRoomId());
         assertThat(chatRooms2).extracting(
                         "partnerProfile.mainPhoto",
                         "partnerProfile.primaryRole",
@@ -232,7 +231,7 @@ class ChatRoomServiceV1Test {
                         tuple(imageUrlGenerator.getImageUrl("abc42"), "MT", "연42"),
                         tuple(imageUrlGenerator.getImageUrl("abc41"), "MT", "연41"));
 
-        List<ChatRoomResponse> chatRooms3 = chatFacadeV1.getChatRooms("dusgh1234", chatRooms2.get(9).chatRoomId());
+        List<ChatRoom> chatRooms3 = chatFacadeV1.getChatRooms("dusgh1234", chatRooms2.get(9).chatRoomId());
         assertThat(chatRooms3).extracting(
                         "partnerProfile.mainPhoto",
                         "partnerProfile.primaryRole",
@@ -260,7 +259,7 @@ class ChatRoomServiceV1Test {
         Thread.sleep(1000);
         sendMessage("dusgh1234", "dusgh123", "hi");
 
-        List<ChatRoomResponse> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
+        List<ChatRoom> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
         assertThat(chatRooms.size()).isEqualTo(3);
 
         assertThat(chatRooms.get(2).lastChat()).isEqualTo("hello");
@@ -276,8 +275,8 @@ class ChatRoomServiceV1Test {
         assertThat(chatRooms.get(0).partnerProfile().nickName()).isEqualTo("연2");
 
         chatFacadeV1.leaveChatRoom(chatRooms.get(0).chatRoomId(), "dusgh1234");
-        List<ChatRoomResponse> chatRooms2 = chatFacadeV1.getChatRooms("dusgh12345", null);
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRooms.get(0).chatRoomId()).get();
+        List<ChatRoom> chatRooms2 = chatFacadeV1.getChatRooms("dusgh12345", null);
+        com.plaything.api.domain.repository.entity.chat.ChatRoom chatRoom = chatRoomRepository.findById(chatRooms.get(0).chatRoomId()).get();
 
         assertThat(chatRoom.getExitedUserLoginId()).isEqualTo("dusgh1234");
         assertThat(chatRooms2).hasSize(1);
@@ -293,12 +292,12 @@ class ChatRoomServiceV1Test {
         Thread.sleep(1000);
         sendMessage("dusgh1234", "dusgh12345", "hi");
 
-        List<ChatRoomResponse> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
+        List<ChatRoom> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
         chatFacadeV1.leaveChatRoom(chatRooms.get(1).chatRoomId(), "dusgh1234");
         chatFacadeV1.leaveChatRoom(chatRooms.get(1).chatRoomId(), "dusgh12");
 
-        List<ChatRoomResponse> chatRooms1 = chatFacadeV1.getChatRooms("dusgh1234", null);
-        List<ChatRoomResponse> chatRooms2 = chatFacadeV1.getChatRooms("dusgh12", null);
+        List<ChatRoom> chatRooms1 = chatFacadeV1.getChatRooms("dusgh1234", null);
+        List<ChatRoom> chatRooms2 = chatFacadeV1.getChatRooms("dusgh12", null);
 
         assertThat(chatRooms1.size()).isEqualTo(2);
         assertThat(chatRooms2).isEmpty();
@@ -313,7 +312,7 @@ class ChatRoomServiceV1Test {
         Thread.sleep(1000);
         sendMessage("dusgh1234", "dusgh12345", "hi");
 
-        List<ChatRoomResponse> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
+        List<ChatRoom> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
         chatFacadeV1.leaveChatRoom(chatRooms.get(1).chatRoomId(), "dusgh1234");
         chatFacadeV1.leaveChatRoom(chatRooms.get(1).chatRoomId(), "dusgh12");
 
@@ -330,9 +329,9 @@ class ChatRoomServiceV1Test {
         Thread.sleep(1000);
         sendMessage("dusgh1234", "dusgh12345", "hi");
 
-        List<ChatRoomResponse> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
+        List<ChatRoom> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
         chatFacadeV1.leaveChatRoom(chatRooms.get(1).chatRoomId(), "dusgh12");
-        List<ChatRoomResponse> chatRooms2 = chatFacadeV1.getChatRooms("dusgh1234", null);
+        List<ChatRoom> chatRooms2 = chatFacadeV1.getChatRooms("dusgh1234", null);
         assertThat(chatRooms2.size()).isEqualTo(3);
 
         assertThatThrownBy(() -> chatFacadeV1.getChatList("dusgh1234", chatRooms.get(1).chatRoomId(), null)).isInstanceOf(CustomException.class).hasMessage("상대방이 채팅방을 떠났습니다");
@@ -347,10 +346,10 @@ class ChatRoomServiceV1Test {
         Thread.sleep(1000);
         sendMessage("dusgh1234", "dusgh12345", "hi");
 
-        List<ChatRoomResponse> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
+        List<ChatRoom> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
         chatFacadeV1.leaveChatRoom(chatRooms.get(1).chatRoomId(), "dusgh12");
 
-        List<ChatRoomResponse> chatRooms2 = chatFacadeV1.getChatRooms("dusgh12", null);
+        List<ChatRoom> chatRooms2 = chatFacadeV1.getChatRooms("dusgh12", null);
         assertThat(chatRooms.size()).isEqualTo(3);
         assertThat(chatRooms2.size()).isEqualTo(0);
     }
@@ -363,12 +362,12 @@ class ChatRoomServiceV1Test {
         Thread.sleep(1000);
         sendMessage("dusgh1234", "dusgh12345", "hi");
 
-        List<ChatRoomResponse> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
-        List<ProfileRecordResponse> records = profileMonitoringFacadeV1.getRecords();
+        List<ChatRoom> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
+        List<ProfileRecord> records = profileMonitoringFacadeV1.getRecords();
 
         profileMonitoringFacadeV1.rejectProfile(records.get(1).recordId(), "부적절한 사진");
 
-        List<ChatRoomResponse> chatRooms2 = chatFacadeV1.getChatRooms("dusgh1234", null);
+        List<ChatRoom> chatRooms2 = chatFacadeV1.getChatRooms("dusgh1234", null);
         assertThat(chatRooms.size()).isEqualTo(3);
         assertThat(chatRooms2.size()).isEqualTo(2);
 
@@ -391,11 +390,11 @@ class ChatRoomServiceV1Test {
         Thread.sleep(1000);
         sendMessage("dusgh1234", "dusgh12345", "hi");
 
-        List<ChatRoomResponse> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
+        List<ChatRoom> chatRooms = chatFacadeV1.getChatRooms("dusgh1234", null);
 
         userServiceV1.delete("dusgh12345");
 
-        List<ChatRoomResponse> chatRooms2 = chatFacadeV1.getChatRooms("dusgh1234", null);
+        List<ChatRoom> chatRooms2 = chatFacadeV1.getChatRooms("dusgh1234", null);
         assertThat(chatRooms.size()).isEqualTo(3);
         assertThat(chatRooms2.size()).isEqualTo(2);
 
@@ -427,7 +426,7 @@ class ChatRoomServiceV1Test {
     void test12() {
 
         sendMessage("dusgh1234", "dusgh12", "hi~");
-        ChatRoom chatRoom = chatRoomRepository.findChatRoomByUsers("dusgh1234", "dusgh12").get();
+        com.plaything.api.domain.repository.entity.chat.ChatRoom chatRoom = chatRoomRepository.findChatRoomByUsers("dusgh1234", "dusgh12").get();
         chatFacadeV1.getChatList("dusgh1234", chatRoom.getId(), null);
 
         IndexResponse index1 = indexServiceV1.refreshIndex("dusgh12");

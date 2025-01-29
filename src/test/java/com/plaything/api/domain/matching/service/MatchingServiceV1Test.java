@@ -1,7 +1,7 @@
 package com.plaything.api.domain.matching.service;
 
 import com.plaything.api.common.exception.CustomException;
-import com.plaything.api.domain.admin.model.response.ProfileRecordResponse;
+import com.plaything.api.domain.admin.model.response.ProfileRecord;
 import com.plaything.api.domain.admin.service.ProfileMonitoringFacadeV1;
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
 import com.plaything.api.domain.auth.service.AuthServiceV1;
@@ -13,7 +13,7 @@ import com.plaything.api.domain.key.model.response.PointKeyUsageLog;
 import com.plaything.api.domain.key.service.PointKeyFacadeV1;
 import com.plaything.api.domain.key.service.PointKeyLogServiceV1;
 import com.plaything.api.domain.matching.model.response.UserMatching;
-import com.plaything.api.domain.notification.model.response.NotificationResponse;
+import com.plaything.api.domain.notification.model.response.Notification;
 import com.plaything.api.domain.notification.service.NotificationServiceV1;
 import com.plaything.api.domain.profile.constants.PersonalityTraitConstant;
 import com.plaything.api.domain.profile.constants.PrimaryRole;
@@ -272,9 +272,9 @@ class MatchingServiceV1Test {
         userGenerator.addImages("알렉3", "a", true);
 
 
-        List<ProfileRecordResponse> records = profileMonitoringFacadeV1.getRecords();
+        List<ProfileRecord> records = profileMonitoringFacadeV1.getRecords();
 
-        ProfileRecordResponse record = records.stream().filter(i -> i.nickName().equals("알렉2")).findFirst().get();
+        ProfileRecord record = records.stream().filter(i -> i.nickName().equals("알렉2")).findFirst().get();
         profileMonitoringFacadeV1.rejectProfile(record.recordId(), "그냥");
 
         List<UserMatching> matched = matchingFacadeV1.findMatchingCandidates("fnel123", 1, TimeUnit.DAYS);
@@ -416,7 +416,7 @@ class MatchingServiceV1Test {
         em.clear();
         matchingFacadeV1.sendMatchingRequest("dusgh1234", matchingRequest, "123");
 
-        List<NotificationResponse> notification = notificationServiceV1.getNotification("dusgh12345");
+        List<Notification> notification = notificationServiceV1.getNotification("dusgh12345");
 
         assertThat(notification.size()).isEqualTo(1);
         assertThat(notification.get(0).title()).isEqualTo("연호1" + MATCHING_REQUEST_TITLE);

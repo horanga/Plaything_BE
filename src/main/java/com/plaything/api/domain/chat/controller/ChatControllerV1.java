@@ -7,12 +7,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Tag(name = "Chats", description = "V1 Chat API")
 @RestController
@@ -31,12 +28,12 @@ public class ChatControllerV1 {
                     """
     )
     @GetMapping("/chat-rooms")
-    public ResponseEntity<List<ChatRoomResponse>> chatRoom(
+    public ChatRoomResponse chatRoom(
             @Parameter(hidden = true) @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam(value = "lastId", required = false) Long lastChatRoomId
 
     ) {
-        return ResponseEntity.ok().body(chatFacadeV1.getChatRooms(userDetails.getUsername(), lastChatRoomId));
+        return new ChatRoomResponse(chatFacadeV1.getChatRooms(userDetails.getUsername(), lastChatRoomId));
     }
 
     @Operation(
@@ -53,13 +50,13 @@ public class ChatControllerV1 {
 
     )
     @GetMapping("/chat-list/{chatRoomId}")
-    public ResponseEntity<List<ChatResponse>> chatList(
+    public ChatResponse chatList(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable("chatRoomId") Long chatRoomId,
             @RequestParam(value = "lastChatId", required = false) Long lastChatId
 
     ) {
-        return ResponseEntity.ok().body(chatFacadeV1.getChatList(userDetails.getUsername(), chatRoomId, lastChatId));
+        return new ChatResponse(chatFacadeV1.getChatList(userDetails.getUsername(), chatRoomId, lastChatId));
     }
 
     @Operation(

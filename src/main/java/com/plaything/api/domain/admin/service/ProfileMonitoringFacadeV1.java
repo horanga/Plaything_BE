@@ -1,10 +1,9 @@
 package com.plaything.api.domain.admin.service;
 
-import com.plaything.api.domain.admin.model.response.ProfileRecordResponse;
+import com.plaything.api.domain.admin.model.response.ProfileRecord;
 import com.plaything.api.domain.profile.model.response.UserStats;
 import com.plaything.api.domain.profile.service.ProfileFacadeV1;
 import com.plaything.api.domain.profile.service.UserServiceV1;
-import com.plaything.api.domain.repository.entity.monitor.ProfileRecord;
 import com.plaything.api.domain.repository.entity.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +19,7 @@ public class ProfileMonitoringFacadeV1 {
     private final ProfileMonitoringServiceV1 profileMonitoringServiceV1;
     private final ProfileFacadeV1 profileFacadeV1;
 
-    public List<ProfileRecordResponse> getRecords() {
+    public List<ProfileRecord> getRecords() {
         return profileMonitoringServiceV1.getRecords();
     }
 
@@ -30,7 +29,7 @@ public class ProfileMonitoringFacadeV1 {
 
     @Transactional
     public void rejectProfile(Long recordId, String rejectedReason) {
-        ProfileRecord record = profileMonitoringServiceV1.findByRecordId(recordId);
+        com.plaything.api.domain.repository.entity.monitor.ProfileRecord record = profileMonitoringServiceV1.findByRecordId(recordId);
         profileFacadeV1.banProfile(record.getProfileId(), rejectedReason, record.getUser());
         profileMonitoringServiceV1.deleteById(recordId);
     }

@@ -4,9 +4,8 @@ import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorCode;
 import com.plaything.api.domain.chat.model.reqeust.ChatRequest;
 import com.plaything.api.domain.chat.model.reqeust.ChatWithSequence;
-import com.plaything.api.domain.chat.model.response.ChatResponse;
+import com.plaything.api.domain.chat.model.response.Chat;
 import com.plaything.api.domain.chat.model.response.ChatWithMissingChat;
-import com.plaything.api.domain.repository.entity.chat.Chat;
 import com.plaything.api.domain.repository.entity.chat.ChatRoom;
 import com.plaything.api.domain.repository.repo.chat.ChatRepository;
 import com.plaything.api.domain.repository.repo.chat.ChatRoomRepository;
@@ -37,11 +36,11 @@ public class ChatServiceV1 {
 
     private final ChatRoomRepository chatRoomRepository;
 
-    public List<ChatResponse> chatList(Long chatRoomId, String requesterNickName, Long lastId, LocalDate now) {
+    public List<Chat> chatList(Long chatRoomId, String requesterNickName, Long lastId, LocalDate now) {
 
-        List<Chat> chats = chatQueryRepository.findChat(chatRoomId, lastId, now);
+        List<com.plaything.api.domain.repository.entity.chat.Chat> chats = chatQueryRepository.findChat(chatRoomId, lastId, now);
         return chats.stream()
-                .map(i -> ChatResponse.toResponse(i, requesterNickName))
+                .map(i -> Chat.toResponse(i, requesterNickName))
                 .toList();
     }
 
@@ -54,7 +53,7 @@ public class ChatServiceV1 {
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_MATCHING));
 
         int newSequence = room.getLastSequence() + 1;
-        Chat chat = chat(msg, chatRoom.get(), now, newSequence);
+        com.plaything.api.domain.repository.entity.chat.Chat chat = chat(msg, chatRoom.get(), now, newSequence);
         chatRepository.save(chat);
 
         room.updateLastMessage(msg.senderLoginId(), msg.chat(), LocalDateTime.now(), newSequence);
@@ -64,7 +63,7 @@ public class ChatServiceV1 {
     }
 
     private List<ChatWithSequence> getMissingChats(ChatRequest msg, ChatRoom room) {
-        List<Chat> missingChat = new ArrayList<>();
+        List<com.plaything.api.domain.repository.entity.chat.Chat> missingChat = new ArrayList<>();
 
         if (msg.lastChatSequence() < room.getLastSequence()) {
             List<Integer> missingSequences = IntStream.range(msg.lastChatSequence() + 1, room.getLastSequence())
@@ -87,8 +86,8 @@ public class ChatServiceV1 {
     }
 
 
-    private Chat chat(ChatRequest msg, ChatRoom chatRoom, LocalDateTime now, int sequence) {
-        return Chat.builder()
+    private com.plaything.api.domain.repository.entity.chat.Chat chat(ChatRequest msg, ChatRoom chatRoom, LocalDateTime now, int sequence) {
+        return com.plaything.api.domain.repository.entity.chat.Chat.builder()
                 .senderLoginId(msg.senderLoginId())
                 .receiverLoginId(msg.receiverLoginId())
                 .message(msg.chat())
