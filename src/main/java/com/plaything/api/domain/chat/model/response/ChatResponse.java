@@ -6,6 +6,6 @@ import java.util.List;
 
 public record ChatResponse(
         @Schema(description = "채팅 list")
-        List<Chat> chatList
+        List<Chat> list
 ) {
 }

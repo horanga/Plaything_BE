@@ -4,7 +4,7 @@ import com.plaything.api.domain.profile.model.request.ProfileImageRequest;
 import com.plaything.api.domain.profile.model.request.ProfileRegistration;
 import com.plaything.api.domain.profile.model.request.ProfileUpdate;
 import com.plaything.api.domain.profile.model.request.ProfileUpdateRequest;
-import com.plaything.api.domain.profile.model.response.MyPageProfile;
+import com.plaything.api.domain.profile.model.response.MyPageProfileResponse;
 import com.plaything.api.domain.profile.service.ProfileFacadeV1;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -106,11 +106,11 @@ public class ProfileControllerV1 {
     )
     @SecurityRequirement(name = "Authorization")
     @GetMapping("/get-profile")
-    public MyPageProfile getProfile(
+    public MyPageProfileResponse getProfile(
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         String user = userDetails.getUsername();
-        return profileFacadeV1.getMyPageProfile(user);
+        return new MyPageProfileResponse(List.of(profileFacadeV1.getMyPageProfile(user)));
     }
 
     @Operation(

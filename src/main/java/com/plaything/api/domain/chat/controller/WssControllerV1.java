@@ -4,6 +4,7 @@ import com.plaything.api.common.exception.CustomException;
 import com.plaything.api.common.exception.ErrorResponse;
 import com.plaything.api.domain.chat.model.reqeust.ChatRequest;
 import com.plaything.api.domain.chat.model.response.ChatWithMissingChat;
+import com.plaything.api.domain.chat.model.response.SentChatResponse;
 import com.plaything.api.domain.chat.service.ChatFacadeV1;
 import com.plaything.api.security.JWTProvider;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Controller
@@ -25,11 +27,11 @@ public class WssControllerV1 {
     private final SimpMessagingTemplate messagingTemplate;
     private final JWTProvider jwtProvider;
 
-    @MessageMapping("/chat/message/{to}")
-    public ChatWithMissingChat sendMessage(@DestinationVariable String to, ChatRequest msg) {
+    @MessageMapping("/chat/list/{to}")
+    public SentChatResponse sendMessage(@DestinationVariable String to, ChatRequest msg) {
         ChatWithMissingChat chatWithMissingChat = chatFacadeV1.saveMessage(msg, LocalDateTime.now());
         messagingTemplate.convertAndSendToUser(to, "/chat", chatWithMissingChat.chat());
-        return chatWithMissingChat;
+        return new SentChatResponse(List.of(chatWithMissingChat));
     }
 
     @MessageExceptionHandler(CustomException.class)

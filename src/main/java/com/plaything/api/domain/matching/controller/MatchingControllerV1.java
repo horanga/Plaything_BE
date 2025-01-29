@@ -150,7 +150,7 @@ public class MatchingControllerV1 {
                     """
     )
     @SecurityRequirement(name = "Authorization")
-    @GetMapping("/profile-skip")
+    @PostMapping("/profile-skip")
     public void recordProfileSkip(
             @AuthenticationPrincipal UserDetails userDetails
             , @RequestParam(value = "lastProfileId") long lastProfileId

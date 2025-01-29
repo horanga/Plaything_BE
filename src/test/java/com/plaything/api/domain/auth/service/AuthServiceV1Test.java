@@ -28,8 +28,8 @@ class AuthServiceV1Test {
 
         LoginResult login = authServiceV1.login(OAuth2Provider.GOOGLE, "123", "DADFAS", "ABC");
         assertThat(login.token()).isNotNull();
-        assertThat(login.loginResponse().dailyRewardProvided()).isTrue();
-        assertThat(login.loginResponse().invalidProfile()).isTrue();
+        assertThat(login.login().dailyRewardProvided()).isTrue();
+        assertThat(login.login().invalidProfile()).isTrue();
 
         User user = userRepository.findByLoginId("GOOGLE123").orElse(null);
         assertThat(user).isNotNull();
@@ -44,7 +44,7 @@ class AuthServiceV1Test {
         LoginResult login2 = authServiceV1.login(OAuth2Provider.GOOGLE, "123", "DADFASAD", "DDD");
 
         assertThat(login.token()).isNotNull();
-        assertThat(login2.loginResponse().dailyRewardProvided()).isFalse();
+        assertThat(login2.login().dailyRewardProvided()).isFalse();
         User user = userRepository.findByLoginId("GOOGLE123").orElse(null);
         assertThat(user).isNotNull();
         assertThat(user.getFcmToken()).isEqualTo("DDD");

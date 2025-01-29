@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
+import java.util.List;
 import java.util.Map;
 
 @Tag(name = "Auth", description = "V1 Auth API")
@@ -72,7 +73,7 @@ public class AuthControllerV1 {
 
         return ResponseEntity.ok()
                 .header("Authorization", "Bearer " + result.token())
-                .body(result.loginResponse());
+                .body(new LoginResponse(List.of(result.login())));
     }
 
     @Operation(
@@ -100,7 +101,7 @@ public class AuthControllerV1 {
         LoginResult result = authServiceV1.login(OAuth2Provider.APPLE, claim.getSubject(), transactionId, request.fcmToken());
         return ResponseEntity.ok()
                 .header("Authorization", "Bearer " + result.token())
-                .body(result.loginResponse());
+                .body(new LoginResponse(List.of(result.login())));
     }
 
     @Operation(

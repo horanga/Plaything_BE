@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @Tag(name = "Index", description = "V1 Auth API")
 
 @RequiredArgsConstructor
@@ -31,6 +33,6 @@ public class IndexController {
 
         //TODO 웹소켓 연결 끊겼을 때로 변경
         String user = userDetails.getUsername();
-        return indexServiceV1.refreshIndex(user);
+        return new IndexResponse(List.of(indexServiceV1.refreshIndex(user)));
     }
 }

@@ -6,6 +6,6 @@ import java.util.List;
 
 public record NotificationResponse(
         @Schema(description = "알림 list")
-        List<Notification> notificationList
+        List<Notification> list
 ) {
 }

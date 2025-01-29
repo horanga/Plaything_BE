@@ -1,16 +1,9 @@
 package com.plaything.api.domain.auth.model.response;
 
-import com.plaything.api.common.exception.ErrorCode;
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 
-
-@Schema(description = "Login 요청")
 public record LoginResponse(
-        @Schema(description = "error code")
-        ErrorCode description,
-        @Schema(description = "프로필 유무")
-        boolean invalidProfile,
-        @Schema(description = "일일 포인트 키 지급 여부")
-        boolean dailyRewardProvided
+
+        List<Login> list
 ) {
 }

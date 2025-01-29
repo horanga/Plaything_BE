@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import com.plaything.api.domain.chat.model.reqeust.ChatRequest;
-import com.plaything.api.domain.index.model.response.IndexResponse;
+import com.plaything.api.domain.index.model.response.Index;
 import com.plaything.api.domain.index.service.IndexServiceV1;
 import com.plaything.api.domain.profile.constants.PersonalityTraitConstant;
 import com.plaything.api.domain.repository.repo.chat.ChatRepository;
@@ -200,7 +200,7 @@ public class StompTest {
         // when
         ChatRequest testChatRequest = new ChatRequest(1, "dusgh12345", "dusgh1234", "test chat");
         StompHeaders sendHeaders = new StompHeaders();
-        sendHeaders.setDestination("/pub/chat/message/dusgh1234");
+        sendHeaders.setDestination("/pub/chat/list/dusgh1234");
         sendHeaders.add("Authorization", "Bearer " + token2);
 
         senderSession.send(sendHeaders, testChatRequest);
@@ -261,7 +261,7 @@ public class StompTest {
         // when
         ChatRequest testChatRequest = new ChatRequest(1, "dusgh1234", "dusgh12345", "test chat");
         StompHeaders sendHeaders = new StompHeaders();
-        sendHeaders.setDestination("/pub/chat/message/dusgh12345");
+        sendHeaders.setDestination("/pub/chat/list/dusgh12345");
         sendHeaders.add("Authorization", "Bearer " + token);
 
         senderSession.send(sendHeaders, testChatRequest);
@@ -273,8 +273,8 @@ public class StompTest {
         TestTransaction.start();
 
         // then
-        IndexResponse noti1 = indexServiceV1.refreshIndex("dusgh1234");
-        IndexResponse noti2 = indexServiceV1.refreshIndex("dusgh12345");
+        Index noti1 = indexServiceV1.refreshIndex("dusgh1234");
+        Index noti2 = indexServiceV1.refreshIndex("dusgh12345");
 
         assertThat(noti1.hasNewChat()).isFalse();
         assertThat(noti2.hasNewChat()).isTrue();

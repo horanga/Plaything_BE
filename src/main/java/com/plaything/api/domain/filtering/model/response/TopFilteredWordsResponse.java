@@ -7,5 +7,5 @@ import java.util.List;
 @Schema(description = "필터링 통계")
 public record TopFilteredWordsResponse(
         @Schema(description = "필터링된 단어 list")
-        List<TopFilteredWords> filteredWordList) {
+        List<TopFilteredWords> list) {
 }

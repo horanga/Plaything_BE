@@ -54,3 +54,4 @@ refreshIndex
 userDetails
 userdetails
 getFilteredWordsStatics
+TopFilteredWordsResponse

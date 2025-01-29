@@ -3,7 +3,7 @@ package com.plaything.api.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.plaything.api.domain.auth.client.dto.request.GoogleLoginRequest;
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
-import com.plaything.api.domain.auth.model.response.LoginResponse;
+import com.plaything.api.domain.auth.model.response.Login;
 import com.plaything.api.domain.auth.service.AuthServiceV1;
 import com.plaything.api.domain.key.model.response.AvailablePointKey;
 import com.plaything.api.domain.key.service.PointKeyFacadeV1;
@@ -82,9 +82,9 @@ public class LoginTest {
                 .andExpect(status().isOk())
                 .andReturn();  // 결과를 받아옵니다
 
-        LoginResponse response = objectMapper.readValue(
+        Login response = objectMapper.readValue(
                 result.getResponse().getContentAsString(),
-                LoginResponse.class
+                Login.class
         );
 
         AvailablePointKey availablePointKey1 = pointKeyFacadeV1.getAvailablePointKey("fnel123");
@@ -112,9 +112,9 @@ public class LoginTest {
                 .andExpect(status().isOk())
                 .andReturn();  // 결과를 받아옵니다
 
-        LoginResponse response = objectMapper.readValue(
+        Login response = objectMapper.readValue(
                 result.getResponse().getContentAsString(),
-                LoginResponse.class
+                Login.class
         );
 
         AvailablePointKey availablePointKey1 = pointKeyFacadeV1.getAvailablePointKey("fnel123");
@@ -134,9 +134,9 @@ public class LoginTest {
                 .andExpect(status().isOk())
                 .andReturn();  // 결과를 받아옵니다
 
-        LoginResponse response2 = objectMapper.readValue(
+        Login response2 = objectMapper.readValue(
                 result2.getResponse().getContentAsString(),
-                LoginResponse.class
+                Login.class
         );
 
         AvailablePointKey availablePointKey2 = pointKeyFacadeV1.getAvailablePointKey("fnel123");
@@ -162,9 +162,9 @@ public class LoginTest {
                 .andExpect(status().isOk())
                 .andReturn();  // 결과를 받아옵니다
 
-        LoginResponse response = objectMapper.readValue(
+        Login response = objectMapper.readValue(
                 result.getResponse().getContentAsString(),
-                LoginResponse.class
+                Login.class
         );
 
         AvailablePointKey availablePointKey1 = pointKeyFacadeV1.getAvailablePointKey("fnel123");
@@ -191,9 +191,9 @@ public class LoginTest {
                 .andExpect(status().isOk())
                 .andReturn();  // 결과를 받아옵니다
 
-        LoginResponse response = objectMapper.readValue(
+        Login response = objectMapper.readValue(
                 result.getResponse().getContentAsString(),
-                LoginResponse.class
+                Login.class
         );
 
         assertThat(response.invalidProfile()).isFalse();

@@ -1,12 +1,14 @@
 package com.plaything.api.domain.admin.controller;
 
 import com.plaything.api.domain.admin.model.response.ProfileRecordResponse;
+import com.plaything.api.domain.admin.model.response.UserStatResponse;
 import com.plaything.api.domain.admin.service.ProfileMonitoringFacadeV1;
-import com.plaything.api.domain.profile.model.response.UserStats;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Tag(name = "Monitoring", description = "V1 Profile Monitoring API")
 @RestController
@@ -30,10 +32,10 @@ public class ProfileMonitoringController {
             description = "유저 금지 행위 통계"
     )
     @GetMapping("/{id}")
-    public UserStats getUserStats(
+    public UserStatResponse getUserStats(
             @PathVariable("id") Long id
     ) {
-        return profileMonitoringFacadeV1.getUserStats(id);
+        return new UserStatResponse(List.of(profileMonitoringFacadeV1.getUserStats(id)));
     }
 
     @Operation(

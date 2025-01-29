@@ -5,7 +5,7 @@ import com.plaything.api.common.exception.ErrorCode;
 import com.plaything.api.domain.auth.client.constants.OAuth2Provider;
 import com.plaything.api.domain.auth.model.request.CreateUserRequest;
 import com.plaything.api.domain.auth.model.request.LoginRequest;
-import com.plaything.api.domain.auth.model.response.LoginResponse;
+import com.plaything.api.domain.auth.model.response.Login;
 import com.plaything.api.domain.auth.model.response.LoginResult;
 import com.plaything.api.domain.repository.entity.pay.UserRewardActivity;
 import com.plaything.api.domain.repository.entity.user.User;
@@ -56,8 +56,8 @@ public class AuthServiceV1 {
             }
         }
         String token = jwtProvider.createToken(user.getLoginId(), user.getRole().toString(), 60 * 60 * 1000L);
-        LoginResponse loginResponse = loginSuccessHandler.handleSuccessFulLogin(user.getLoginId(), transactionId, LocalDate.now());
-        return new LoginResult(token, loginResponse);
+        Login login = loginSuccessHandler.handleSuccessFulLogin(user.getLoginId(), transactionId, LocalDate.now());
+        return new LoginResult(token, login);
     }
 
     public void validateAppleLogin(Claims claims) {

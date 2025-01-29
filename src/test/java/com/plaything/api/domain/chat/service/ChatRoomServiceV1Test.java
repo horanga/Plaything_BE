@@ -6,7 +6,7 @@ import com.plaything.api.domain.admin.service.ProfileMonitoringFacadeV1;
 import com.plaything.api.domain.chat.model.reqeust.ChatRequest;
 import com.plaything.api.domain.chat.model.response.ChatRoom;
 import com.plaything.api.domain.chat.model.response.ChatWithMissingChat;
-import com.plaything.api.domain.index.model.response.IndexResponse;
+import com.plaything.api.domain.index.model.response.Index;
 import com.plaything.api.domain.index.service.IndexServiceV1;
 import com.plaything.api.domain.key.constant.PointStatus;
 import com.plaything.api.domain.key.model.request.AdRewardRequest;
@@ -413,8 +413,8 @@ class ChatRoomServiceV1Test {
     @Test
     void test11() {
         sendMessage("dusgh1234", "dusgh12", "hi~");
-        IndexResponse index1 = indexServiceV1.refreshIndex("dusgh12");
-        IndexResponse index2 = indexServiceV1.refreshIndex("dusgh1234");
+        Index index1 = indexServiceV1.refreshIndex("dusgh12");
+        Index index2 = indexServiceV1.refreshIndex("dusgh1234");
 
         assertThat(index1.hasNewChat()).isTrue();
         assertThat(index2.hasNewChat()).isFalse();
@@ -429,16 +429,16 @@ class ChatRoomServiceV1Test {
         com.plaything.api.domain.repository.entity.chat.ChatRoom chatRoom = chatRoomRepository.findChatRoomByUsers("dusgh1234", "dusgh12").get();
         chatFacadeV1.getChatList("dusgh1234", chatRoom.getId(), null);
 
-        IndexResponse index1 = indexServiceV1.refreshIndex("dusgh12");
-        IndexResponse index2 = indexServiceV1.refreshIndex("dusgh1234");
+        Index index1 = indexServiceV1.refreshIndex("dusgh12");
+        Index index2 = indexServiceV1.refreshIndex("dusgh1234");
 
         assertThat(index1.hasNewChat()).isTrue();
         assertThat(index2.hasNewChat()).isFalse();
 
         chatFacadeV1.getChatList("dusgh12", chatRoom.getId(), null);
 
-        IndexResponse index3 = indexServiceV1.refreshIndex("dusgh12");
-        IndexResponse index4 = indexServiceV1.refreshIndex("dusgh1234");
+        Index index3 = indexServiceV1.refreshIndex("dusgh12");
+        Index index4 = indexServiceV1.refreshIndex("dusgh1234");
 
         assertThat(index3.hasNewChat()).isFalse();
         assertThat(index4.hasNewChat()).isFalse();

@@ -1,7 +1,7 @@
 package com.plaything.api.domain.key.controller;
 
 import com.plaything.api.domain.key.model.request.AdRewardRequest;
-import com.plaything.api.domain.key.model.response.AvailablePointKey;
+import com.plaything.api.domain.key.model.response.AvailablePointKeyResponse;
 import com.plaything.api.domain.key.model.response.PointKeyLogResponse;
 import com.plaything.api.domain.key.service.PointKeyFacadeV1;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Tag(name = "Points", description = "V1 PointKey API")
 @RestController
@@ -65,11 +66,11 @@ public class PointKeyControllerV1 {
     )
     @SecurityRequirement(name = "Authorization")
     @GetMapping("/get-key")
-    public AvailablePointKey getPointKey(
+    public AvailablePointKeyResponse getPointKey(
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         String user = userDetails.getUsername();
-        return pointKeyFacadeV1.getAvailablePointKey(user);
+        return new AvailablePointKeyResponse(List.of(pointKeyFacadeV1.getAvailablePointKey(user)));
     }
 
 }

@@ -6,6 +6,6 @@ import java.util.List;
 
 public record UserMatchingResponse(
         @Schema(description = "매칭 조회 list")
-        List<UserMatching> userMatchingList
+        List<UserMatching> list
 ) {
 }
