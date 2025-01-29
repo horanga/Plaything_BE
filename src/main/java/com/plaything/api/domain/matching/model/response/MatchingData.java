@@ -4,8 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 
-@Schema(description = "레디스 캐시 데이터")
-public record MatchingRedisData(
+@Schema(description = "매칭 관련 데이터")
+public record MatchingData(
 
         @Schema(description = "매칭 신청한 사람 목록")
         List<String> candidateList,
@@ -16,5 +16,7 @@ public record MatchingRedisData(
         @Schema(description = "마지막으로 본 프로필 id")
         String lastProfileId,
         @Schema(description = "프로필 skip 횟수")
-        String count) {
+        String count,
+        @Schema(description = "Redis 상태")
+        boolean isAvailable) {
 }

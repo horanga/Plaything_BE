@@ -9,11 +9,6 @@ import com.plaything.api.domain.matching.model.request.MatchRequestForOthers;
 import com.plaything.api.domain.matching.model.response.MatchingResponse;
 import com.plaything.api.domain.matching.model.response.UserMatching;
 import com.plaything.api.domain.notification.service.NotificationServiceV1;
-import com.plaything.api.domain.repository.entity.matching.Matching;
-import com.plaything.api.domain.repository.entity.user.User;
-import com.plaything.api.domain.repository.entity.profile.Profile;
-import com.plaything.api.domain.repository.repo.matching.MatchingRepository;
-import com.plaything.api.domain.repository.repo.query.ProfileQueryRepository;
 import com.plaything.api.domain.profile.constants.MatchingRelationship;
 import com.plaything.api.domain.profile.constants.PersonalityTraitConstant;
 import com.plaything.api.domain.profile.model.response.PersonalityTraitResponse;
@@ -21,6 +16,11 @@ import com.plaything.api.domain.profile.model.response.ProfileImageResponse;
 import com.plaything.api.domain.profile.model.response.RelationshipPreferenceResponse;
 import com.plaything.api.domain.profile.service.UserServiceV1;
 import com.plaything.api.domain.profile.util.ImageUrlGenerator;
+import com.plaything.api.domain.repository.entity.matching.Matching;
+import com.plaything.api.domain.repository.entity.profile.Profile;
+import com.plaything.api.domain.repository.entity.user.User;
+import com.plaything.api.domain.repository.repo.matching.MatchingRepository;
+import com.plaything.api.domain.repository.repo.query.ProfileQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -136,7 +136,7 @@ public class MatchingServiceV1 {
         return profiles.stream()
                 .map(p -> new UserMatching(
                         p.getLoginId(),
-                        p.getPrimaryRole(),
+                        p.getPrimaryRoleAsString(),
                         p.getNickName(),
                         p.getBirthDate(),
                         p.getIntroduction(),
