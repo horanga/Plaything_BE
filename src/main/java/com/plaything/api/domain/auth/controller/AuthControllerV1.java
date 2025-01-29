@@ -45,7 +45,7 @@ public class AuthControllerV1 {
             description = "새로운 유저 생성"
     )
     @PostMapping("/create-user")
-    public void creatUser(
+    public void createUser(
             @Valid @RequestBody CreateUserRequest request
     ) {
         authServiceV1.createUser(request);
