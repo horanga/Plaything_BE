@@ -8,5 +8,5 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class PointKeyLogController {
 
-    private final AdLogServiceV1 adLogServiceV1;
+  private final AdLogServiceV1 adLogServiceV1;
 }

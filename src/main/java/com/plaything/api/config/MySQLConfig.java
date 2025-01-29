@@ -14,38 +14,38 @@ import org.springframework.transaction.support.TransactionTemplate;
 @EnableTransactionManagement
 public class MySQLConfig {
 
-    @Value("${spring.datasource.url}")
-    private String url;
+  @Value("${spring.datasource.url}")
+  private String url;
 
-    @Value("${spring.datasource.username}")
-    private String userName;
+  @Value("${spring.datasource.username}")
+  private String userName;
 
-    @Value("${spring.datasource.password}")
-    private String password;
+  @Value("${spring.datasource.password}")
+  private String password;
 
-    @Value("${spring.datasource.driver-class-name}")
-    private String driverClassName;
+  @Value("${spring.datasource.driver-class-name}")
+  private String driverClassName;
 
 
-    @Bean
-    TransactionTemplate transactionTemplate(PlatformTransactionManager transactionManager) {
-        return new TransactionTemplate(transactionManager);
-    }
+  @Bean
+  TransactionTemplate transactionTemplate(PlatformTransactionManager transactionManager) {
+    return new TransactionTemplate(transactionManager);
+  }
 
-    @Bean(name = "createChatTransactionManger")
-    public PlatformTransactionManager createChatTransactionManager(EntityManagerFactory factory) {
-        JpaTransactionManager transactionManager = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(factory);
-        return transactionManager;
-    }
+  @Bean(name = "createChatTransactionManger")
+  public PlatformTransactionManager createChatTransactionManager(EntityManagerFactory factory) {
+    JpaTransactionManager transactionManager = new JpaTransactionManager();
+    transactionManager.setEntityManagerFactory(factory);
+    return transactionManager;
+  }
 
-    @Primary
-    @Bean(name = "transactionManager")
-    public PlatformTransactionManager createTransactionManager(EntityManagerFactory factory) {
-        JpaTransactionManager transactionManager = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(factory);
-        return transactionManager;
-    }
+  @Primary
+  @Bean(name = "transactionManager")
+  public PlatformTransactionManager createTransactionManager(EntityManagerFactory factory) {
+    JpaTransactionManager transactionManager = new JpaTransactionManager();
+    transactionManager.setEntityManagerFactory(factory);
+    return transactionManager;
+  }
 
 
 }

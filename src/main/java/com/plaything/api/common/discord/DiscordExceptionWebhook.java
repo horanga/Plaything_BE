@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(value = "discord-error-message", url = "${discord.webhook.exception.url}")
 public interface DiscordExceptionWebhook {
 
-    @PostMapping()
-    void sendAlarm(@RequestBody DiscordMessage message);
+  @PostMapping()
+  void sendAlarm(@RequestBody DiscordMessage message);
 }
 

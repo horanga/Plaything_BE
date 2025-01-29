@@ -15,25 +15,25 @@ import com.querydsl.core.types.Path;
 @Generated("com.querydsl.codegen.DefaultSupertypeSerializer")
 public class QBaseLogEntity extends EntityPathBase<BaseLogEntity> {
 
-    private static final long serialVersionUID = 745014287L;
+  public static final QBaseLogEntity baseLogEntity = new QBaseLogEntity("baseLogEntity");
+  private static final long serialVersionUID = 745014287L;
+  public final DateTimePath<java.time.LocalDateTime> createdAt = createDateTime("createdAt",
+      java.time.LocalDateTime.class);
 
-    public static final QBaseLogEntity baseLogEntity = new QBaseLogEntity("baseLogEntity");
+  public final DateTimePath<java.time.LocalDateTime> modifiedAt = createDateTime("modifiedAt",
+      java.time.LocalDateTime.class);
 
-    public final DateTimePath<java.time.LocalDateTime> createdAt = createDateTime("createdAt", java.time.LocalDateTime.class);
+  public QBaseLogEntity(String variable) {
+    super(BaseLogEntity.class, forVariable(variable));
+  }
 
-    public final DateTimePath<java.time.LocalDateTime> modifiedAt = createDateTime("modifiedAt", java.time.LocalDateTime.class);
+  public QBaseLogEntity(Path<? extends BaseLogEntity> path) {
+    super(path.getType(), path.getMetadata());
+  }
 
-    public QBaseLogEntity(String variable) {
-        super(BaseLogEntity.class, forVariable(variable));
-    }
-
-    public QBaseLogEntity(Path<? extends BaseLogEntity> path) {
-        super(path.getType(), path.getMetadata());
-    }
-
-    public QBaseLogEntity(PathMetadata metadata) {
-        super(BaseLogEntity.class, metadata);
-    }
+  public QBaseLogEntity(PathMetadata metadata) {
+    super(BaseLogEntity.class, metadata);
+  }
 
 }
 

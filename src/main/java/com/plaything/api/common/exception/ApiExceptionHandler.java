@@ -15,34 +15,36 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
-    private final DiscordAlarm discordAlarm;
+  private final DiscordAlarm discordAlarm;
 
-    @ExceptionHandler({CustomException.class})
-    public ResponseEntity<ErrorResponse> exceptionHandler(CustomException e, HttpServletRequest request) {
-        ErrorResponse errorResponse = ErrorResponse.toResponse(e);
+  @ExceptionHandler({CustomException.class})
+  public ResponseEntity<ErrorResponse> exceptionHandler(CustomException e,
+      HttpServletRequest request) {
+    ErrorResponse errorResponse = ErrorResponse.toResponse(e);
 
-        if (e.getHttpStatus() == HttpStatus.INTERNAL_SERVER_ERROR) {
-            discordAlarm.sendServerErrorAlarm(e, request);
-        }
-
-        return ResponseEntity
-                .status(errorResponse.httpStatus())
-                .body(errorResponse);
+    if (e.getHttpStatus() == HttpStatus.INTERNAL_SERVER_ERROR) {
+      discordAlarm.sendServerErrorAlarm(e, request);
     }
 
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleInternalServerError(Exception e, HttpServletRequest request) {
-        discordAlarm.sendServerErrorAlarm(e, request);
+    return ResponseEntity
+        .status(errorResponse.httpStatus())
+        .body(errorResponse);
+  }
 
-        ErrorResponse errorResponse = new ErrorResponse(
-                null,
-                HttpStatus.INTERNAL_SERVER_ERROR);
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  @ExceptionHandler(Exception.class)
+  public ResponseEntity<ErrorResponse> handleInternalServerError(Exception e,
+      HttpServletRequest request) {
+    discordAlarm.sendServerErrorAlarm(e, request);
 
-        log.info(e.getMessage());
+    ErrorResponse errorResponse = new ErrorResponse(
+        null,
+        HttpStatus.INTERNAL_SERVER_ERROR);
 
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(errorResponse);
-    }
+    log.info(e.getMessage());
+
+    return ResponseEntity
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body(errorResponse);
+  }
 }

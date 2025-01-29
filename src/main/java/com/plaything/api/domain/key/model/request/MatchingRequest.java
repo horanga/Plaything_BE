@@ -6,8 +6,9 @@ import jakarta.validation.constraints.NotBlank;
 @Schema(description = "매칭 요청")
 public record MatchingRequest(
 
-        @Schema(description = "매칭 상대방 로그인 ID")
-        @NotBlank
-        String partnerLoginId
+    @Schema(description = "매칭 상대방 로그인 ID")
+    @NotBlank
+    String partnerLoginId
 ) {
+
 }

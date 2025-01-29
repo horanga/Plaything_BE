@@ -16,11 +16,11 @@ import lombok.NoArgsConstructor;
 @Entity
 public class ProfileImageRegistration {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private long id;
 
-    private String fileName;
+  private String fileName;
 
-    private long profileImageId;
+  private long profileImageId;
 }

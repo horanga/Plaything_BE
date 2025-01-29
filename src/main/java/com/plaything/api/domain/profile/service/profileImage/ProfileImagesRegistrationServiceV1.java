@@ -8,6 +8,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProfileImagesRegistrationServiceV1 {
 
-    private final ProfileImagesRegistrationRepository profileImagesRegistrationRepository;
+  private final ProfileImagesRegistrationRepository profileImagesRegistrationRepository;
 
 }

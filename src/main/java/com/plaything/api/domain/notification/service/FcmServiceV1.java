@@ -13,31 +13,31 @@ import org.springframework.stereotype.Service;
 @Service
 public class FcmServiceV1 {
 
-    public void sendMessageTo(
-            ChatProfile chatProfile,
-            String title,
-            String message,
-            String fcmToken) {
+  public void sendMessageTo(
+      ChatProfile chatProfile,
+      String title,
+      String message,
+      String fcmToken) {
 
-        Message msg = makeMessage(chatProfile, title, message, fcmToken);
+    Message msg = makeMessage(chatProfile, title, message, fcmToken);
 
-        try {
-            FirebaseMessaging.getInstance().send(msg);
-        } catch (FirebaseMessagingException e) {
-            throw new RuntimeException(e);
-        }
+    try {
+      FirebaseMessaging.getInstance().send(msg);
+    } catch (FirebaseMessagingException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    private Message makeMessage(ChatProfile chatProfile,
-                                String title,
-                                String message,
-                                String fckToken) {
+  private Message makeMessage(ChatProfile chatProfile,
+      String title,
+      String message,
+      String fckToken) {
 
-        return Message.builder().putData("title", title)
-                .putData("partner", chatProfile.nickName())
-                .putData("partnerImage", chatProfile.mainPhoto())
-                .putData("body", message)
-                .setToken(fckToken)
-                .build();
-    }
+    return Message.builder().putData("title", title)
+        .putData("partner", chatProfile.nickName())
+        .putData("partnerImage", chatProfile.mainPhoto())
+        .putData("body", message)
+        .setToken(fckToken)
+        .build();
+  }
 }

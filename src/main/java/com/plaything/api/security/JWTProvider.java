@@ -7,117 +7,119 @@ import com.plaything.api.common.exception.ErrorCode;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
-
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 @RequiredArgsConstructor
 @Component
 public class JWTProvider {
 
-    private static SecretKey secretKey;
-    private final ObjectMapper objectMapper;
-    private static String refreshSecretKey;
-    private static long tokenTimeForMinutes;
-    private static long refreshTokenTimeForMinutes;
+  private static SecretKey secretKey;
+  private static String refreshSecretKey;
+  private static long tokenTimeForMinutes;
+  private static long refreshTokenTimeForMinutes;
+  private final ObjectMapper objectMapper;
 
-    @Value("${token.secret-key}")
-    public void setSecretKey(String secretKey) {
-        JWTProvider.secretKey = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
+  @Value("${token.secret-key}")
+  public void setSecretKey(String secretKey) {
+    JWTProvider.secretKey = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8),
+        Jwts.SIG.HS256.key().build().getAlgorithm());
+  }
+
+  @Value("${token.refresh_secret_key}")
+  public void setRefreshSecretKey(String refreshSecretKey) {
+    JWTProvider.refreshSecretKey = refreshSecretKey;
+  }
+
+  @Value("${token.token-time}")
+  public void setTokenTimeForMinutes(long tokenTimeForMinutes) {
+    JWTProvider.tokenTimeForMinutes = tokenTimeForMinutes;
+  }
+
+  @Value("${token.refresh-token-time}")
+  public void setRefreshTokenTimeForMinutes(long refreshTokenTimeForMinutes) {
+    JWTProvider.refreshTokenTimeForMinutes = refreshTokenTimeForMinutes;
+  }
+
+  public String createToken(String name, String role, Long expiredMs) {
+
+    return Jwts.builder()
+        .claim("username", name)
+        .claim("role", role)
+        .issuedAt(new Date(System.currentTimeMillis()))
+        .expiration(new Date(System.currentTimeMillis() + expiredMs))
+        .signWith(secretKey)
+        .compact();
+  }
+
+  public String extractToken(String header) {
+    if (header == null) {
+      throw new CustomException(ErrorCode.TOKEN_IS_INVALID);
     }
 
-    @Value("${token.refresh_secret_key}")
-    public void setRefreshSecretKey(String refreshSecretKey) {
-        JWTProvider.refreshSecretKey = refreshSecretKey;
+    if (StringUtils.hasText(header) && header.startsWith("Bearer ")) {
+      return header.substring(7);
+    } else {
+      throw new CustomException(ErrorCode.TOKEN_IS_INVALID);
     }
+  }
 
-    @Value("${token.token-time}")
-    public void setTokenTimeForMinutes(long tokenTimeForMinutes) {
-        JWTProvider.tokenTimeForMinutes = tokenTimeForMinutes;
+  public String getUsername(String token) {
+
+    return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()
+        .get("username", String.class);
+  }
+
+  public String getRole(String token) {
+
+    return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()
+        .get("role", String.class);
+  }
+
+  public Boolean isExpired(String token) {
+    try {
+
+      return Jwts.parser()
+          .verifyWith(secretKey)
+          .build()
+          .parseSignedClaims(token)
+          .getPayload()
+          .getExpiration()
+          .before(new Date());
+    } catch (JwtException e) {
+      return true;
     }
+  }
 
-    @Value("${token.refresh-token-time}")
-    public void setRefreshTokenTimeForMinutes(long refreshTokenTimeForMinutes) {
-        JWTProvider.refreshTokenTimeForMinutes = refreshTokenTimeForMinutes;
-    }
+  public Map<String, String> parseHeaders(String token) throws JsonProcessingException {
+    // JWT의 첫 번째 부분(헤더)을 가져옴
+    String header = token.split("\\.")[0];
 
-    public String createToken(String name, String role, Long expiredMs) {
+    // Base64 디코딩 후 JSON을 Map으로 변환
+    return objectMapper.readValue(decodeHeader(header), Map.class);
+  }
 
-        return Jwts.builder()
-                .claim("username", name)
-                .claim("role", role)
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiredMs))
-                .signWith(secretKey)
-                .compact();
-    }
-
-    public String extractToken(String header) {
-        if (header == null) {
-            throw new CustomException(ErrorCode.TOKEN_IS_INVALID);
-        }
-
-        if (StringUtils.hasText(header) && header.startsWith("Bearer ")) {
-            return header.substring(7);
-        } else {
-            throw new CustomException(ErrorCode.TOKEN_IS_INVALID);
-        }
-    }
-
-    public String getUsername(String token) {
-
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("username", String.class);
-    }
-
-    public String getRole(String token) {
-
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("role", String.class);
-    }
-
-    public Boolean isExpired(String token) {
-        try {
-
-            return Jwts.parser()
-                    .verifyWith(secretKey)
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload()
-                    .getExpiration()
-                    .before(new Date());
-        } catch (JwtException e) {
-            return true;
-        }
-    }
-
-    public Map<String, String> parseHeaders(String token) throws JsonProcessingException {
-        // JWT의 첫 번째 부분(헤더)을 가져옴
-        String header = token.split("\\.")[0];
-
-        // Base64 디코딩 후 JSON을 Map으로 변환
-        return objectMapper.readValue(decodeHeader(header), Map.class);
-    }
-
-    public String decodeHeader(String token) {
-        return new String(Base64.getDecoder().decode(token), StandardCharsets.UTF_8);
-    }
+  public String decodeHeader(String token) {
+    return new String(Base64.getDecoder().decode(token), StandardCharsets.UTF_8);
+  }
 
 
-    public Claims getTokenClaims(String token, PublicKey publicKey) {
-        return Jwts.parser()
-                .verifyWith(publicKey)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
-    }
+  public Claims getTokenClaims(String token, PublicKey publicKey) {
+    return Jwts.parser()
+        .verifyWith(publicKey)
+        .build()
+        .parseSignedClaims(token)
+        .getPayload();
+  }
 
 //    public String createRefreshToken(String name) {
 //

@@ -16,48 +16,48 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QAdViewLog extends EntityPathBase<AdViewLog> {
 
-    private static final long serialVersionUID = -397819018L;
+  public static final QAdViewLog adViewLog = new QAdViewLog("adViewLog");
+  private static final long serialVersionUID = -397819018L;
+  private static final PathInits INITS = PathInits.DIRECT2;
+  public final com.plaything.api.domain.repository.entity.common.QBaseLogEntity _super = new com.plaything.api.domain.repository.entity.common.QBaseLogEntity(
+      this);
 
-    private static final PathInits INITS = PathInits.DIRECT2;
+  public final StringPath adType = createString("adType");
 
-    public static final QAdViewLog adViewLog = new QAdViewLog("adViewLog");
+  //inherited
+  public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
-    public final com.plaything.api.domain.repository.entity.common.QBaseLogEntity _super = new com.plaything.api.domain.repository.entity.common.QBaseLogEntity(this);
+  public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final StringPath adType = createString("adType");
+  //inherited
+  public final DateTimePath<java.time.LocalDateTime> modifiedAt = _super.modifiedAt;
 
-    //inherited
-    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
+  public final com.plaything.api.domain.repository.entity.user.QUser user;
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+  public final NumberPath<Integer> viewDuration = createNumber("viewDuration", Integer.class);
 
-    //inherited
-    public final DateTimePath<java.time.LocalDateTime> modifiedAt = _super.modifiedAt;
+  public QAdViewLog(String variable) {
+    this(AdViewLog.class, forVariable(variable), INITS);
+  }
 
-    public final com.plaything.api.domain.repository.entity.user.QUser user;
+  public QAdViewLog(Path<? extends AdViewLog> path) {
+    this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
+  }
 
-    public final NumberPath<Integer> viewDuration = createNumber("viewDuration", Integer.class);
+  public QAdViewLog(PathMetadata metadata) {
+    this(metadata, PathInits.getFor(metadata, INITS));
+  }
 
-    public QAdViewLog(String variable) {
-        this(AdViewLog.class, forVariable(variable), INITS);
-    }
+  public QAdViewLog(PathMetadata metadata, PathInits inits) {
+    this(AdViewLog.class, metadata, inits);
+  }
 
-    public QAdViewLog(Path<? extends AdViewLog> path) {
-        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
-    }
-
-    public QAdViewLog(PathMetadata metadata) {
-        this(metadata, PathInits.getFor(metadata, INITS));
-    }
-
-    public QAdViewLog(PathMetadata metadata, PathInits inits) {
-        this(AdViewLog.class, metadata, inits);
-    }
-
-    public QAdViewLog(Class<? extends AdViewLog> type, PathMetadata metadata, PathInits inits) {
-        super(type, metadata, inits);
-        this.user = inits.isInitialized("user") ? new com.plaything.api.domain.repository.entity.user.QUser(forProperty("user"), inits.get("user")) : null;
-    }
+  public QAdViewLog(Class<? extends AdViewLog> type, PathMetadata metadata, PathInits inits) {
+    super(type, metadata, inits);
+    this.user =
+        inits.isInitialized("user") ? new com.plaything.api.domain.repository.entity.user.QUser(
+            forProperty("user"), inits.get("user")) : null;
+  }
 
 }
 

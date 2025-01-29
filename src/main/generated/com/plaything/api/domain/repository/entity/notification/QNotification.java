@@ -16,50 +16,51 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QNotification extends EntityPathBase<Notification> {
 
-    private static final long serialVersionUID = -781500366L;
+  public static final QNotification notification = new QNotification("notification");
+  private static final long serialVersionUID = -781500366L;
+  private static final PathInits INITS = PathInits.DIRECT2;
+  public final com.plaything.api.domain.repository.entity.common.QBaseEntity _super = new com.plaything.api.domain.repository.entity.common.QBaseEntity(
+      this);
 
-    private static final PathInits INITS = PathInits.DIRECT2;
+  //inherited
+  public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
-    public static final QNotification notification = new QNotification("notification");
+  public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final com.plaything.api.domain.repository.entity.common.QBaseEntity _super = new com.plaything.api.domain.repository.entity.common.QBaseEntity(this);
+  //inherited
+  public final DateTimePath<java.time.LocalDateTime> modifiedAt = _super.modifiedAt;
 
-    //inherited
-    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
+  public final com.plaything.api.domain.repository.entity.user.QUser receiver;
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+  public final StringPath requesterMainPhoto = createString("requesterMainPhoto");
 
-    //inherited
-    public final DateTimePath<java.time.LocalDateTime> modifiedAt = _super.modifiedAt;
+  public final StringPath requesterNickName = createString("requesterNickName");
 
-    public final com.plaything.api.domain.repository.entity.user.QUser receiver;
+  public final EnumPath<com.plaything.api.domain.notification.constant.NotificationType> type = createEnum(
+      "type", com.plaything.api.domain.notification.constant.NotificationType.class);
 
-    public final StringPath requesterMainPhoto = createString("requesterMainPhoto");
+  public QNotification(String variable) {
+    this(Notification.class, forVariable(variable), INITS);
+  }
 
-    public final StringPath requesterNickName = createString("requesterNickName");
+  public QNotification(Path<? extends Notification> path) {
+    this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
+  }
 
-    public final EnumPath<com.plaything.api.domain.notification.constant.NotificationType> type = createEnum("type", com.plaything.api.domain.notification.constant.NotificationType.class);
+  public QNotification(PathMetadata metadata) {
+    this(metadata, PathInits.getFor(metadata, INITS));
+  }
 
-    public QNotification(String variable) {
-        this(Notification.class, forVariable(variable), INITS);
-    }
+  public QNotification(PathMetadata metadata, PathInits inits) {
+    this(Notification.class, metadata, inits);
+  }
 
-    public QNotification(Path<? extends Notification> path) {
-        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
-    }
-
-    public QNotification(PathMetadata metadata) {
-        this(metadata, PathInits.getFor(metadata, INITS));
-    }
-
-    public QNotification(PathMetadata metadata, PathInits inits) {
-        this(Notification.class, metadata, inits);
-    }
-
-    public QNotification(Class<? extends Notification> type, PathMetadata metadata, PathInits inits) {
-        super(type, metadata, inits);
-        this.receiver = inits.isInitialized("receiver") ? new com.plaything.api.domain.repository.entity.user.QUser(forProperty("receiver"), inits.get("receiver")) : null;
-    }
+  public QNotification(Class<? extends Notification> type, PathMetadata metadata, PathInits inits) {
+    super(type, metadata, inits);
+    this.receiver =
+        inits.isInitialized("receiver") ? new com.plaything.api.domain.repository.entity.user.QUser(
+            forProperty("receiver"), inits.get("receiver")) : null;
+  }
 
 }
 

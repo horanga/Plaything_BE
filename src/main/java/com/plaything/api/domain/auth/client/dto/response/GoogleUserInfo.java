@@ -6,10 +6,11 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class GoogleUserInfo {
-    private String sub;
-    private String provider;
 
-    public void setProvider() {
-        this.provider = "Google";
-    }
+  private String sub;
+  private String provider;
+
+  public void setProvider() {
+    this.provider = "Google";
+  }
 }

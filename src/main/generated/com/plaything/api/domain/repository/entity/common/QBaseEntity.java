@@ -15,25 +15,25 @@ import com.querydsl.core.types.Path;
 @Generated("com.querydsl.codegen.DefaultSupertypeSerializer")
 public class QBaseEntity extends EntityPathBase<BaseEntity> {
 
-    private static final long serialVersionUID = -648960741L;
+  public static final QBaseEntity baseEntity = new QBaseEntity("baseEntity");
+  private static final long serialVersionUID = -648960741L;
+  public final DateTimePath<java.time.LocalDateTime> createdAt = createDateTime("createdAt",
+      java.time.LocalDateTime.class);
 
-    public static final QBaseEntity baseEntity = new QBaseEntity("baseEntity");
+  public final DateTimePath<java.time.LocalDateTime> modifiedAt = createDateTime("modifiedAt",
+      java.time.LocalDateTime.class);
 
-    public final DateTimePath<java.time.LocalDateTime> createdAt = createDateTime("createdAt", java.time.LocalDateTime.class);
+  public QBaseEntity(String variable) {
+    super(BaseEntity.class, forVariable(variable));
+  }
 
-    public final DateTimePath<java.time.LocalDateTime> modifiedAt = createDateTime("modifiedAt", java.time.LocalDateTime.class);
+  public QBaseEntity(Path<? extends BaseEntity> path) {
+    super(path.getType(), path.getMetadata());
+  }
 
-    public QBaseEntity(String variable) {
-        super(BaseEntity.class, forVariable(variable));
-    }
-
-    public QBaseEntity(Path<? extends BaseEntity> path) {
-        super(path.getType(), path.getMetadata());
-    }
-
-    public QBaseEntity(PathMetadata metadata) {
-        super(BaseEntity.class, metadata);
-    }
+  public QBaseEntity(PathMetadata metadata) {
+    super(BaseEntity.class, metadata);
+  }
 
 }
 

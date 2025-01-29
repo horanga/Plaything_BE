@@ -16,36 +16,37 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QProfileImageRegistration extends EntityPathBase<ProfileImageRegistration> {
 
-    private static final long serialVersionUID = 1115591099L;
+  public static final QProfileImageRegistration profileImageRegistration = new QProfileImageRegistration(
+      "profileImageRegistration");
+  private static final long serialVersionUID = 1115591099L;
+  private static final PathInits INITS = PathInits.DIRECT2;
+  public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    private static final PathInits INITS = PathInits.DIRECT2;
+  public final com.plaything.api.domain.repository.entity.user.profile.QProfileImage profileImage;
 
-    public static final QProfileImageRegistration profileImageRegistration = new QProfileImageRegistration("profileImageRegistration");
+  public QProfileImageRegistration(String variable) {
+    this(ProfileImageRegistration.class, forVariable(variable), INITS);
+  }
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+  public QProfileImageRegistration(Path<? extends ProfileImageRegistration> path) {
+    this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
+  }
 
-    public final com.plaything.api.domain.repository.entity.user.profile.QProfileImage profileImage;
+  public QProfileImageRegistration(PathMetadata metadata) {
+    this(metadata, PathInits.getFor(metadata, INITS));
+  }
 
-    public QProfileImageRegistration(String variable) {
-        this(ProfileImageRegistration.class, forVariable(variable), INITS);
-    }
+  public QProfileImageRegistration(PathMetadata metadata, PathInits inits) {
+    this(ProfileImageRegistration.class, metadata, inits);
+  }
 
-    public QProfileImageRegistration(Path<? extends ProfileImageRegistration> path) {
-        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
-    }
-
-    public QProfileImageRegistration(PathMetadata metadata) {
-        this(metadata, PathInits.getFor(metadata, INITS));
-    }
-
-    public QProfileImageRegistration(PathMetadata metadata, PathInits inits) {
-        this(ProfileImageRegistration.class, metadata, inits);
-    }
-
-    public QProfileImageRegistration(Class<? extends ProfileImageRegistration> type, PathMetadata metadata, PathInits inits) {
-        super(type, metadata, inits);
-        this.profileImage = inits.isInitialized("profileImage") ? new com.plaything.api.domain.repository.entity.user.profile.QProfileImage(forProperty("profileImage"), inits.get("profileImage")) : null;
-    }
+  public QProfileImageRegistration(Class<? extends ProfileImageRegistration> type,
+      PathMetadata metadata, PathInits inits) {
+    super(type, metadata, inits);
+    this.profileImage = inits.isInitialized("profileImage")
+        ? new com.plaything.api.domain.repository.entity.user.profile.QProfileImage(
+        forProperty("profileImage"), inits.get("profileImage")) : null;
+  }
 
 }
 

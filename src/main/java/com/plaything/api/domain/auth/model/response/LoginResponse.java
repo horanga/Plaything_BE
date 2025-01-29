@@ -4,6 +4,7 @@ import java.util.List;
 
 public record LoginResponse(
 
-        List<Login> list
+    List<Login> list
 ) {
+
 }

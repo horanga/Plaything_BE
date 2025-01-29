@@ -18,18 +18,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/notification")
 public class NotificationControllerV1 {
 
-    private final NotificationServiceV1 notificationServiceV1;
+  private final NotificationServiceV1 notificationServiceV1;
 
-    @Operation(
-            summary = "Get notification",
-            description = "알림 목록 조회하기"
-    )
-    @SecurityRequirement(name = "Authorization")
-    @GetMapping("/get-notification")
-    public NotificationResponse getNotification(
-            @AuthenticationPrincipal UserDetails userDetails
-    ) {
-        String user = userDetails.getUsername();
-        return new NotificationResponse(notificationServiceV1.getNotification(user));
-    }
+  @Operation(
+      summary = "Get notification",
+      description = "알림 목록 조회하기"
+  )
+  @SecurityRequirement(name = "Authorization")
+  @GetMapping("/get-notification")
+  public NotificationResponse getNotification(
+      @AuthenticationPrincipal UserDetails userDetails
+  ) {
+    String user = userDetails.getUsername();
+    return new NotificationResponse(notificationServiceV1.getNotification(user));
+  }
 }

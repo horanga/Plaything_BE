@@ -5,13 +5,12 @@ import com.plaything.api.domain.index.service.IndexServiceV1;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @Tag(name = "Index", description = "V1 Auth API")
 
@@ -19,20 +18,20 @@ import java.util.List;
 @RestController
 public class IndexController {
 
-    private final IndexServiceV1 indexServiceV1;
+  private final IndexServiceV1 indexServiceV1;
 
-    @Operation(
-            summary = "새로운 메시지 여부를 확인",
-            description = "새로운 메시지가 있는지 확인하는 용도입니다"
-    )
-    @SecurityRequirement(name = "Authorization")
-    @GetMapping
-    public IndexResponse refreshIndex(
-            @AuthenticationPrincipal UserDetails userDetails
-    ) {
+  @Operation(
+      summary = "새로운 메시지 여부를 확인",
+      description = "새로운 메시지가 있는지 확인하는 용도입니다"
+  )
+  @SecurityRequirement(name = "Authorization")
+  @GetMapping
+  public IndexResponse refreshIndex(
+      @AuthenticationPrincipal UserDetails userDetails
+  ) {
 
-        //TODO 웹소켓 연결 끊겼을 때로 변경
-        String user = userDetails.getUsername();
-        return new IndexResponse(List.of(indexServiceV1.refreshIndex(user)));
-    }
+    //TODO 웹소켓 연결 끊겼을 때로 변경
+    String user = userDetails.getUsername();
+    return new IndexResponse(List.of(indexServiceV1.refreshIndex(user)));
+  }
 }

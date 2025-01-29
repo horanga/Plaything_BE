@@ -1,7 +1,11 @@
 package com.plaything.api.domain.repository.entity.log;
 
 import com.plaything.api.domain.repository.entity.common.BaseLogEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,14 +18,14 @@ import lombok.NoArgsConstructor;
 @Entity
 public class KeyUsageLog extends BaseLogEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private long id;
 
-    @Column(nullable = false)
-    private long senderId;
+  @Column(nullable = false)
+  private long senderId;
 
-    @Column(nullable = false)
-    private long receiverId;
+  @Column(nullable = false)
+  private long receiverId;
 
 }

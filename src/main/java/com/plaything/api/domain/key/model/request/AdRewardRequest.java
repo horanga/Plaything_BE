@@ -9,13 +9,14 @@ import jakarta.validation.constraints.Positive;
 @Schema(description = "광고 리워드 제공")
 public record AdRewardRequest(
 
-        @Schema(description = "광고 유형")
-        @NotBlank
-        String adType,
+    @Schema(description = "광고 유형")
+    @NotBlank
+    String adType,
 
-        @Schema(description = "광고 시청 시간")
-        @Positive
-        @NotNull
-        int viewDuration
+    @Schema(description = "광고 시청 시간")
+    @Positive
+    @NotNull
+    int viewDuration
 ) {
+
 }

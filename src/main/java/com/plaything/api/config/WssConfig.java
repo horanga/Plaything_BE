@@ -21,56 +21,57 @@ import org.springframework.web.socket.handler.WebSocketHandlerDecorator;
 @RequiredArgsConstructor
 public class WssConfig implements WebSocketMessageBrokerConfigurer {
 
-    private final StompHandler stompHandler;
-    private final StompErrorHandler stompErrorHandler;
+  private final StompHandler stompHandler;
+  private final StompErrorHandler stompErrorHandler;
 
-    @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(stompHandler);
-    }
+  @Override
+  public void configureClientInboundChannel(ChannelRegistration registration) {
+    registration.interceptors(stompHandler);
+  }
 
-    @Override
-    public void configureMessageBroker(MessageBrokerRegistry registry) {
-        //pub, sub 경로 지정
-        //응답을 내려주는 경로
-        registry.enableSimpleBroker("/user")
-                .setTaskScheduler(taskScheduler())
-                .setHeartbeatValue(new long[]{10000, 10000});
-        registry.setUserDestinationPrefix("/user");
-        registry.setApplicationDestinationPrefixes("/pub");
-    }
+  @Override
+  public void configureMessageBroker(MessageBrokerRegistry registry) {
+    //pub, sub 경로 지정
+    //응답을 내려주는 경로
+    registry.enableSimpleBroker("/user")
+        .setTaskScheduler(taskScheduler())
+        .setHeartbeatValue(new long[]{10000, 10000});
+    registry.setUserDestinationPrefix("/user");
+    registry.setApplicationDestinationPrefixes("/pub");
+  }
 
-    public TaskScheduler taskScheduler() {
-        ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
-        taskScheduler.initialize();
-        return taskScheduler;
-    }
+  public TaskScheduler taskScheduler() {
+    ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
+    taskScheduler.initialize();
+    return taskScheduler;
+  }
 
-    @Override
-    public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws-stomp")
-                .setAllowedOrigins("http://localhost:3000",
-                        "https://jiangxy.github.io");
-        registry.setErrorHandler(stompErrorHandler);
-    }
+  @Override
+  public void registerStompEndpoints(StompEndpointRegistry registry) {
+    registry.addEndpoint("/ws-stomp")
+        .setAllowedOrigins("http://localhost:3000",
+            "https://jiangxy.github.io");
+    registry.setErrorHandler(stompErrorHandler);
+  }
 
-    @Override
-    public void configureWebSocketTransport(WebSocketTransportRegistration registration) {
-        registration.setMessageSizeLimit(128 * 1024)
-                .setSendTimeLimit(2 * 10000)
-                .setSendBufferSizeLimit(512 * 1024)
-                .addDecoratorFactory(handler -> new WebSocketHandlerDecorator(handler) {
-                    @Override
-                    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-                        super.afterConnectionEstablished(session);
-                    }
+  @Override
+  public void configureWebSocketTransport(WebSocketTransportRegistration registration) {
+    registration.setMessageSizeLimit(128 * 1024)
+        .setSendTimeLimit(2 * 10000)
+        .setSendBufferSizeLimit(512 * 1024)
+        .addDecoratorFactory(handler -> new WebSocketHandlerDecorator(handler) {
+          @Override
+          public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+            super.afterConnectionEstablished(session);
+          }
 
-                    @Override
-                    public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
-                        session.close(CloseStatus.SERVER_ERROR);
-                        super.handleTransportError(session, exception);
-                    }
-                });
-    }
+          @Override
+          public void handleTransportError(WebSocketSession session, Throwable exception)
+              throws Exception {
+            session.close(CloseStatus.SERVER_ERROR);
+            super.handleTransportError(session, exception);
+          }
+        });
+  }
 
 }

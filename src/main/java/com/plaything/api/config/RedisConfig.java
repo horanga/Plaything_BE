@@ -2,6 +2,8 @@ package com.plaything.api.config;
 
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.SocketOptions;
+import java.time.Duration;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,61 +17,60 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import java.time.Duration;
-import java.util.List;
-
 @Configuration
 public class RedisConfig {
-    @Value("${spring.data.redis.host}")
-    private String host;
 
-    @Value("${spring.data.redis.port}")
-    private int port;
+  @Value("${spring.data.redis.host}")
+  private String host;
 
-    @Bean
-    public RedisConnectionFactory redisConnectionFactory() {
+  @Value("${spring.data.redis.port}")
+  private int port;
 
-        SocketOptions socketOptions = SocketOptions.builder()
-                .connectTimeout(Duration.ofSeconds(10))
-                .build();
+  @Bean
+  public RedisConnectionFactory redisConnectionFactory() {
 
-        LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
-                .clientOptions(ClientOptions.builder()
-                        .disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS)
-                        .autoReconnect(true)
-                        .socketOptions(socketOptions)
-                        .build())
-                .commandTimeout(Duration.ofSeconds(5))
-                .useSsl()
-                .build();
+    SocketOptions socketOptions = SocketOptions.builder()
+        .connectTimeout(Duration.ofSeconds(10))
+        .build();
 
-        RedisStandaloneConfiguration serverConfig = new RedisStandaloneConfiguration(host, port);
+    LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
+        .clientOptions(ClientOptions.builder()
+            .disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS)
+            .autoReconnect(true)
+            .socketOptions(socketOptions)
+            .build())
+        .commandTimeout(Duration.ofSeconds(5))
+        .useSsl()
+        .build();
 
-        LettuceConnectionFactory factory = new LettuceConnectionFactory(serverConfig, clientConfig);
-        factory.setPipeliningFlushPolicy(LettuceConnection.PipeliningFlushPolicy.buffered(1000));
+    RedisStandaloneConfiguration serverConfig = new RedisStandaloneConfiguration(host, port);
 
-        return factory;
-    }
+    LettuceConnectionFactory factory = new LettuceConnectionFactory(serverConfig, clientConfig);
+    factory.setPipeliningFlushPolicy(LettuceConnection.PipeliningFlushPolicy.buffered(1000));
 
-    @Bean
-    @Primary
-    public RedisTemplate<String, String> redisTemplate() {
-        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(redisConnectionFactory());
+    return factory;
+  }
 
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new StringRedisSerializer());
-        redisTemplate.setEnableTransactionSupport(false);
+  @Bean
+  @Primary
+  public RedisTemplate<String, String> redisTemplate() {
+    RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+    redisTemplate.setConnectionFactory(redisConnectionFactory());
 
-        return redisTemplate;
-    }
+    redisTemplate.setKeySerializer(new StringRedisSerializer());
+    redisTemplate.setValueSerializer(new StringRedisSerializer());
+    redisTemplate.setEnableTransactionSupport(false);
 
-    @Bean
-    public RedisTemplate<String, List<String>> listRedisTemplate(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, List<String>> template = new RedisTemplate<>();
-        template.setConnectionFactory(connectionFactory);
-        template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(List.class));
-        return template;
-    }
+    return redisTemplate;
+  }
+
+  @Bean
+  public RedisTemplate<String, List<String>> listRedisTemplate(
+      RedisConnectionFactory connectionFactory) {
+    RedisTemplate<String, List<String>> template = new RedisTemplate<>();
+    template.setConnectionFactory(connectionFactory);
+    template.setKeySerializer(new StringRedisSerializer());
+    template.setValueSerializer(new Jackson2JsonRedisSerializer<>(List.class));
+    return template;
+  }
 }

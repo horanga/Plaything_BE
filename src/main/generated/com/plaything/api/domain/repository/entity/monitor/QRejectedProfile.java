@@ -16,44 +16,44 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QRejectedProfile extends EntityPathBase<RejectedProfile> {
 
-    private static final long serialVersionUID = -680550757L;
+  public static final QRejectedProfile rejectedProfile = new QRejectedProfile("rejectedProfile");
+  private static final long serialVersionUID = -680550757L;
+  private static final PathInits INITS = PathInits.DIRECT2;
+  public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    private static final PathInits INITS = PathInits.DIRECT2;
+  public final StringPath introduction = createString("introduction");
 
-    public static final QRejectedProfile rejectedProfile = new QRejectedProfile("rejectedProfile");
+  public final StringPath nickName = createString("nickName");
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+  public final NumberPath<Long> profileId = createNumber("profileId", Long.class);
 
-    public final StringPath introduction = createString("introduction");
+  public final StringPath rejectedReason = createString("rejectedReason");
 
-    public final StringPath nickName = createString("nickName");
+  public final com.plaything.api.domain.repository.entity.user.QUser user;
 
-    public final NumberPath<Long> profileId = createNumber("profileId", Long.class);
+  public QRejectedProfile(String variable) {
+    this(RejectedProfile.class, forVariable(variable), INITS);
+  }
 
-    public final StringPath rejectedReason = createString("rejectedReason");
+  public QRejectedProfile(Path<? extends RejectedProfile> path) {
+    this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
+  }
 
-    public final com.plaything.api.domain.repository.entity.user.QUser user;
+  public QRejectedProfile(PathMetadata metadata) {
+    this(metadata, PathInits.getFor(metadata, INITS));
+  }
 
-    public QRejectedProfile(String variable) {
-        this(RejectedProfile.class, forVariable(variable), INITS);
-    }
+  public QRejectedProfile(PathMetadata metadata, PathInits inits) {
+    this(RejectedProfile.class, metadata, inits);
+  }
 
-    public QRejectedProfile(Path<? extends RejectedProfile> path) {
-        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
-    }
-
-    public QRejectedProfile(PathMetadata metadata) {
-        this(metadata, PathInits.getFor(metadata, INITS));
-    }
-
-    public QRejectedProfile(PathMetadata metadata, PathInits inits) {
-        this(RejectedProfile.class, metadata, inits);
-    }
-
-    public QRejectedProfile(Class<? extends RejectedProfile> type, PathMetadata metadata, PathInits inits) {
-        super(type, metadata, inits);
-        this.user = inits.isInitialized("user") ? new com.plaything.api.domain.repository.entity.user.QUser(forProperty("user"), inits.get("user")) : null;
-    }
+  public QRejectedProfile(Class<? extends RejectedProfile> type, PathMetadata metadata,
+      PathInits inits) {
+    super(type, metadata, inits);
+    this.user =
+        inits.isInitialized("user") ? new com.plaything.api.domain.repository.entity.user.QUser(
+            forProperty("user"), inits.get("user")) : null;
+  }
 
 }
 

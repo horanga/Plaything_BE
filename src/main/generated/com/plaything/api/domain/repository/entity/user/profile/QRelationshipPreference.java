@@ -18,38 +18,39 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QRelationshipPreference extends EntityPathBase<RelationshipPreference> {
 
-    private static final long serialVersionUID = 1427805119L;
+  public static final QRelationshipPreference relationshipPreference1 = new QRelationshipPreference(
+      "relationshipPreference1");
+  private static final long serialVersionUID = 1427805119L;
+  private static final PathInits INITS = PathInits.DIRECT2;
+  public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    private static final PathInits INITS = PathInits.DIRECT2;
+  public final QProfile profile;
 
-    public static final QRelationshipPreference relationshipPreference1 = new QRelationshipPreference("relationshipPreference1");
+  public final EnumPath<com.plaything.api.domain.profile.constants.RelationshipPreferenceConstant> relationshipPreference = createEnum(
+      "relationshipPreferenceList",
+      com.plaything.api.domain.profile.constants.RelationshipPreferenceConstant.class);
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+  public QRelationshipPreference(String variable) {
+    this(RelationshipPreference.class, forVariable(variable), INITS);
+  }
 
-    public final QProfile profile;
+  public QRelationshipPreference(Path<? extends RelationshipPreference> path) {
+    this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
+  }
 
-    public final EnumPath<com.plaything.api.domain.profile.constants.RelationshipPreferenceConstant> relationshipPreference = createEnum("relationshipPreferenceList", com.plaything.api.domain.profile.constants.RelationshipPreferenceConstant.class);
+  public QRelationshipPreference(PathMetadata metadata) {
+    this(metadata, PathInits.getFor(metadata, INITS));
+  }
 
-    public QRelationshipPreference(String variable) {
-        this(RelationshipPreference.class, forVariable(variable), INITS);
-    }
+  public QRelationshipPreference(PathMetadata metadata, PathInits inits) {
+    this(RelationshipPreference.class, metadata, inits);
+  }
 
-    public QRelationshipPreference(Path<? extends RelationshipPreference> path) {
-        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
-    }
-
-    public QRelationshipPreference(PathMetadata metadata) {
-        this(metadata, PathInits.getFor(metadata, INITS));
-    }
-
-    public QRelationshipPreference(PathMetadata metadata, PathInits inits) {
-        this(RelationshipPreference.class, metadata, inits);
-    }
-
-    public QRelationshipPreference(Class<? extends RelationshipPreference> type, PathMetadata metadata, PathInits inits) {
-        super(type, metadata, inits);
-        this.profile = inits.isInitialized("profile") ? new QProfile(forProperty("profile")) : null;
-    }
+  public QRelationshipPreference(Class<? extends RelationshipPreference> type,
+      PathMetadata metadata, PathInits inits) {
+    super(type, metadata, inits);
+    this.profile = inits.isInitialized("profile") ? new QProfile(forProperty("profile")) : null;
+  }
 
 }
 

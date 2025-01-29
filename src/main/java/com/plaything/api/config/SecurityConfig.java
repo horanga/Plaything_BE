@@ -23,70 +23,70 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SecurityConfig {
 
-    //AuthenticationManager가 인자로 받을 AuthenticationConfiguraion 객체 생성자 주입
-    private final AuthenticationConfiguration authenticationConfiguration;
-    private final JWTProvider jwtProvider;
-    private final ObjectMapper objectMapper;
-    private final LoginSuccessHandler loginSuccessHandler;
+  //AuthenticationManager가 인자로 받을 AuthenticationConfiguraion 객체 생성자 주입
+  private final AuthenticationConfiguration authenticationConfiguration;
+  private final JWTProvider jwtProvider;
+  private final ObjectMapper objectMapper;
+  private final LoginSuccessHandler loginSuccessHandler;
 
-    public SecurityConfig(
-            AuthenticationConfiguration authenticationConfiguration,
-            JWTProvider jwtProvider,
-            ObjectMapper objectMapper,
-            LoginSuccessHandler loginSuccessHandler) {
+  public SecurityConfig(
+      AuthenticationConfiguration authenticationConfiguration,
+      JWTProvider jwtProvider,
+      ObjectMapper objectMapper,
+      LoginSuccessHandler loginSuccessHandler) {
 
-        this.authenticationConfiguration = authenticationConfiguration;
-        this.jwtProvider = jwtProvider;
-        this.objectMapper = objectMapper;
-        this.loginSuccessHandler = loginSuccessHandler;
-    }
+    this.authenticationConfiguration = authenticationConfiguration;
+    this.jwtProvider = jwtProvider;
+    this.objectMapper = objectMapper;
+    this.loginSuccessHandler = loginSuccessHandler;
+  }
 
 
-    //AuthenticationManager Bean 등록
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+  //AuthenticationManager Bean 등록
+  @Bean
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
+      throws Exception {
 
-        return configuration.getAuthenticationManager();
-    }
+    return configuration.getAuthenticationManager();
+  }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http.csrf(AbstractHttpConfigurer::disable);
+    http.csrf(AbstractHttpConfigurer::disable);
 
-        //Form 로그인 disable
-        http.formLogin(AbstractHttpConfigurer::disable);
+    //Form 로그인 disable
+    http.formLogin(AbstractHttpConfigurer::disable);
 
-        //Http basic 인증방식 disable
-        http.httpBasic(AbstractHttpConfigurer::disable);
+    //Http basic 인증방식 disable
+    http.httpBasic(AbstractHttpConfigurer::disable);
 
-        http.addFilterBefore(
-                new JWTFilter(jwtProvider),
-                UsernamePasswordAuthenticationFilter.class
+    http.addFilterBefore(
+        new JWTFilter(jwtProvider),
+        UsernamePasswordAuthenticationFilter.class
+    );
+    http
+        .exceptionHandling(exception -> exception
+            .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+            .accessDeniedHandler(new CustomAccessDeniedHandler())
+        )
+        .authorizeHttpRequests(auth ->
+            auth.requestMatchers(SecurityConstants.getAuthWhitelist()).permitAll()
+                .requestMatchers("/admin").hasRole("ADMIN")
+                .requestMatchers("/error").permitAll()
+                .anyRequest().authenticated()
         );
-        http
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
-                        .accessDeniedHandler(new CustomAccessDeniedHandler())
-                )
-                .authorizeHttpRequests(auth ->
-                        auth.requestMatchers(SecurityConstants.getAuthWhitelist()).permitAll()
-                                .requestMatchers("/admin").hasRole("ADMIN")
-                                .requestMatchers("/error").permitAll()
-                                .anyRequest().authenticated()
-                );
+
+    //세션 설정
+    http.sessionManagement((session -> session
+        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)));
+
+    return http.build();
+  }
 
 
-        //세션 설정
-        http.sessionManagement((session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)));
-
-        return http.build();
-    }
-
-
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+  @Bean
+  public BCryptPasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 }

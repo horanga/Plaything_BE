@@ -15,35 +15,34 @@ import com.querydsl.core.types.Path;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QMatching extends EntityPathBase<Matching> {
 
-    private static final long serialVersionUID = -1359449614L;
+  public static final QMatching matching = new QMatching("matching");
+  private static final long serialVersionUID = -1359449614L;
+  public final com.plaything.api.domain.repository.entity.common.QBaseEntity _super = new com.plaything.api.domain.repository.entity.common.QBaseEntity(
+      this);
 
-    public static final QMatching matching = new QMatching("matching");
+  //inherited
+  public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
-    public final com.plaything.api.domain.repository.entity.common.QBaseEntity _super = new com.plaything.api.domain.repository.entity.common.QBaseEntity(this);
+  public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    //inherited
-    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
+  //inherited
+  public final DateTimePath<java.time.LocalDateTime> modifiedAt = _super.modifiedAt;
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+  public final NumberPath<Long> receiverId = createNumber("receiverId", Long.class);
 
-    //inherited
-    public final DateTimePath<java.time.LocalDateTime> modifiedAt = _super.modifiedAt;
+  public final NumberPath<Long> senderId = createNumber("senderId", Long.class);
 
-    public final NumberPath<Long> receiverId = createNumber("receiverId", Long.class);
+  public QMatching(String variable) {
+    super(Matching.class, forVariable(variable));
+  }
 
-    public final NumberPath<Long> senderId = createNumber("senderId", Long.class);
+  public QMatching(Path<? extends Matching> path) {
+    super(path.getType(), path.getMetadata());
+  }
 
-    public QMatching(String variable) {
-        super(Matching.class, forVariable(variable));
-    }
-
-    public QMatching(Path<? extends Matching> path) {
-        super(path.getType(), path.getMetadata());
-    }
-
-    public QMatching(PathMetadata metadata) {
-        super(Matching.class, metadata);
-    }
+  public QMatching(PathMetadata metadata) {
+    super(Matching.class, metadata);
+  }
 
 }
 

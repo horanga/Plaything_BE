@@ -15,25 +15,23 @@ import com.querydsl.core.types.Path;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QUserCredentials extends EntityPathBase<UserCredentials> {
 
-    private static final long serialVersionUID = 1804611690L;
+  public static final QUserCredentials userCredentials = new QUserCredentials("userCredentials");
+  private static final long serialVersionUID = 1804611690L;
+  public final StringPath hashedPassword = createString("hashedPassword");
 
-    public static final QUserCredentials userCredentials = new QUserCredentials("userCredentials");
+  public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final StringPath hashedPassword = createString("hashedPassword");
+  public QUserCredentials(String variable) {
+    super(UserCredentials.class, forVariable(variable));
+  }
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+  public QUserCredentials(Path<? extends UserCredentials> path) {
+    super(path.getType(), path.getMetadata());
+  }
 
-    public QUserCredentials(String variable) {
-        super(UserCredentials.class, forVariable(variable));
-    }
-
-    public QUserCredentials(Path<? extends UserCredentials> path) {
-        super(path.getType(), path.getMetadata());
-    }
-
-    public QUserCredentials(PathMetadata metadata) {
-        super(UserCredentials.class, metadata);
-    }
+  public QUserCredentials(PathMetadata metadata) {
+    super(UserCredentials.class, metadata);
+  }
 
 }
 

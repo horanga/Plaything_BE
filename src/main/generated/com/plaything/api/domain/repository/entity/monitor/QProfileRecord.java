@@ -16,44 +16,45 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QProfileRecord extends EntityPathBase<ProfileRecord> {
 
-    private static final long serialVersionUID = 62967466L;
+  public static final QProfileRecord profileRecord = new QProfileRecord("profileRecord");
+  private static final long serialVersionUID = 62967466L;
+  private static final PathInits INITS = PathInits.DIRECT2;
+  public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    private static final PathInits INITS = PathInits.DIRECT2;
+  public final StringPath introduction = createString("introduction");
 
-    public static final QProfileRecord profileRecord = new QProfileRecord("profileRecord");
+  public final StringPath nickName = createString("nickName");
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+  public final NumberPath<Long> profileId = createNumber("profileId", Long.class);
 
-    public final StringPath introduction = createString("introduction");
+  public final EnumPath<com.plaything.api.domain.profile.constants.ProfileStatus> profileStatus = createEnum(
+      "profileStatus", com.plaything.api.domain.profile.constants.ProfileStatus.class);
 
-    public final StringPath nickName = createString("nickName");
+  public final com.plaything.api.domain.repository.entity.user.QUser user;
 
-    public final NumberPath<Long> profileId = createNumber("profileId", Long.class);
+  public QProfileRecord(String variable) {
+    this(ProfileRecord.class, forVariable(variable), INITS);
+  }
 
-    public final EnumPath<com.plaything.api.domain.profile.constants.ProfileStatus> profileStatus = createEnum("profileStatus", com.plaything.api.domain.profile.constants.ProfileStatus.class);
+  public QProfileRecord(Path<? extends ProfileRecord> path) {
+    this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
+  }
 
-    public final com.plaything.api.domain.repository.entity.user.QUser user;
+  public QProfileRecord(PathMetadata metadata) {
+    this(metadata, PathInits.getFor(metadata, INITS));
+  }
 
-    public QProfileRecord(String variable) {
-        this(ProfileRecord.class, forVariable(variable), INITS);
-    }
+  public QProfileRecord(PathMetadata metadata, PathInits inits) {
+    this(ProfileRecord.class, metadata, inits);
+  }
 
-    public QProfileRecord(Path<? extends ProfileRecord> path) {
-        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
-    }
-
-    public QProfileRecord(PathMetadata metadata) {
-        this(metadata, PathInits.getFor(metadata, INITS));
-    }
-
-    public QProfileRecord(PathMetadata metadata, PathInits inits) {
-        this(ProfileRecord.class, metadata, inits);
-    }
-
-    public QProfileRecord(Class<? extends ProfileRecord> type, PathMetadata metadata, PathInits inits) {
-        super(type, metadata, inits);
-        this.user = inits.isInitialized("user") ? new com.plaything.api.domain.repository.entity.user.QUser(forProperty("user"), inits.get("user")) : null;
-    }
+  public QProfileRecord(Class<? extends ProfileRecord> type, PathMetadata metadata,
+      PathInits inits) {
+    super(type, metadata, inits);
+    this.user =
+        inits.isInitialized("user") ? new com.plaything.api.domain.repository.entity.user.QUser(
+            forProperty("user"), inits.get("user")) : null;
+  }
 
 }
 

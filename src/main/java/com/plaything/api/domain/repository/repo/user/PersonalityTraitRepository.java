@@ -4,4 +4,5 @@ import com.plaything.api.domain.repository.entity.profile.PersonalityTrait;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PersonalityTraitRepository extends JpaRepository<PersonalityTrait, Long> {
+
 }

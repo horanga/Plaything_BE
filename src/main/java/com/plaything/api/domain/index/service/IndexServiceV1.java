@@ -10,12 +10,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class IndexServiceV1 {
 
-    private final ChatRoomQueryRepository chatRoomQueryRepository;
-    private final ProfileFacadeV1 profileFacadeV1;
+  private final ChatRoomQueryRepository chatRoomQueryRepository;
+  private final ProfileFacadeV1 profileFacadeV1;
 
-    //TODO 추후 레디스로 변경
-    public Index refreshIndex(String loginId) {
-        boolean newChat = chatRoomQueryRepository.findNewChat(loginId);
-        return new Index(newChat);
-    }
+  //TODO 추후 레디스로 변경
+  public Index refreshIndex(String loginId) {
+    boolean newChat = chatRoomQueryRepository.findNewChat(loginId);
+    return new Index(newChat);
+  }
 }

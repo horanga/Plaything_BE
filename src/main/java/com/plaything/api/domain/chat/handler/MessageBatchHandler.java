@@ -6,88 +6,93 @@ import com.plaything.api.domain.notification.service.FcmServiceV1;
 import com.plaything.api.domain.profile.util.ImageUrlGenerator;
 import com.plaything.api.domain.repository.entity.profile.Profile;
 import com.plaything.api.domain.repository.repo.profile.ProfileRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
 public class MessageBatchHandler {
 
-    private static final int WAIT_TIME_SECONDS = 5;
+  private static final int WAIT_TIME_SECONDS = 5;
 
-    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-    private final Map<String, Queue<ChatRequest>> messageQueues = new ConcurrentHashMap<>();
-    private final Map<String, ScheduledFuture<?>> scheduledTasks = new ConcurrentHashMap<>();
+  private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+  private final Map<String, Queue<ChatRequest>> messageQueues = new ConcurrentHashMap<>();
+  private final Map<String, ScheduledFuture<?>> scheduledTasks = new ConcurrentHashMap<>();
 
-    @Autowired
-    private final FcmServiceV1 fcmService;
+  @Autowired
+  private final FcmServiceV1 fcmService;
 
-    @Autowired
-    private final ProfileRepository profileRepository;
+  @Autowired
+  private final ProfileRepository profileRepository;
 
-    @Autowired
-    private final ImageUrlGenerator imageUrlGenerator;
+  @Autowired
+  private final ImageUrlGenerator imageUrlGenerator;
 
-    public void queueMessage(String userId, ChatRequest chatRequest, String fcmToken) {
-        if (!scheduledTasks.containsKey(userId)) {
-            scheduleMessageDelivery(userId, fcmToken);
-        }
-        Queue<ChatRequest> queue = messageQueues.computeIfAbsent(userId, k -> new ConcurrentLinkedQueue<>());
-
-        queue.offer(chatRequest);
+  public void queueMessage(String userId, ChatRequest chatRequest, String fcmToken) {
+    if (!scheduledTasks.containsKey(userId)) {
+      scheduleMessageDelivery(userId, fcmToken);
     }
+    Queue<ChatRequest> queue = messageQueues.computeIfAbsent(userId,
+        k -> new ConcurrentLinkedQueue<>());
 
-    public void scheduleMessageDelivery(String userId, String fcmToken) {
-        ScheduledFuture<?> task = scheduler.schedule(
-                () -> sendFirebaseNotification(userId, fcmToken),
-                WAIT_TIME_SECONDS,
-                TimeUnit.SECONDS
-        );
-        scheduledTasks.put(userId, task);
-    }
+    queue.offer(chatRequest);
+  }
 
-    public void sendFirebaseNotification(String userId, String fcmToken) {
-        try {
-            Queue<ChatRequest> queue = messageQueues.get(userId);
-            if (queue == null || queue.isEmpty()) {
-                return;
-            }
+  public void scheduleMessageDelivery(String userId, String fcmToken) {
+    ScheduledFuture<?> task = scheduler.schedule(
+        () -> sendFirebaseNotification(userId, fcmToken),
+        WAIT_TIME_SECONDS,
+        TimeUnit.SECONDS
+    );
+    scheduledTasks.put(userId, task);
+  }
 
-            List<ChatRequest> messages = new ArrayList<>();
-            ChatRequest message;
-            while ((message = queue.poll()) != null) {
-                messages.add(message);
-            }
+  public void sendFirebaseNotification(String userId, String fcmToken) {
+    try {
+      Queue<ChatRequest> queue = messageQueues.get(userId);
+      if (queue == null || queue.isEmpty()) {
+        return;
+      }
 
-            Profile profile = profileRepository.findByLoginId(List.of(userId)).get(0);
+      List<ChatRequest> messages = new ArrayList<>();
+      ChatRequest message;
+      while ((message = queue.poll()) != null) {
+        messages.add(message);
+      }
 
-            String imageUrl = imageUrlGenerator.getImageUrl(profile.getMainPhotoFileName());
-            ChatProfile chatProfile = ChatProfile.toResponse(profile, imageUrl);
+      Profile profile = profileRepository.findByLoginId(List.of(userId)).get(0);
 
-            String msg = makeMessage(messages);
+      String imageUrl = imageUrlGenerator.getImageUrl(profile.getMainPhotoFileName());
+      ChatProfile chatProfile = ChatProfile.toResponse(profile, imageUrl);
 
-            // FCM으로만 전송
+      String msg = makeMessage(messages);
+
+      // FCM으로만 전송
 //            fcmService.sendMessageTo(chatProfile, "새로운 메시지가 도착했습니다", msg, fcmToken);
 
-        } catch (Exception e) {
-            log.error("FCM 전송 중 에러 발생", e);
-        } finally {
-            scheduledTasks.remove(userId);
-        }
+    } catch (Exception e) {
+      log.error("FCM 전송 중 에러 발생", e);
+    } finally {
+      scheduledTasks.remove(userId);
     }
+  }
 
-    private String makeMessage(List<ChatRequest> messages) {
-        return messages.size() == 1 ? messages.get(0).chat() :
-                messages.size() + "개의 메시지가 도착했습니다.";
+  private String makeMessage(List<ChatRequest> messages) {
+    return messages.size() == 1 ? messages.get(0).chat() :
+        messages.size() + "개의 메시지가 도착했습니다.";
 
-    }
+  }
 }

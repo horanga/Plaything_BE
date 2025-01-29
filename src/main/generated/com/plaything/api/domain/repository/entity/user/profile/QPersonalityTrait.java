@@ -18,40 +18,40 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QPersonalityTrait extends EntityPathBase<PersonalityTrait> {
 
-    private static final long serialVersionUID = 1110396876L;
+  public static final QPersonalityTrait personalityTrait = new QPersonalityTrait(
+      "personalityTraitList");
+  private static final long serialVersionUID = 1110396876L;
+  private static final PathInits INITS = PathInits.DIRECT2;
+  public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    private static final PathInits INITS = PathInits.DIRECT2;
+  public final BooleanPath isPrimaryTrait = createBoolean("isPrimaryTrait");
 
-    public static final QPersonalityTrait personalityTrait = new QPersonalityTrait("personalityTraitList");
+  public final QProfile profile;
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+  public final EnumPath<com.plaything.api.domain.profile.constants.PersonalityTraitConstant> trait = createEnum(
+      "trait", com.plaything.api.domain.profile.constants.PersonalityTraitConstant.class);
 
-    public final BooleanPath isPrimaryTrait = createBoolean("isPrimaryTrait");
+  public QPersonalityTrait(String variable) {
+    this(PersonalityTrait.class, forVariable(variable), INITS);
+  }
 
-    public final QProfile profile;
+  public QPersonalityTrait(Path<? extends PersonalityTrait> path) {
+    this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
+  }
 
-    public final EnumPath<com.plaything.api.domain.profile.constants.PersonalityTraitConstant> trait = createEnum("trait", com.plaything.api.domain.profile.constants.PersonalityTraitConstant.class);
+  public QPersonalityTrait(PathMetadata metadata) {
+    this(metadata, PathInits.getFor(metadata, INITS));
+  }
 
-    public QPersonalityTrait(String variable) {
-        this(PersonalityTrait.class, forVariable(variable), INITS);
-    }
+  public QPersonalityTrait(PathMetadata metadata, PathInits inits) {
+    this(PersonalityTrait.class, metadata, inits);
+  }
 
-    public QPersonalityTrait(Path<? extends PersonalityTrait> path) {
-        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
-    }
-
-    public QPersonalityTrait(PathMetadata metadata) {
-        this(metadata, PathInits.getFor(metadata, INITS));
-    }
-
-    public QPersonalityTrait(PathMetadata metadata, PathInits inits) {
-        this(PersonalityTrait.class, metadata, inits);
-    }
-
-    public QPersonalityTrait(Class<? extends PersonalityTrait> type, PathMetadata metadata, PathInits inits) {
-        super(type, metadata, inits);
-        this.profile = inits.isInitialized("profile") ? new QProfile(forProperty("profile")) : null;
-    }
+  public QPersonalityTrait(Class<? extends PersonalityTrait> type, PathMetadata metadata,
+      PathInits inits) {
+    super(type, metadata, inits);
+    this.profile = inits.isInitialized("profile") ? new QProfile(forProperty("profile")) : null;
+  }
 
 }
 
