@@ -75,6 +75,7 @@ public class MatchingServiceV1 {
         try {
             notificationServiceV1.saveNotification(
                     MATCHING_REQUEST,
+                    requester.getLoginId(),
                     requester.getProfile(),
                     partner);
         } catch (IOException e) {
