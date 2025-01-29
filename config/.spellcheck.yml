@@ -8,7 +8,10 @@ matrix:
         - wordlists.txt
     pipeline:
       - pyspelling.filters.html: # Swagger 어노테이션 내용 체크
-          comments: false
+          comments: true
+      - pyspelling.filters.code: # 코드 필터
+          comments: true
+          strings: true
     sources:
       - 'src/main/java/com/plaything/api/domain/*/controller/*Controller.java'    # Controller 디렉토리만 검사
     excludes:
