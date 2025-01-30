@@ -27,7 +27,7 @@ public class ApiExceptionHandler {
     }
 
     return ResponseEntity
-        .status(errorResponse.httpStatus())
+        .status(errorResponse.status())
         .body(errorResponse);
   }
 
@@ -38,8 +38,8 @@ public class ApiExceptionHandler {
     discordAlarm.sendServerErrorAlarm(e, request);
 
     ErrorResponse errorResponse = new ErrorResponse(
-        null,
-        HttpStatus.INTERNAL_SERVER_ERROR);
+        "Internal Server Error",
+        HttpStatus.INTERNAL_SERVER_ERROR.value());
 
     log.info(e.getMessage());
 
