@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Monitoring", description = "V1 Profile Monitoring API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/admin/profiles")
+@RequestMapping("/api/v1/admin/profile-monitorings")
 public class ProfileMonitoringController {
 
   private final ProfileMonitoringFacadeV1 profileMonitoringFacadeV1;
@@ -36,29 +35,29 @@ public class ProfileMonitoringController {
       summary = "Get user stats",
       description = "유저 금지 행위 통계"
   )
-  @GetMapping("/{id}")
+  @GetMapping("/users/{userId}/stats")
   public UserStatResponse getUserStats(
-      @PathVariable("id") Long id
+      @PathVariable("userId") Long userId
   ) {
-    return new UserStatResponse(List.of(profileMonitoringFacadeV1.getUserStats(id)));
+    return new UserStatResponse(List.of(profileMonitoringFacadeV1.getUserStats(userId)));
   }
 
   @Operation(
       summary = "Approve profile",
       description = "유저 프로필 승인하기"
   )
-  @DeleteMapping("/{id}")
-  public void approveProfile(@PathVariable("id") long id) {
-    profileMonitoringFacadeV1.approveProfile(id);
+  @PutMapping("/users/{profileId}/approvals")
+  public void approveProfile(@PathVariable("profileId") long profileId) {
+    profileMonitoringFacadeV1.approveProfile(profileId);
   }
 
   @Operation(
       summary = "Approve profile",
       description = "유저 프로필 거절하기"
   )
-  @PutMapping("/{id}")
-  public void rejectProfile(@PathVariable("id") long id,
+  @PutMapping("/users/{profileId}/rejections")
+  public void rejectProfile(@PathVariable("profileId") long profileId,
       @RequestBody String rejectReason) {
-    profileMonitoringFacadeV1.rejectProfile(id, rejectReason);
+    profileMonitoringFacadeV1.rejectProfile(profileId, rejectReason);
   }
 }
